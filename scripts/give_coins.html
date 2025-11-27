@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Give Coins</title>
+</head>
+<body>
+    <h1>Adding coins...</h1>
+    <script>
+        // Change this constant to give different amounts of coins
+        const COINS_TO_ADD = 100;
+
+        // Get current coins
+        const saved = localStorage.getItem("motorcycleTotalCoins");
+        const currentCoins = saved ? parseInt(saved, 10) : 0;
+
+        // Add coins
+        const newTotal = currentCoins + COINS_TO_ADD;
+        localStorage.setItem("motorcycleTotalCoins", newTotal.toString());
+
+        document.body.innerHTML = `<h1>Coins added!</h1><p>Added ${COINS_TO_ADD} coins.</p><p>Previous balance: ${currentCoins}</p><p>New balance: ${newTotal}</p><p>You can close this window and reload your game.</p>`;
+    </script>
+</body>
+</html>

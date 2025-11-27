@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lock Vehicles</title>
+</head>
+<body>
+    <h1>Locking vehicles...</h1>
+    <script>
+        localStorage.setItem("motorcycleUnlockedVehicles", JSON.stringify(["motorcycle"]));
+        document.body.innerHTML = "<h1>Vehicles locked!</h1><p>Only the motorcycle is unlocked now. You can close this window and reload your game.</p>";
+    </script>
+</body>
+</html>
