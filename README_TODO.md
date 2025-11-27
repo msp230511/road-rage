@@ -1,9 +1,11 @@
 # Motorcycle Sidescroller - TODO List
 
 ## Current Status
-The game is in a solid playable state with core mechanics, powerups, difficulty scaling, and polish features implemented.
+
+The game is in a solid playable state with core mechanics, powerups, difficulty scaling, polish features, vehicle unlocking system, and vehicle modification system implemented. Players can now unlock vehicles with coins and purchase mods that will enhance gameplay.
 
 ## Completed Features
+
 - [x] Core game loop and rendering
 - [x] 3-lane motorcycle movement (Arrow Keys / A/D/W)
 - [x] Obstacle spawning and collision detection
@@ -13,6 +15,7 @@ The game is in a solid playable state with core mechanics, powerups, difficulty 
 - [x] Shield powerup (protects from one hit)
 - [x] Bomb powerup (instant game over)
 - [x] Heart powerup (adds health)
+- [x] Coin collectibles (persistent balance)
 - [x] Boost mechanic (hold W/Up Arrow to double speed)
 - [x] Pause/unpause functionality
 - [x] Mute/unmute audio controls
@@ -22,26 +25,38 @@ The game is in a solid playable state with core mechanics, powerups, difficulty 
 - [x] High score tracking (localStorage persistence)
 - [x] Smart obstacle spawning (prevents undodgeable scenarios)
 - [x] Visual polish (road tiles, lane dividers, shield effects)
+- [x] Menu screen with vehicle selection
+- [x] Multiple playable vehicles (motorcycle, sports car, monster truck)
+- [x] Vehicle unlock system with coin prices
+- [x] Vehicle-specific characteristics and rendering
+- [x] Vehicle modification screen
+- [x] Mod unlock system (3 mods per vehicle)
+- [x] Per-vehicle mod state management (localStorage)
+- [x] Modification UI with lock icons and pricing
 
 ## Known Issues
+
 - None currently
 
 ## Future Enhancements (Ideas)
 
 ### Gameplay
+
+- [ ] **NEXT: Implement mod gameplay effects** (currently placeholder)
 - [ ] Multiple difficulty modes (Easy/Normal/Hard)
 - [ ] Different obstacle types (cones, barrels, cars)
 - [ ] More powerup types:
   - [ ] Temporary invincibility star
   - [ ] Speed boost powerup (separate from W key)
-  - [ ] Score multiplier
-  - [ ] Coin/token collectibles
+  - [ ] Score multiplier (could be mod effect)
 - [ ] Combo system (rewards for consecutive dodges)
 - [ ] Achievement system
 - [ ] Different road environments (desert, city, highway)
 - [ ] Weather effects (rain, fog)
+- [ ] Lane expansion (5 lanes at higher scores)
 
 ### UI/UX
+
 - [ ] Start menu/title screen
 - [ ] Settings menu (volume control, key bindings)
 - [ ] Tutorial/instructions screen
@@ -51,11 +66,13 @@ The game is in a solid playable state with core mechanics, powerups, difficulty 
 - [ ] Responsive canvas sizing
 
 ### Audio
+
 - [ ] Sound effects (collision, powerup pickup, boost)
 - [ ] Multiple music tracks
 - [ ] Volume sliders (music and SFX separate)
 
 ### Technical
+
 - [ ] Leaderboard (online or local)
 - [ ] Save game state
 - [ ] Performance optimizations for lower-end devices
@@ -63,6 +80,7 @@ The game is in a solid playable state with core mechanics, powerups, difficulty 
 - [ ] Add analytics/telemetry
 
 ### Polish
+
 - [ ] Better motorcycle sprite/animation
 - [ ] Better obstacle sprites
 - [ ] Background scenery (trees, buildings)
@@ -71,12 +89,86 @@ The game is in a solid playable state with core mechanics, powerups, difficulty 
 - [ ] Better heart powerup rendering
 
 ## Next Priority Tasks
-1. Start menu/title screen - the game currently starts immediately
-2. Sound effects for collisions and powerups
+
+1. **Implement mod gameplay effects** - mods currently have no in-game effects
+2. Sound effects for collisions and powerups (explosion, coin, hitmarker already exist)
 3. Mobile touch controls for broader accessibility
 
+## Vehicle Modification System
+
+### Current Implementation
+
+- **3 vehicles**: Motorcycle (free), Sports Car (50 coins), Monster Truck (100 coins)
+- **3 mods per vehicle**: Each with unique price point
+- **localStorage persistence**: Separate unlock state per vehicle
+- **Modification screen**: Accessible via MODIFY button on each unlocked vehicle
+- **Lock/unlock UI**: Visual feedback for locked/unlocked mods
+
+### Mod Possibilities (Planned Implementation)
+
+#### Mod Categories
+
+1. **Survival/Defense**: Shield-based and damage mitigation
+2. **Health/Recovery**: Max health increases and healing
+3. **Coin/Economy**: Coin value multipliers and spawn rates
+4. **Speed/Mobility**: Boost and lane switching enhancements
+5. **Powerup**: Powerup spawn rates and effectiveness
+6. **Obstacle**: Obstacle spawn rates and hitbox sizes
+7. **Scoring**: Score multipliers
+
+#### Vehicle-Specific Mod Themes
+
+**Motorcycle (Beginner-Friendly/Balanced)**
+
+- Theme: Defense and survival for learning the game
+- Mod 1 (25 coins): Start with shield
+- Mod 2 (40 coins): Hearts spawn 25% more frequently
+- Mod 3 (60 coins): 20% chance to survive critical hit
+
+**Sports Car (Speed/Risk-Reward)**
+
+- Theme: Speed and earning potential
+- Mod 1 (30 coins): 25% faster boost speed
+- Mod 2 (50 coins): Coins worth 2x (high risk → high reward)
+- Mod 3 (75 coins): Score multiplier 1.5x
+
+**Monster Truck (Tank/Durability)**
+
+- Theme: Maximum survivability and durability
+- Mod 1 (40 coins): +1 max health (start with 4 hearts)
+- Mod 2 (65 coins): Shields protect against 2 hits
+- Mod 3 (100 coins): 35% chance to survive any fatal hit
+
+#### Additional Mod Ideas (Future)
+
+- Magnetic coin collection (auto-collect nearby coins)
+- 25% chance to gain heart instead of dying on bomb
+- Invincibility for first 3 seconds of each life
+- Shield automatically regenerates every 30 seconds
+- Obstacles move 10% slower
+- 30% smaller hitbox on vehicle
+- Permanent speed boost available
+- Powerups have larger pickup radius
+- Heal 1 heart every 1000 points
+
+### Implementation Notes
+
+- Check `isModUnlocked(vehicleType, modId)` during gameplay
+- Apply effects in relevant game logic:
+  - Survival chances → collision detection
+  - Spawn rates → spawn chance constants
+  - Score/coin multipliers → reward calculations
+  - Starting bonuses → startGame() function
+- Current VEHICLE_MODS config: `game.js:194-211`
+- Mod management functions: `game.js:240-274`
+- Mod UI: `index.html:64-134`, `style.css:268-402`
+
 ## Notes
+
 - Game currently runs at 60 FPS via requestAnimationFrame
-- All game state is in single `game` object for easy serialization
+- All game state in single `game` object for easy serialization
 - No dependencies or build process - pure vanilla JS
 - Difficulty thresholds defined in DIFFICULTY_CONFIG (game.js:26-33)
+- Vehicle prices: Motorcycle (0), Car (50), Truck (100)
+- Mod prices range from 25-100 coins depending on vehicle and tier
+- Testing utilities in `scripts/` folder (give coins, reset coins, lock vehicles)

@@ -14,6 +14,7 @@ const explosionSound = document.getElementById("explosionSound");
 const hitmarkerSound = document.getElementById("hitmarkerSound");
 const bubbleSound = document.getElementById("bubbleSound");
 const pauseMenuSound = document.getElementById("pauseMenuSound");
+const heroesNeverDieSound = document.getElementById("heroesNeverDieSound");
 const milestone1000Sound = document.getElementById("milestone1000Sound");
 const milestone2000Sound = document.getElementById("milestone2000Sound");
 const milestone3000Sound = document.getElementById("milestone3000Sound");
@@ -203,19 +204,73 @@ const VEHICLE_PRICES = {
 // Vehicle modifications configuration
 const VEHICLE_MODS = {
   motorcycle: [
-    { id: "mod1", name: "Mod 1", price: 25, description: "Placeholder mod" },
-    { id: "mod2", name: "Mod 2", price: 40, description: "Placeholder mod" },
-    { id: "mod3", name: "Mod 3", price: 60, description: "Placeholder mod" },
+    {
+      id: "mod1",
+      name: "Shield Start",
+      price: 25,
+      description: "Start each life with a shield",
+      effect: "startWithShield",
+    },
+    {
+      id: "mod2",
+      name: "Heart Boost",
+      price: 40,
+      description: "Hearts spawn 50% more often",
+      effect: "heartSpawnBoost",
+    },
+    {
+      id: "mod3",
+      name: "Second Chance",
+      price: 60,
+      description: "20% chance to survive fatal hit",
+      effect: "survivalChance20",
+    },
   ],
   car: [
-    { id: "mod1", name: "Mod 1", price: 30, description: "Placeholder mod" },
-    { id: "mod2", name: "Mod 2", price: 50, description: "Placeholder mod" },
-    { id: "mod3", name: "Mod 3", price: 75, description: "Placeholder mod" },
+    {
+      id: "mod1",
+      name: "Turbo Boost",
+      price: 30,
+      description: "50% faster boost speed",
+      effect: "boostSpeed25",
+    },
+    {
+      id: "mod2",
+      name: "Double Money",
+      price: 50,
+      description: "Coins are worth 2x",
+      effect: "coinValue2x",
+    },
+    {
+      id: "mod3",
+      name: "Score Master",
+      price: 75,
+      description: "Score multiplier 1.5x",
+      effect: "scoreMultiplier1_5x",
+    },
   ],
   truck: [
-    { id: "mod1", name: "Mod 1", price: 40, description: "Placeholder mod" },
-    { id: "mod2", name: "Mod 2", price: 65, description: "Placeholder mod" },
-    { id: "mod3", name: "Mod 3", price: 100, description: "Placeholder mod" },
+    {
+      id: "mod1",
+      name: "Time Lord",
+      price: 40,
+      description: "Start with 5 hearts instead of 3",
+      effect: "maxHealth5",
+    },
+    {
+      id: "mod2",
+      name: "Reinforced Shield",
+      price: 65,
+      description: "Shields protect against 2 hits",
+      effect: "shieldDoubleHit",
+    },
+    {
+      id: "mod3",
+      name: "Tank Mode",
+      price: 100,
+      description: "35% chance to survive fatal hit",
+      effect: "survivalChance35",
+    },
   ],
 };
 
@@ -249,11 +304,13 @@ function unlockVehicle(vehicleType) {
 // Load unlocked mods for all vehicles from localStorage
 function loadUnlockedMods() {
   const saved = localStorage.getItem("motorcycleUnlockedMods");
-  return saved ? JSON.parse(saved) : {
-    motorcycle: [],
-    car: [],
-    truck: [],
-  };
+  return saved
+    ? JSON.parse(saved)
+    : {
+        motorcycle: [],
+        car: [],
+        truck: [],
+      };
 }
 
 // Save unlocked mods to localStorage
@@ -280,6 +337,31 @@ function unlockMod(vehicleType, modId) {
 // Get all unlocked mods for a vehicle
 function getVehicleMods(vehicleType) {
   return unlockedMods[vehicleType] || [];
+}
+
+// Check if current vehicle has a specific mod effect
+function hasModEffect(effectName) {
+  const vehicleMods = VEHICLE_MODS[selectedVehicle] || [];
+  const unlockedModIds = getVehicleMods(selectedVehicle);
+
+  return vehicleMods.some(
+    (mod) => unlockedModIds.includes(mod.id) && mod.effect === effectName
+  );
+}
+
+// Get mod effect value (for multipliers, etc.)
+function getModEffectValue(effectName, defaultValue = 1) {
+  if (!hasModEffect(effectName)) return defaultValue;
+
+  // Define effect multipliers
+  const effectValues = {
+    coinValue2x: 2,
+    scoreMultiplier1_5x: 1.5,
+    boostSpeed25: 1.5,
+    heartSpawnBoost: 1.5,
+  };
+
+  return effectValues[effectName] || defaultValue;
 }
 
 // Game state
@@ -495,7 +577,11 @@ function spawnBomb() {
 
 // Spawn heart powerup
 function spawnHeart() {
-  if (Math.random() < HEART_SPAWN_CHANCE) {
+  // Apply heart spawn boost mod
+  const heartSpawnChance =
+    HEART_SPAWN_CHANCE * getModEffectValue("heartSpawnBoost", 1);
+
+  if (Math.random() < heartSpawnChance) {
     const lane = Math.floor(Math.random() * game.lanes);
     game.powerups.push({
       type: "heart",
@@ -550,10 +636,11 @@ function update() {
   // Update lane expansion based on score
   updateLaneExpansion();
 
-  // Calculate actual speed (double if boosting)
-  const actualSpeed = game.isBoosting
-    ? game.currentSpeed * 2
-    : game.currentSpeed;
+  // Calculate actual speed (double if boosting, with boost mod multiplier)
+  const boostMultiplier = game.isBoosting
+    ? 2 * getModEffectValue("boostSpeed25", 1)
+    : 1;
+  const actualSpeed = game.currentSpeed * boostMultiplier;
 
   // Update scroll offset
   game.scrollOffset += actualSpeed;
@@ -586,6 +673,8 @@ function update() {
     ) {
       if (powerup.type === "shield") {
         game.hasShield = true;
+        // Set shield hits based on mods
+        game.shieldHits = hasModEffect("shieldDoubleHit") ? 2 : 1;
         // Play bubble sound
         if (!game.isMuted) {
           bubbleSound.currentTime = 0;
@@ -594,23 +683,49 @@ function update() {
             .catch((e) => console.log("Bubble sound error:", e));
         }
       } else if (powerup.type === "bomb") {
-        // Instant game over when hitting bomb
-        game.health = 0;
-        // Play explosion sound
-        if (!game.isMuted) {
-          explosionSound.currentTime = 0;
-          explosionSound
-            .play()
-            .catch((e) => console.log("Explosion sound error:", e));
+        // Check survival chance before fatal bomb damage
+        let survived = false;
+
+        // Check survival chance mods (bomb is always fatal)
+        if (hasModEffect("survivalChance35")) {
+          if (Math.random() < 0.35) {
+            survived = true;
+          }
+        } else if (hasModEffect("survivalChance20")) {
+          if (Math.random() < 0.2) {
+            survived = true;
+          }
         }
-        gameOver();
+
+        if (survived) {
+          // Survived the bomb! Play Heroes Never Die sound
+          if (!game.isMuted) {
+            heroesNeverDieSound.currentTime = 0;
+            heroesNeverDieSound
+              .play()
+              .catch((e) => console.log("Survival sound error:", e));
+          }
+        } else {
+          // Fatal bomb damage
+          game.health = 0;
+          healthDisplay.textContent = game.health;
+          // Play explosion sound
+          if (!game.isMuted) {
+            explosionSound.currentTime = 0;
+            explosionSound
+              .play()
+              .catch((e) => console.log("Explosion sound error:", e));
+          }
+          gameOver();
+        }
       } else if (powerup.type === "heart") {
         // Add 1 health point
         game.health++;
         healthDisplay.textContent = game.health;
       } else if (powerup.type === "coin") {
-        // Collect coin and add to total
-        totalCoins++;
+        // Collect coin and add to total (with coin value multiplier)
+        const coinValue = Math.floor(getModEffectValue("coinValue2x", 1));
+        totalCoins += coinValue;
         saveTotalCoins(totalCoins);
         updateCoinsDisplay();
         // Play coin sound
@@ -640,7 +755,10 @@ function update() {
     ) {
       // Shield absorbs the hit
       if (game.hasShield) {
-        game.hasShield = false;
+        game.shieldHits--;
+        if (game.shieldHits <= 0) {
+          game.hasShield = false;
+        }
         // Play hitmarker sound when shield absorbs hit
         if (!game.isMuted) {
           hitmarkerSound.currentTime = 0;
@@ -651,26 +769,58 @@ function update() {
         return false; // Remove obstacle
       }
 
-      // No shield, take damage
-      game.health--;
-      healthDisplay.textContent = game.health;
-      // Play hitmarker sound on damage
-      if (!game.isMuted) {
-        hitmarkerSound.currentTime = 0;
-        hitmarkerSound
-          .play()
-          .catch((e) => console.log("Hitmarker sound error:", e));
+      // No shield, check for survival chance mods
+      let survived = false;
+
+      // Check if this would be fatal
+      if (game.health - 1 <= 0) {
+        // Check survival chance mods
+        if (hasModEffect("survivalChance35")) {
+          if (Math.random() < 0.35) {
+            survived = true;
+          }
+        } else if (hasModEffect("survivalChance20")) {
+          if (Math.random() < 0.2) {
+            survived = true;
+          }
+        }
       }
 
-      if (game.health <= 0) {
-        gameOver();
+      if (survived) {
+        // Survived the critical hit, don't take damage
+        // Play Heroes Never Die sound as feedback
+        if (!game.isMuted) {
+          heroesNeverDieSound.currentTime = 0;
+          heroesNeverDieSound
+            .play()
+            .catch((e) => console.log("Survival sound error:", e));
+        }
+      } else {
+        // Take damage
+        game.health--;
+        healthDisplay.textContent = game.health;
+        // Play hitmarker sound on damage
+        if (!game.isMuted) {
+          hitmarkerSound.currentTime = 0;
+          hitmarkerSound
+            .play()
+            .catch((e) => console.log("Hitmarker sound error:", e));
+        }
+
+        if (game.health <= 0) {
+          gameOver();
+        }
       }
       return false; // Remove obstacle after collision
     }
 
     // Remove obstacles that are off screen
     if (obstacle.y > canvas.height) {
-      game.score += 10;
+      // Apply score multiplier mod
+      const scoreValue = Math.floor(
+        10 * getModEffectValue("scoreMultiplier1_5x", 1)
+      );
+      game.score += scoreValue;
       scoreDisplay.textContent = game.score;
 
       // Update high score if current score exceeds it
@@ -994,8 +1144,23 @@ function restart() {
   // Reset canvas to initial width
   canvas.width = 800;
 
+  // Calculate initial health based on mods
+  let initialHealth = 3;
+  if (hasModEffect("maxHealth5")) {
+    initialHealth = 5;
+  }
+
+  // Check if should start with shield
+  const startWithShield = hasModEffect("startWithShield");
+
+  // Calculate shield hit count based on mods
+  let shieldHits = 1;
+  if (hasModEffect("shieldDoubleHit")) {
+    shieldHits = 2;
+  }
+
   game = {
-    health: 3,
+    health: initialHealth,
     score: 0,
     highScore: currentHighScore,
     isRunning: true,
@@ -1007,7 +1172,8 @@ function restart() {
     },
     obstacles: [],
     powerups: [],
-    hasShield: false,
+    hasShield: startWithShield,
+    shieldHits: startWithShield ? shieldHits : 0,
     keys: {},
     currentSpeed: DEFAULT_SCROLL_SPEED,
     currentSpawnChance: DEFAULT_OBSTACLE_SPAWN_CHANCE,
@@ -1053,8 +1219,23 @@ function startGame() {
   // Reset canvas to initial width
   canvas.width = 800;
 
+  // Calculate initial health based on mods
+  let initialHealth = 3;
+  if (hasModEffect("maxHealth5")) {
+    initialHealth = 5;
+  }
+
+  // Check if should start with shield
+  const startWithShield = hasModEffect("startWithShield");
+
+  // Calculate shield hit count based on mods
+  let shieldHits = 1;
+  if (hasModEffect("shieldDoubleHit")) {
+    shieldHits = 2;
+  }
+
   game = {
-    health: 3,
+    health: initialHealth,
     score: 0,
     highScore: currentHighScore,
     isRunning: true,
@@ -1066,7 +1247,8 @@ function startGame() {
     },
     obstacles: [],
     powerups: [],
-    hasShield: false,
+    hasShield: startWithShield,
+    shieldHits: startWithShield ? shieldHits : 0,
     keys: {},
     currentSpeed: DEFAULT_SCROLL_SPEED,
     currentSpawnChance: DEFAULT_OBSTACLE_SPAWN_CHANCE,
@@ -1265,7 +1447,9 @@ function setupModUnlockButtons() {
         // Play coin sound
         if (!game.isMuted) {
           coinSound.currentTime = 0;
-          coinSound.play().catch((e) => console.log("Purchase sound error:", e));
+          coinSound
+            .play()
+            .catch((e) => console.log("Purchase sound error:", e));
         }
       }
     });
@@ -1297,7 +1481,9 @@ function setupUnlockButtons() {
         // Play coin sound (but reverse it or use a different sound for purchase)
         if (!game.isMuted) {
           coinSound.currentTime = 0;
-          coinSound.play().catch((e) => console.log("Purchase sound error:", e));
+          coinSound
+            .play()
+            .catch((e) => console.log("Purchase sound error:", e));
         }
       }
     });
@@ -1333,7 +1519,8 @@ function openModScreen(vehicleType) {
     car: "SPORTS CAR",
     truck: "MONSTER TRUCK",
   };
-  modVehicleName.textContent = vehicleNames[vehicleType] || vehicleType.toUpperCase();
+  modVehicleName.textContent =
+    vehicleNames[vehicleType] || vehicleType.toUpperCase();
 
   // Draw the vehicle preview
   drawModVehiclePreview(vehicleType);
@@ -1362,12 +1549,7 @@ function drawModVehiclePreview(vehicleType) {
   ctx.clearRect(0, 0, modVehicleCanvas.width, modVehicleCanvas.height);
 
   // Draw the vehicle at scale 2
-  vehicle.draw(
-    ctx,
-    centerX,
-    centerY,
-    2
-  );
+  vehicle.draw(ctx, centerX, centerY, 2);
 }
 
 // Vehicle selection

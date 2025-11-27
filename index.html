@@ -20,17 +20,27 @@
           <div class="vehicle-selection">
             <div class="vehicle-option" data-vehicle="motorcycle">
               <div class="vehicle-preview-container">
-                <canvas class="vehicle-preview" width="150" height="150"></canvas>
+                <canvas
+                  class="vehicle-preview"
+                  width="150"
+                  height="150"
+                ></canvas>
               </div>
               <p>MOTORCYCLE</p>
               <button class="vehicle-modify-btn">MODIFY</button>
             </div>
             <div class="vehicle-option" data-vehicle="car">
               <div class="vehicle-preview-container">
-                <canvas class="vehicle-preview" width="150" height="150"></canvas>
+                <canvas
+                  class="vehicle-preview"
+                  width="150"
+                  height="150"
+                ></canvas>
                 <div class="lock-overlay">
                   <svg class="lock-icon" viewBox="0 0 24 24" fill="white">
-                    <path d="M12 2C9.243 2 7 4.243 7 7v3H6c-1.103 0-2 .897-2 2v8c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2v-8c0-1.103-.897-2-2-2h-1V7c0-2.757-2.243-5-5-5zm6 10 .002 8H6v-8h12zm-9-2V7c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9z"/>
+                    <path
+                      d="M12 2C9.243 2 7 4.243 7 7v3H6c-1.103 0-2 .897-2 2v8c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2v-8c0-1.103-.897-2-2-2h-1V7c0-2.757-2.243-5-5-5zm6 10 .002 8H6v-8h12zm-9-2V7c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9z"
+                    />
                   </svg>
                 </div>
               </div>
@@ -43,10 +53,16 @@
             </div>
             <div class="vehicle-option" data-vehicle="truck">
               <div class="vehicle-preview-container">
-                <canvas class="vehicle-preview" width="150" height="150"></canvas>
+                <canvas
+                  class="vehicle-preview"
+                  width="150"
+                  height="150"
+                ></canvas>
                 <div class="lock-overlay">
                   <svg class="lock-icon" viewBox="0 0 24 24" fill="white">
-                    <path d="M12 2C9.243 2 7 4.243 7 7v3H6c-1.103 0-2 .897-2 2v8c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2v-8c0-1.103-.897-2-2-2h-1V7c0-2.757-2.243-5-5-5zm6 10 .002 8H6v-8h12zm-9-2V7c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9z"/>
+                    <path
+                      d="M12 2C9.243 2 7 4.243 7 7v3H6c-1.103 0-2 .897-2 2v8c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2v-8c0-1.103-.897-2-2-2h-1V7c0-2.757-2.243-5-5-5zm6 10 .002 8H6v-8h12zm-9-2V7c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9z"
+                    />
                   </svg>
                 </div>
               </div>
@@ -72,7 +88,12 @@
 
           <!-- Current Vehicle Display -->
           <div class="mod-vehicle-display">
-            <canvas id="modVehicleCanvas" class="mod-vehicle-preview" width="200" height="200"></canvas>
+            <canvas
+              id="modVehicleCanvas"
+              class="mod-vehicle-preview"
+              width="200"
+              height="200"
+            ></canvas>
           </div>
 
           <!-- Modification Boxes -->
@@ -85,7 +106,9 @@
                 </div>
                 <div class="lock-overlay">
                   <svg class="lock-icon" viewBox="0 0 24 24" fill="white">
-                    <path d="M12 2C9.243 2 7 4.243 7 7v3H6c-1.103 0-2 .897-2 2v8c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2v-8c0-1.103-.897-2-2-2h-1V7c0-2.757-2.243-5-5-5zm6 10 .002 8H6v-8h12zm-9-2V7c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9z"/>
+                    <path
+                      d="M12 2C9.243 2 7 4.243 7 7v3H6c-1.103 0-2 .897-2 2v8c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2v-8c0-1.103-.897-2-2-2h-1V7c0-2.757-2.243-5-5-5zm6 10 .002 8H6v-8h12zm-9-2V7c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9z"
+                    />
                   </svg>
                 </div>
               </div>
@@ -102,7 +125,9 @@
                 </div>
                 <div class="lock-overlay">
                   <svg class="lock-icon" viewBox="0 0 24 24" fill="white">
-                    <path d="M12 2C9.243 2 7 4.243 7 7v3H6c-1.103 0-2 .897-2 2v8c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2v-8c0-1.103-.897-2-2-2h-1V7c0-2.757-2.243-5-5-5zm6 10 .002 8H6v-8h12zm-9-2V7c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9z"/>
+                    <path
+                      d="M12 2C9.243 2 7 4.243 7 7v3H6c-1.103 0-2 .897-2 2v8c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2v-8c0-1.103-.897-2-2-2h-1V7c0-2.757-2.243-5-5-5zm6 10 .002 8H6v-8h12zm-9-2V7c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9z"
+                    />
                   </svg>
                 </div>
               </div>
@@ -119,7 +144,9 @@
                 </div>
                 <div class="lock-overlay">
                   <svg class="lock-icon" viewBox="0 0 24 24" fill="white">
-                    <path d="M12 2C9.243 2 7 4.243 7 7v3H6c-1.103 0-2 .897-2 2v8c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2v-8c0-1.103-.897-2-2-2h-1V7c0-2.757-2.243-5-5-5zm6 10 .002 8H6v-8h12zm-9-2V7c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9z"/>
+                    <path
+                      d="M12 2C9.243 2 7 4.243 7 7v3H6c-1.103 0-2 .897-2 2v8c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2v-8c0-1.103-.897-2-2-2h-1V7c0-2.757-2.243-5-5-5zm6 10 .002 8H6v-8h12zm-9-2V7c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9z"
+                    />
                   </svg>
                 </div>
               </div>
@@ -154,11 +181,17 @@
 
         <!-- Game Over Screen -->
         <div id="gameOver" class="game-over hidden">
-          <img src="media/images/cat-scream.gif" alt="Cat Scream" class="game-over-gif" />
+          <img
+            src="media/images/cat-scream.gif"
+            alt="Cat Scream"
+            class="game-over-gif"
+          />
           <h2>Game Over!</h2>
           <p>Final Score: <span id="finalScore">0</span></p>
           <button id="restartBtn" class="menu-btn">PLAY AGAIN</button>
-          <button id="menuFromGameOverBtn" class="menu-btn">BACK TO MENU</button>
+          <button id="menuFromGameOverBtn" class="menu-btn">
+            BACK TO MENU
+          </button>
         </div>
       </div>
       <div class="banana-cheerer">
@@ -166,49 +199,100 @@
       </div>
     </div>
     <audio id="bgMusic" loop>
-      <source src="media/sounds/the-return-of-the-8-bit-era-301292.mp3" type="audio/mpeg" />
+      <source
+        src="media/sounds/the-return-of-the-8-bit-era-301292.mp3"
+        type="audio/mpeg"
+      />
     </audio>
     <audio id="coinSound">
-      <source src="media/sounds/sound-effects/base-effects/subway-surfers-coin-collect.mp3" type="audio/mpeg" />
+      <source
+        src="media/sounds/sound-effects/base-effects/subway-surfers-coin-collect.mp3"
+        type="audio/mpeg"
+      />
     </audio>
     <audio id="explosionSound">
-      <source src="media/sounds/sound-effects/base-effects/explosion.mp3" type="audio/mpeg" />
+      <source
+        src="media/sounds/sound-effects/base-effects/explosion.mp3"
+        type="audio/mpeg"
+      />
     </audio>
     <audio id="hitmarkerSound">
-      <source src="media/sounds/sound-effects/base-effects/hitmarker.mp3" type="audio/mpeg" />
+      <source
+        src="media/sounds/sound-effects/base-effects/hitmarker.mp3"
+        type="audio/mpeg"
+      />
     </audio>
     <audio id="bubbleSound">
-      <source src="media/sounds/sound-effects/base-effects/bubble_add.mp3" type="audio/mpeg" />
+      <source
+        src="media/sounds/sound-effects/base-effects/bubble_add.mp3"
+        type="audio/mpeg"
+      />
     </audio>
     <audio id="pauseMenuSound">
-      <source src="media/sounds/sound-effects/base-effects/pause-menu.mp3" type="audio/mpeg" />
+      <source
+        src="media/sounds/sound-effects/base-effects/pause-menu.mp3"
+        type="audio/mpeg"
+      />
     </audio>
     <audio id="milestone1000Sound">
-      <source src="media/sounds/sound-effects/milestones/nioce.mp3" type="audio/mpeg" />
+      <source
+        src="media/sounds/sound-effects/milestones/nioce.mp3"
+        type="audio/mpeg"
+      />
     </audio>
     <audio id="milestone2000Sound">
-      <source src="media/sounds/sound-effects/milestones/messi.mp3" type="audio/mpeg" />
+      <source
+        src="media/sounds/sound-effects/milestones/messi.mp3"
+        type="audio/mpeg"
+      />
     </audio>
     <audio id="milestone3000Sound">
-      <source src="media/sounds/sound-effects/milestones/cheering.mp3" type="audio/mpeg" />
+      <source
+        src="media/sounds/sound-effects/milestones/cheering.mp3"
+        type="audio/mpeg"
+      />
     </audio>
     <audio id="gameOverSound1">
-      <source src="media/sounds/sound-effects/game-over/faaah.mp3" type="audio/mpeg" />
+      <source
+        src="media/sounds/sound-effects/game-over/faaah.mp3"
+        type="audio/mpeg"
+      />
     </audio>
     <audio id="gameOverSound2">
-      <source src="media/sounds/sound-effects/game-over/meatloaf.mp3" type="audio/mpeg" />
+      <source
+        src="media/sounds/sound-effects/game-over/meatloaf.mp3"
+        type="audio/mpeg"
+      />
     </audio>
     <audio id="gameOverSound3">
-      <source src="media/sounds/sound-effects/game-over/i-am-stupid-leclarc.mp3" type="audio/mpeg" />
+      <source
+        src="media/sounds/sound-effects/game-over/i-am-stupid-leclarc.mp3"
+        type="audio/mpeg"
+      />
     </audio>
     <audio id="gameOverSound4">
-      <source src="media/sounds/sound-effects/game-over/sadtrombone.swf.mp3" type="audio/mpeg" />
+      <source
+        src="media/sounds/sound-effects/game-over/sadtrombone.swf.mp3"
+        type="audio/mpeg"
+      />
     </audio>
     <audio id="gameOverSound5">
-      <source src="media/sounds/sound-effects/game-over/dank-meme-compilation-volume-17_cutted.mp3" type="audio/mpeg" />
+      <source
+        src="media/sounds/sound-effects/game-over/dank-meme-compilation-volume-17_cutted.mp3"
+        type="audio/mpeg"
+      />
     </audio>
     <audio id="gameOverSound6">
-      <source src="media/sounds/sound-effects/game-over/nandesuka_BAXMe6g.mp3" type="audio/mpeg" />
+      <source
+        src="media/sounds/sound-effects/game-over/nandesuka_BAXMe6g.mp3"
+        type="audio/mpeg"
+      />
+    </audio>
+    <audio id="heroesNeverDieSound">
+      <source
+        src="media/sounds/sound-effects/base-effects/heros-never-die.mp3"
+        type="audio/mpeg"
+      />
     </audio>
     <script src="game.js"></script>
   </body>
