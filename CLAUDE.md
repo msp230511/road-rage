@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a 2D vertical sidescroller motorcycle game built with vanilla JavaScript and HTML5 Canvas. The game features dynamic difficulty scaling, powerups, audio, high score tracking, and visual polish. The game runs entirely in the browser with no build process or dependencies.
+This is a 2D vertical sidescroller motorcycle game (titled "ROAD RAGE") built with vanilla JavaScript and HTML5 Canvas. The game features dynamic difficulty scaling, powerups, audio, high score tracking, visual polish, a vehicle unlock system with 3 playable vehicles, and a comprehensive vehicle modification system with 9 unique mods that provide gameplay enhancements. The game runs entirely in the browser with no build process or dependencies.
 
 ## Running the Game
 
@@ -54,10 +54,11 @@ Occurs when obstacle/powerup lane matches motorcycle lane AND their y-positions 
 - **High Score**: Persists to localStorage (game.js:36-44), displayed in top-left corner (game.js:358-361)
 
 #### Powerup System (game.js:168-201, 453-568)
-Three powerup types spawn randomly:
-1. **Shield** (light blue bubble): Protects from one obstacle collision
-2. **Bomb** (black cannonball): Instant game over on contact
-3. **Heart** (red heart): Adds +1 health
+Four powerup types spawn randomly:
+1. **Shield** (light blue bubble): Protects from one obstacle collision (can be upgraded to 2 hits with mods)
+2. **Bomb** (black cannonball): Instant game over on contact (can be survived with survival chance mods)
+3. **Heart** (red heart): Adds +1 health (spawn rate can be increased with mods)
+4. **Coin** (yellow coin): Persistent currency for unlocking vehicles and mods
 
 #### Boost Mechanic
 - Hold W or Up Arrow to double speed (game.js:127-136, 231-233)
@@ -94,12 +95,16 @@ Keyboard events (game.js:122-136):
 - **Mute Button**: Toggles `game.isMuted`, controls background music, shows 🔊/🔇
 - **Health/Score Display**: Updated in real-time via DOM manipulation
 
-### Audio System (game.js:68-97, 629-657)
+### Audio System
 
-- Background music: `the-return-of-the-8-bit-era-301292.mp3` (loops)
-- Volume set to 50% (game.js:69)
+- **Background music**: `the-return-of-the-8-bit-era-301292.mp3` (loops, volume 50%)
+- **Sound effects**:
+  - Coin collection, explosions, hitmarkers, bubbles, pause menu
+  - Milestone sounds at 1000, 2000, 3000 points
+  - 6 random game over sounds
+  - "Heroes Never Die" sound for survival chance mods
 - Respects mute and pause states
-- Requires user interaction for autoplay (browser requirement) (game.js:649-657)
+- Requires user interaction for autoplay (browser requirement)
 
 ### Game Over & Restart (game.js:592-634)
 
@@ -116,17 +121,99 @@ Keyboard events (game.js:122-136):
 - **Game Over Screen**: Animated GIF (cat-scream.gif) with dark overlay
 - **Banana Cheerer**: Fixed position GIF (banana-cheerer.gif) at bottom-left (style.css:30-41)
 
+### Vehicle System (game.js:195-265)
+
+The game features 3 unlockable vehicles with unique characteristics:
+
+1. **Motorcycle** (Free, default)
+   - Balanced beginner-friendly vehicle
+   - 3 starting hearts
+   - No special characteristics
+
+2. **Sports Car** (50 coins)
+   - Speed and risk-reward focused
+   - 3 starting hearts
+   - Access to boost speed and coin multiplier mods
+
+3. **Monster Truck** (100 coins)
+   - Maximum durability and survivability
+   - 3 starting hearts (5 with mod)
+   - Access to extra health and reinforced shield mods
+
+**Vehicle Storage**: Unlocked vehicles persist in localStorage (`motorcycleUnlockedVehicles`)
+**Vehicle Selection**: Menu screen with canvas previews, lock overlays, and unlock/modify buttons
+
+### Modification System (game.js:195-355)
+
+Each vehicle has 3 unique mods that enhance gameplay. All mods are **fully implemented** and affect gameplay.
+
+#### Motorcycle Mods (Beginner-Friendly/Balanced)
+
+1. **Shield Start** (25 coins, `startWithShield`)
+   - Start each life with an active shield
+   - Applied at game start/restart
+
+2. **Heart Boost** (40 coins, `heartSpawnBoost`)
+   - Hearts spawn 50% more frequently
+   - Multiplies HEART_SPAWN_CHANCE by 1.5
+
+3. **Second Chance** (60 coins, `survivalChance20`)
+   - 20% chance to survive any fatal hit
+   - Checks on fatal damage from obstacles or bombs
+   - Plays "Heroes Never Die" sound on survival
+
+#### Sports Car Mods (Speed/Risk-Reward)
+
+1. **Turbo Boost** (30 coins, `boostSpeed25`)
+   - 50% faster boost speed
+   - Multiplies boost speed by 1.5 (normal boost is 2x, becomes 3x)
+
+2. **Double Money** (50 coins, `coinValue2x`)
+   - Coins are worth 2x value
+   - Each coin collected gives 2 coins instead of 1
+
+3. **Score Master** (75 coins, `scoreMultiplier1_5x`)
+   - Score multiplier 1.5x
+   - Each avoided obstacle gives 15 points instead of 10
+
+#### Monster Truck Mods (Tank/Durability)
+
+1. **Time Lord** (40 coins, `maxHealth5`)
+   - Start with 5 hearts instead of 3
+   - +2 extra hearts at game start/restart
+
+2. **Reinforced Shield** (65 coins, `shieldDoubleHit`)
+   - Shields protect against 2 hits instead of 1
+   - Shield persists after first hit, breaks on second
+
+3. **Tank Mode** (100 coins, `survivalChance35`)
+   - 35% chance to survive any fatal hit
+   - Checks on fatal damage from obstacles or bombs
+   - Plays "Heroes Never Die" sound on survival
+
+**Mod Storage**: Unlocked mods persist per-vehicle in localStorage (`motorcycleUnlockedMods`)
+**Mod Logic**:
+- `hasModEffect(effectName)` checks if current vehicle has mod unlocked
+- `getModEffectValue(effectName, defaultValue)` returns multiplier values
+- Effects applied in spawn functions, collision detection, scoring, and game initialization
+
 ## File Structure
 
-- [index.html](index.html): HTML structure, canvas, UI elements, audio element
-- [game.js](game.js): All game logic (658 lines)
-- [style.css](style.css): Styling for game container, UI, and overlays (129 lines)
-- [CLAUDE.md](CLAUDE.md): This file
+- [index.html](index.html): HTML structure, menu screens, mod screen, canvas, UI elements, 18 audio elements
+- [game.js](game.js): All game logic (1084+ lines) - vehicle system, mod system, collision detection, rendering
+- [style.css](style.css): Styling for game container, menu screens, mod screen, UI, and overlays
+- [CLAUDE.md](CLAUDE.md): This file - architecture documentation
 - [README_TODO.md](README_TODO.md): Development TODO list and feature ideas
-- **Assets** (referenced but not in repo):
+- [CONTRIBUTING.md](CONTRIBUTING.md): Git workflow and contribution guidelines
+- **scripts/** folder: Testing utilities
+  - `give_coins.html`: Add coins for testing
+  - `reset_coins.html`: Reset coins to 0
+  - `lock_vehicles.html`: Lock all vehicles and reset mods
+- **Assets** (in media/ folder):
   - `cat-scream.gif`: Game over screen animation
   - `banana-cheerer.gif`: Decorative cheering banana
   - `the-return-of-the-8-bit-era-301292.mp3`: Background music
+  - Sound effects for collisions, powerups, milestones, game over
 
 ## Modifying Game Parameters
 
@@ -151,7 +238,12 @@ Keyboard events (game.js:122-136):
 
 - Pure vanilla JavaScript - no frameworks, no dependencies
 - All state in single `game` object for easy debugging and potential serialization
-- High score persistence via `localStorage` API
+- Persistence via `localStorage` API:
+  - High scores (`motorcycleHighScore`)
+  - Total coins (`motorcycleTotalCoins`)
+  - Unlocked vehicles (`motorcycleUnlockedVehicles`)
+  - Unlocked mods per vehicle (`motorcycleUnlockedMods`)
 - 60 FPS target via `requestAnimationFrame()`
 - Mobile support: Limited (keyboard controls only, could add touch events)
 - Browser compatibility: Modern browsers only (ES6+ features used)
+- Testing utilities in `scripts/` folder for rapid development/testing
