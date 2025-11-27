@@ -37,6 +37,14 @@ const menuBtn = document.getElementById("menuBtn");
 const menuFromGameOverBtn = document.getElementById("menuFromGameOverBtn");
 const menuCoinsDisplay = document.getElementById("menuCoins");
 
+// Modification screen elements
+const modScreen = document.getElementById("modScreen");
+const backToMenuBtn = document.getElementById("backToMenuBtn");
+const modCoinsDisplay = document.getElementById("modCoins");
+const modVehicleName = document.getElementById("modVehicleName");
+const modVehicleCanvas = document.getElementById("modVehicleCanvas");
+let currentModVehicle = "motorcycle"; // Track which vehicle is being modified
+
 // Game constants
 const TILE_HEIGHT = 50;
 const TOTAL_TILES = 18;
@@ -192,6 +200,25 @@ const VEHICLE_PRICES = {
   truck: 100,
 };
 
+// Vehicle modifications configuration
+const VEHICLE_MODS = {
+  motorcycle: [
+    { id: "mod1", name: "Mod 1", price: 25, description: "Placeholder mod" },
+    { id: "mod2", name: "Mod 2", price: 40, description: "Placeholder mod" },
+    { id: "mod3", name: "Mod 3", price: 60, description: "Placeholder mod" },
+  ],
+  car: [
+    { id: "mod1", name: "Mod 1", price: 30, description: "Placeholder mod" },
+    { id: "mod2", name: "Mod 2", price: 50, description: "Placeholder mod" },
+    { id: "mod3", name: "Mod 3", price: 75, description: "Placeholder mod" },
+  ],
+  truck: [
+    { id: "mod1", name: "Mod 1", price: 40, description: "Placeholder mod" },
+    { id: "mod2", name: "Mod 2", price: 65, description: "Placeholder mod" },
+    { id: "mod3", name: "Mod 3", price: 100, description: "Placeholder mod" },
+  ],
+};
+
 // Load unlocked vehicles from localStorage
 function loadUnlockedVehicles() {
   const saved = localStorage.getItem("motorcycleUnlockedVehicles");
@@ -219,10 +246,47 @@ function unlockVehicle(vehicleType) {
   }
 }
 
+// Load unlocked mods for all vehicles from localStorage
+function loadUnlockedMods() {
+  const saved = localStorage.getItem("motorcycleUnlockedMods");
+  return saved ? JSON.parse(saved) : {
+    motorcycle: [],
+    car: [],
+    truck: [],
+  };
+}
+
+// Save unlocked mods to localStorage
+function saveUnlockedMods(unlockedMods) {
+  localStorage.setItem("motorcycleUnlockedMods", JSON.stringify(unlockedMods));
+}
+
+// Check if a specific mod is unlocked for a vehicle
+function isModUnlocked(vehicleType, modId) {
+  return unlockedMods[vehicleType]?.includes(modId) || false;
+}
+
+// Unlock a mod for a vehicle
+function unlockMod(vehicleType, modId) {
+  if (!isModUnlocked(vehicleType, modId)) {
+    if (!unlockedMods[vehicleType]) {
+      unlockedMods[vehicleType] = [];
+    }
+    unlockedMods[vehicleType].push(modId);
+    saveUnlockedMods(unlockedMods);
+  }
+}
+
+// Get all unlocked mods for a vehicle
+function getVehicleMods(vehicleType) {
+  return unlockedMods[vehicleType] || [];
+}
+
 // Game state
 let selectedVehicle = "motorcycle"; // Default vehicle selection
 let totalCoins = loadTotalCoins(); // Persistent coin counter
 let unlockedVehicles = loadUnlockedVehicles(); // Persistent unlocked vehicles
+let unlockedMods = loadUnlockedMods(); // Persistent unlocked mods per vehicle
 
 let game = {
   health: 3,
@@ -904,6 +968,7 @@ function drawShield() {
 function updateCoinsDisplay() {
   coinsDisplay.textContent = totalCoins;
   menuCoinsDisplay.textContent = totalCoins;
+  modCoinsDisplay.textContent = totalCoins;
 }
 
 function gameOver() {
@@ -1077,6 +1142,106 @@ function updateVehicleUI() {
   updateCoinsDisplay();
 }
 
+// Update mod UI based on unlock state
+function updateModUI() {
+  const modBoxes = document.querySelectorAll(".mod-box");
+  const mods = VEHICLE_MODS[currentModVehicle] || [];
+
+  modBoxes.forEach((box, index) => {
+    if (index >= mods.length) return;
+
+    const mod = mods[index];
+    const modId = mod.id;
+    const unlocked = isModUnlocked(currentModVehicle, modId);
+    const lockOverlay = box.querySelector(".lock-overlay");
+    const unlockBtn = box.querySelector(".mod-unlock-btn");
+    const previewContainer = box.querySelector(".mod-preview-container");
+    const modName = box.querySelector(".mod-name");
+    const modDescription = box.querySelector(".mod-description");
+    const unlockPrice = box.querySelector(".unlock-price");
+
+    // Update mod name and description
+    if (modName) modName.textContent = mod.name;
+    if (modDescription) modDescription.textContent = mod.description;
+    if (unlockPrice) unlockPrice.textContent = mod.price;
+
+    // Set data attribute for mod ID
+    box.dataset.mod = modId;
+
+    if (unlocked) {
+      // Mod is unlocked
+      if (lockOverlay) {
+        lockOverlay.style.display = "none";
+      }
+      if (previewContainer) {
+        previewContainer.classList.remove("locked");
+      }
+      if (unlockBtn) {
+        unlockBtn.textContent = "UNLOCKED";
+        unlockBtn.classList.add("unlocked");
+        unlockBtn.disabled = true;
+      }
+    } else {
+      // Mod is locked
+      if (lockOverlay) {
+        lockOverlay.style.display = "flex";
+      }
+      if (previewContainer) {
+        previewContainer.classList.add("locked");
+      }
+      if (unlockBtn) {
+        unlockBtn.classList.remove("unlocked");
+        // Update button disabled state based on coins
+        if (totalCoins >= mod.price) {
+          unlockBtn.disabled = false;
+        } else {
+          unlockBtn.disabled = true;
+        }
+      }
+    }
+  });
+
+  // Update coin display
+  modCoinsDisplay.textContent = totalCoins;
+}
+
+// Setup mod unlock button clicks
+function setupModUnlockButtons() {
+  const unlockButtons = document.querySelectorAll(".mod-unlock-btn");
+  unlockButtons.forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const box = btn.closest(".mod-box");
+      const modId = box.dataset.mod;
+
+      // Find the mod config
+      const mods = VEHICLE_MODS[currentModVehicle] || [];
+      const mod = mods.find((m) => m.id === modId);
+      if (!mod) return;
+
+      // Check if player has enough coins
+      if (totalCoins >= mod.price && !isModUnlocked(currentModVehicle, modId)) {
+        // Deduct coins
+        totalCoins -= mod.price;
+        saveTotalCoins(totalCoins);
+
+        // Unlock mod
+        unlockMod(currentModVehicle, modId);
+
+        // Update UI
+        updateModUI();
+        updateCoinsDisplay();
+
+        // Play coin sound
+        if (!game.isMuted) {
+          coinSound.currentTime = 0;
+          coinSound.play().catch((e) => console.log("Purchase sound error:", e));
+        }
+      }
+    });
+  });
+}
+
 // Handle unlock button clicks
 function setupUnlockButtons() {
   const unlockButtons = document.querySelectorAll(".vehicle-unlock-btn");
@@ -1109,7 +1274,7 @@ function setupUnlockButtons() {
   });
 }
 
-// Handle modify button clicks (placeholder for now)
+// Handle modify button clicks
 function setupModifyButtons() {
   const modifyButtons = document.querySelectorAll(".vehicle-modify-btn");
   modifyButtons.forEach((btn) => {
@@ -1118,10 +1283,61 @@ function setupModifyButtons() {
       const option = btn.closest(".vehicle-option");
       const vehicleType = option.dataset.vehicle;
 
-      // TODO: Open modification menu for this vehicle
-      console.log("Modify vehicle:", vehicleType);
+      // Open modification screen for this vehicle
+      openModScreen(vehicleType);
     });
   });
+}
+
+// Open modification screen for a vehicle
+function openModScreen(vehicleType) {
+  currentModVehicle = vehicleType;
+
+  // Hide menu, show mod screen
+  menuScreen.classList.add("hidden");
+  modScreen.classList.remove("hidden");
+
+  // Update vehicle name
+  const vehicleNames = {
+    motorcycle: "MOTORCYCLE",
+    car: "SPORTS CAR",
+    truck: "MONSTER TRUCK",
+  };
+  modVehicleName.textContent = vehicleNames[vehicleType] || vehicleType.toUpperCase();
+
+  // Draw the vehicle preview
+  drawModVehiclePreview(vehicleType);
+
+  // Update mod boxes for this vehicle
+  updateModUI();
+
+  // Update coins display
+  updateCoinsDisplay();
+}
+
+// Close modification screen and return to menu
+function closeModScreen() {
+  modScreen.classList.add("hidden");
+  menuScreen.classList.remove("hidden");
+}
+
+// Draw vehicle preview on mod screen
+function drawModVehiclePreview(vehicleType) {
+  const ctx = modVehicleCanvas.getContext("2d");
+  const centerX = modVehicleCanvas.width / 2;
+  const centerY = modVehicleCanvas.height / 2;
+  const vehicle = VEHICLES[vehicleType];
+
+  // Clear canvas
+  ctx.clearRect(0, 0, modVehicleCanvas.width, modVehicleCanvas.height);
+
+  // Draw the vehicle at scale 2
+  vehicle.draw(
+    ctx,
+    centerX,
+    centerY,
+    2
+  );
 }
 
 // Vehicle selection
@@ -1184,6 +1400,18 @@ menuFromGameOverBtn.addEventListener("click", () => {
   showMenu();
 });
 
+// Back to menu button (from mod screen)
+backToMenuBtn.addEventListener("click", () => {
+  // Play pause menu sound
+  if (!game.isMuted) {
+    pauseMenuSound.currentTime = 0;
+    pauseMenuSound
+      .play()
+      .catch((e) => console.log("Pause menu sound error:", e));
+  }
+  closeModScreen();
+});
+
 // Draw vehicle previews in menu
 function drawVehiclePreviews() {
   vehicleOptions.forEach((option) => {
@@ -1209,6 +1437,7 @@ function drawVehiclePreviews() {
 drawVehiclePreviews();
 setupUnlockButtons();
 setupModifyButtons();
+setupModUnlockButtons();
 updateVehicleUI();
 
 // Initialize coins display
