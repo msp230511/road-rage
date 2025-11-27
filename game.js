@@ -1177,7 +1177,21 @@ function updateModUI() {
         previewContainer.classList.remove("locked");
       }
       if (unlockBtn) {
-        unlockBtn.textContent = "UNLOCKED";
+        // Restore button structure if needed
+        const coinIcon = unlockBtn.querySelector(".coin-icon");
+        const priceSpan = unlockBtn.querySelector(".unlock-price");
+        if (!coinIcon || !priceSpan) {
+          unlockBtn.innerHTML = `
+            <span class="coin-icon">💰</span>
+            <span class="unlock-price">${mod.price}</span>
+          `;
+        }
+        // Hide the price elements and show UNLOCKED text
+        if (coinIcon) coinIcon.style.display = "none";
+        if (priceSpan) {
+          priceSpan.textContent = "UNLOCKED";
+          priceSpan.style.fontSize = "16px";
+        }
         unlockBtn.classList.add("unlocked");
         unlockBtn.disabled = true;
       }
@@ -1190,6 +1204,22 @@ function updateModUI() {
         previewContainer.classList.add("locked");
       }
       if (unlockBtn) {
+        // Restore button structure if needed
+        const coinIcon = unlockBtn.querySelector(".coin-icon");
+        const priceSpan = unlockBtn.querySelector(".unlock-price");
+        if (!coinIcon || !priceSpan) {
+          unlockBtn.innerHTML = `
+            <span class="coin-icon">💰</span>
+            <span class="unlock-price">${mod.price}</span>
+          `;
+        } else {
+          // Show price elements
+          if (coinIcon) coinIcon.style.display = "inline";
+          if (priceSpan) {
+            priceSpan.textContent = mod.price;
+            priceSpan.style.fontSize = "18px";
+          }
+        }
         unlockBtn.classList.remove("unlocked");
         // Update button disabled state based on coins
         if (totalCoins >= mod.price) {
