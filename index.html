@@ -30,9 +30,7 @@
             </div>
           </div>
           <button id="startGameBtn" class="menu-btn">START GAME</button>
-          <button id="worldsBtn" class="worlds-btn">
-            🌍 WORLDS
-          </button>
+          <button id="worldsBtn" class="worlds-btn">🌍 WORLDS</button>
           <button id="achievementsBtn" class="achievements-btn">
             🏆 ACHIEVEMENTS
           </button>
@@ -67,9 +65,15 @@
         <div id="worldMapScreen" class="world-map-screen hidden">
           <h1 class="game-title">WORLDS</h1>
           <div class="world-map-container">
-            <svg class="world-path" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid meet">
+            <svg
+              class="world-path"
+              viewBox="0 0 800 600"
+              preserveAspectRatio="xMidYMid meet"
+            >
               <!-- Winding path connecting all worlds -->
-              <path class="path-line" d="M 100 550
+              <path
+                class="path-line"
+                d="M 100 550
                 Q 150 500, 200 480
                 Q 300 450, 350 400
                 Q 400 350, 300 300
@@ -82,8 +86,14 @@
                 Q 700 250, 650 200
                 Q 600 150, 650 100
                 Q 700 50, 750 80"
-                fill="none" stroke="#8B4513" stroke-width="12" stroke-linecap="round"/>
-              <path class="path-line-inner" d="M 100 550
+                fill="none"
+                stroke="#8B4513"
+                stroke-width="12"
+                stroke-linecap="round"
+              />
+              <path
+                class="path-line-inner"
+                d="M 100 550
                 Q 150 500, 200 480
                 Q 300 450, 350 400
                 Q 400 350, 300 300
@@ -96,100 +106,157 @@
                 Q 700 250, 650 200
                 Q 600 150, 650 100
                 Q 700 50, 750 80"
-                fill="none" stroke="#D2691E" stroke-width="6" stroke-linecap="round" stroke-dasharray="15,10"/>
+                fill="none"
+                stroke="#D2691E"
+                stroke-width="6"
+                stroke-linecap="round"
+                stroke-dasharray="15,10"
+              />
             </svg>
 
             <!-- World nodes positioned along the path -->
-            <div class="world-node unlocked" data-world="1" style="left: 100px; top: 520px;">
+            <div
+              class="world-node unlocked"
+              data-world="1"
+              style="left: 100px; top: 520px"
+            >
               <div class="world-icon">🛣️</div>
               <div class="world-number">1</div>
               <div class="world-name">HIGHWAY</div>
             </div>
 
-            <div class="world-node locked" data-world="2" style="left: 200px; top: 450px;">
+            <div
+              class="world-node locked"
+              data-world="2"
+              style="left: 200px; top: 450px"
+            >
               <div class="world-icon">🏜️</div>
               <div class="world-number">2</div>
               <div class="world-name">DESERT</div>
               <div class="world-lock-overlay">
                 <svg class="world-lock-icon" viewBox="0 0 24 24" fill="white">
-                  <path d="M12 2C9.243 2 7 4.243 7 7v3H6c-1.103 0-2 .897-2 2v8c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2v-8c0-1.103-.897-2-2-2h-1V7c0-2.757-2.243-5-5-5zm6 10 .002 8H6v-8h12zm-9-2V7c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9z"/>
+                  <path
+                    d="M12 2C9.243 2 7 4.243 7 7v3H6c-1.103 0-2 .897-2 2v8c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2v-8c0-1.103-.897-2-2-2h-1V7c0-2.757-2.243-5-5-5zm6 10 .002 8H6v-8h12zm-9-2V7c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9z"
+                  />
                 </svg>
               </div>
             </div>
 
-            <div class="world-node locked" data-world="3" style="left: 350px; top: 370px;">
+            <div
+              class="world-node locked"
+              data-world="3"
+              style="left: 350px; top: 370px"
+            >
               <div class="world-icon">🌲</div>
               <div class="world-number">3</div>
               <div class="world-name">FOREST</div>
               <div class="world-lock-overlay">
                 <svg class="world-lock-icon" viewBox="0 0 24 24" fill="white">
-                  <path d="M12 2C9.243 2 7 4.243 7 7v3H6c-1.103 0-2 .897-2 2v8c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2v-8c0-1.103-.897-2-2-2h-1V7c0-2.757-2.243-5-5-5zm6 10 .002 8H6v-8h12zm-9-2V7c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9z"/>
+                  <path
+                    d="M12 2C9.243 2 7 4.243 7 7v3H6c-1.103 0-2 .897-2 2v8c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2v-8c0-1.103-.897-2-2-2h-1V7c0-2.757-2.243-5-5-5zm6 10 .002 8H6v-8h12zm-9-2V7c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9z"
+                  />
                 </svg>
               </div>
             </div>
 
-            <div class="world-node locked" data-world="4" style="left: 250px; top: 270px;">
+            <div
+              class="world-node locked"
+              data-world="4"
+              style="left: 250px; top: 270px"
+            >
               <div class="world-icon">🌊</div>
               <div class="world-number">4</div>
               <div class="world-name">BEACH</div>
               <div class="world-lock-overlay">
                 <svg class="world-lock-icon" viewBox="0 0 24 24" fill="white">
-                  <path d="M12 2C9.243 2 7 4.243 7 7v3H6c-1.103 0-2 .897-2 2v8c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2v-8c0-1.103-.897-2-2-2h-1V7c0-2.757-2.243-5-5-5zm6 10 .002 8H6v-8h12zm-9-2V7c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9z"/>
+                  <path
+                    d="M12 2C9.243 2 7 4.243 7 7v3H6c-1.103 0-2 .897-2 2v8c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2v-8c0-1.103-.897-2-2-2h-1V7c0-2.757-2.243-5-5-5zm6 10 .002 8H6v-8h12zm-9-2V7c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9z"
+                  />
                 </svg>
               </div>
             </div>
 
-            <div class="world-node locked" data-world="5" style="left: 400px; top: 120px;">
+            <div
+              class="world-node locked"
+              data-world="5"
+              style="left: 400px; top: 120px"
+            >
               <div class="world-icon">🏔️</div>
               <div class="world-number">5</div>
               <div class="world-name">MOUNTAIN</div>
               <div class="world-lock-overlay">
                 <svg class="world-lock-icon" viewBox="0 0 24 24" fill="white">
-                  <path d="M12 2C9.243 2 7 4.243 7 7v3H6c-1.103 0-2 .897-2 2v8c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2v-8c0-1.103-.897-2-2-2h-1V7c0-2.757-2.243-5-5-5zm6 10 .002 8H6v-8h12zm-9-2V7c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9z"/>
+                  <path
+                    d="M12 2C9.243 2 7 4.243 7 7v3H6c-1.103 0-2 .897-2 2v8c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2v-8c0-1.103-.897-2-2-2h-1V7c0-2.757-2.243-5-5-5zm6 10 .002 8H6v-8h12zm-9-2V7c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9z"
+                  />
                 </svg>
               </div>
             </div>
 
-            <div class="world-node locked" data-world="6" style="left: 550px; top: 170px;">
+            <div
+              class="world-node locked"
+              data-world="6"
+              style="left: 550px; top: 170px"
+            >
               <div class="world-icon">🌃</div>
               <div class="world-number">6</div>
               <div class="world-name">CITY</div>
               <div class="world-lock-overlay">
                 <svg class="world-lock-icon" viewBox="0 0 24 24" fill="white">
-                  <path d="M12 2C9.243 2 7 4.243 7 7v3H6c-1.103 0-2 .897-2 2v8c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2v-8c0-1.103-.897-2-2-2h-1V7c0-2.757-2.243-5-5-5zm6 10 .002 8H6v-8h12zm-9-2V7c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9z"/>
+                  <path
+                    d="M12 2C9.243 2 7 4.243 7 7v3H6c-1.103 0-2 .897-2 2v8c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2v-8c0-1.103-.897-2-2-2h-1V7c0-2.757-2.243-5-5-5zm6 10 .002 8H6v-8h12zm-9-2V7c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9z"
+                  />
                 </svg>
               </div>
             </div>
 
-            <div class="world-node locked" data-world="7" style="left: 550px; top: 270px;">
+            <div
+              class="world-node locked"
+              data-world="7"
+              style="left: 550px; top: 270px"
+            >
               <div class="world-icon">❄️</div>
               <div class="world-number">7</div>
               <div class="world-name">ARCTIC</div>
               <div class="world-lock-overlay">
                 <svg class="world-lock-icon" viewBox="0 0 24 24" fill="white">
-                  <path d="M12 2C9.243 2 7 4.243 7 7v3H6c-1.103 0-2 .897-2 2v8c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2v-8c0-1.103-.897-2-2-2h-1V7c0-2.757-2.243-5-5-5zm6 10 .002 8H6v-8h12zm-9-2V7c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9z"/>
+                  <path
+                    d="M12 2C9.243 2 7 4.243 7 7v3H6c-1.103 0-2 .897-2 2v8c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2v-8c0-1.103-.897-2-2-2h-1V7c0-2.757-2.243-5-5-5zm6 10 .002 8H6v-8h12zm-9-2V7c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9z"
+                  />
                 </svg>
               </div>
             </div>
 
-            <div class="world-node locked" data-world="8" style="left: 600px; top: 370px;">
+            <div
+              class="world-node locked"
+              data-world="8"
+              style="left: 600px; top: 370px"
+            >
               <div class="world-icon">🌋</div>
               <div class="world-number">8</div>
               <div class="world-name">VOLCANO</div>
               <div class="world-lock-overlay">
                 <svg class="world-lock-icon" viewBox="0 0 24 24" fill="white">
-                  <path d="M12 2C9.243 2 7 4.243 7 7v3H6c-1.103 0-2 .897-2 2v8c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2v-8c0-1.103-.897-2-2-2h-1V7c0-2.757-2.243-5-5-5zm6 10 .002 8H6v-8h12zm-9-2V7c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9z"/>
+                  <path
+                    d="M12 2C9.243 2 7 4.243 7 7v3H6c-1.103 0-2 .897-2 2v8c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2v-8c0-1.103-.897-2-2-2h-1V7c0-2.757-2.243-5-5-5zm6 10 .002 8H6v-8h12zm-9-2V7c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9z"
+                  />
                 </svg>
               </div>
             </div>
 
-            <div class="world-node locked" data-world="9" style="left: 700px; top: 50px;">
+            <div
+              class="world-node locked"
+              data-world="9"
+              style="left: 700px; top: 50px"
+            >
               <div class="world-icon">🚀</div>
               <div class="world-number">9</div>
               <div class="world-name">SPACE</div>
               <div class="world-lock-overlay">
                 <svg class="world-lock-icon" viewBox="0 0 24 24" fill="white">
-                  <path d="M12 2C9.243 2 7 4.243 7 7v3H6c-1.103 0-2 .897-2 2v8c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2v-8c0-1.103-.897-2-2-2h-1V7c0-2.757-2.243-5-5-5zm6 10 .002 8H6v-8h12zm-9-2V7c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9z"/>
+                  <path
+                    d="M12 2C9.243 2 7 4.243 7 7v3H6c-1.103 0-2 .897-2 2v8c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2v-8c0-1.103-.897-2-2-2h-1V7c0-2.757-2.243-5-5-5zm6 10 .002 8H6v-8h12zm-9-2V7c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9z"
+                  />
                 </svg>
               </div>
             </div>
@@ -197,11 +264,16 @@
 
           <div class="world-info-panel">
             <h2 id="selectedWorldName">HIGHWAY</h2>
-            <p id="selectedWorldDescription">The classic road experience. Dodge traffic and collect coins on the open highway.</p>
+            <p id="selectedWorldDescription">
+              The classic road experience. Dodge traffic and collect coins on
+              the open highway.
+            </p>
             <button id="selectWorldBtn" class="menu-btn">SELECT</button>
           </div>
 
-          <button id="backToMenuFromWorlds" class="menu-btn">BACK TO MENU</button>
+          <button id="backToMenuFromWorlds" class="menu-btn">
+            BACK TO MENU
+          </button>
         </div>
 
         <!-- Modification Screen -->
@@ -331,35 +403,60 @@
         </div>
         <div class="legend-content" id="legendContent">
           <div class="legend-item">
-            <canvas class="legend-canvas" width="40" height="40" id="legendObstacle"></canvas>
+            <canvas
+              class="legend-canvas"
+              width="40"
+              height="40"
+              id="legendObstacle"
+            ></canvas>
             <div class="legend-text">
               <span class="legend-name">OBSTACLE</span>
               <span class="legend-effect">-1 Health</span>
             </div>
           </div>
           <div class="legend-item">
-            <canvas class="legend-canvas" width="40" height="40" id="legendHeart"></canvas>
+            <canvas
+              class="legend-canvas"
+              width="40"
+              height="40"
+              id="legendHeart"
+            ></canvas>
             <div class="legend-text">
               <span class="legend-name">HEART</span>
               <span class="legend-effect">+1 Health</span>
             </div>
           </div>
           <div class="legend-item">
-            <canvas class="legend-canvas" width="40" height="40" id="legendCoin"></canvas>
+            <canvas
+              class="legend-canvas"
+              width="40"
+              height="40"
+              id="legendCoin"
+            ></canvas>
             <div class="legend-text">
               <span class="legend-name">COIN</span>
               <span class="legend-effect">+1 Coin</span>
             </div>
           </div>
           <div class="legend-item">
-            <canvas class="legend-canvas" width="40" height="40" id="legendShield"></canvas>
+            <canvas
+              class="legend-canvas"
+              width="40"
+              height="40"
+              id="legendShield"
+            ></canvas>
             <div class="legend-text">
               <span class="legend-name">SHIELD</span>
               <span class="legend-effect">Protects Once</span>
             </div>
           </div>
           <div class="legend-item">
-            <canvas class="legend-canvas" width="40" height="40" id="legendBomb"></canvas>
+            <canvas
+              class="legend-canvas"
+              width="40"
+              height="40"
+              id="legendBomb"
+            ></canvas>
             <div class="legend-text">
               <span class="legend-name">BOMB</span>
               <span class="legend-effect">Instant Death</span>
@@ -502,18 +599,12 @@
         <div class="debug-section">
           <h3>Worlds</h3>
           <div class="debug-control">
-            <button
-              id="debugResetWorldsBtn"
-              class="debug-btn debug-btn-danger"
-            >
+            <button id="debugResetWorldsBtn" class="debug-btn debug-btn-danger">
               Reset All World Progress
             </button>
           </div>
           <div class="debug-control">
-            <button
-              id="debugUnlockAllWorldsBtn"
-              class="debug-btn"
-            >
+            <button id="debugUnlockAllWorldsBtn" class="debug-btn">
               Unlock All Worlds
             </button>
           </div>
