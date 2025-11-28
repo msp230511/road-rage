@@ -127,6 +127,13 @@ Keyboard events (game.js:122-136):
 - **Shield Effect**: Translucent blue bubble with shimmer around motorcycle
 - **Game Over Screen**: Animated GIF (cat-scream.gif) with dark overlay
 - **Banana Cheerer**: Fixed position GIF (banana-cheerer.gif) at bottom-left (style.css:30-41)
+- **Vehicle Animations**:
+  - Monster Truck: Animated exhaust flames shooting from side pipes
+  - Ornithopter: Animated wing flutter effect
+- **Particle Effects**: World-specific dust/sand trails behind vehicles
+  - Highway: Gray road dust particles
+  - Desert: Tan sand particles with sideways drift
+  - Particle intensity increases when boosting
 
 ### World System (game.js:222-355)
 

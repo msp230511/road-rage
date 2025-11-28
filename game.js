@@ -236,6 +236,16 @@ const WORLDS = {
       backgroundImage: "media/images/highway-bg.png",
       music: "media/sounds/the-return-of-the-8-bit-era-301292.mp3",
       obstacleStyle: "crate",
+      particles: {
+        color: "rgba(120, 120, 120, ", // Gray dust
+        colorAlt: "rgba(100, 100, 100, ", // Darker gray
+        size: { min: 2, max: 4 },
+        speed: { min: 1, max: 3 },
+        lifetime: { min: 20, max: 40 },
+        spread: 15,
+        spawnRate: 0.15,
+        drift: { x: 0.2, y: -0.5 },
+      },
     },
     vehicles: ["motorcycle", "car", "truck"],
   },
@@ -251,6 +261,16 @@ const WORLDS = {
       backgroundImage: "media/images/desert-bg.png",
       music: "media/sounds/desert-world-bg-music.mp3",
       obstacleStyle: "cactus",
+      particles: {
+        color: "rgba(210, 180, 140, ", // Tan sand
+        colorAlt: "rgba(244, 164, 96, ", // Sandy brown
+        size: { min: 2, max: 4 },
+        speed: { min: 2, max: 4 },
+        lifetime: { min: 30, max: 50 },
+        spread: 20,
+        spawnRate: 0.25,
+        drift: { x: 0.5, y: -0.3 },
+      },
     },
     vehicles: ["jeep", "sandworm", "ornithopter"],
   },
@@ -602,6 +622,84 @@ const WORLD_VEHICLES = {
       name: "MONSTER TRUCK",
       price: 300,
       draw: function (context, x, y, scale = 1) {
+        // Flame animation variables
+        const flameFlicker = Math.sin(Date.now() / 50) * 3 * scale;
+        const flameFlicker2 = Math.cos(Date.now() / 40) * 2 * scale;
+        const flameIntensity = 0.7 + Math.sin(Date.now() / 80) * 0.3;
+
+        // Exhaust pipes (chrome/silver vertical pipes on sides)
+        context.fillStyle = "#7f8c8d";
+        // Left exhaust pipe
+        context.fillRect(x - 24 * scale, y - 5 * scale, 4 * scale, 20 * scale);
+        // Right exhaust pipe
+        context.fillRect(x + 20 * scale, y - 5 * scale, 4 * scale, 20 * scale);
+
+        // Pipe highlights
+        context.fillStyle = "#bdc3c7";
+        context.fillRect(x - 23 * scale, y - 5 * scale, 1.5 * scale, 20 * scale);
+        context.fillRect(x + 21 * scale, y - 5 * scale, 1.5 * scale, 20 * scale);
+
+        // Animated flames from exhaust pipes
+        // Left flame (outer orange)
+        context.fillStyle = `rgba(255, 100, 0, ${flameIntensity})`;
+        context.beginPath();
+        context.moveTo(x - 22 * scale, y - 5 * scale);
+        context.quadraticCurveTo(
+          x - 22 * scale + flameFlicker, y - 15 * scale,
+          x - 24 * scale, y - 22 * scale + flameFlicker2
+        );
+        context.quadraticCurveTo(
+          x - 22 * scale - flameFlicker2, y - 12 * scale,
+          x - 20 * scale, y - 5 * scale
+        );
+        context.closePath();
+        context.fill();
+
+        // Left inner flame (yellow core)
+        context.fillStyle = `rgba(255, 220, 0, ${flameIntensity})`;
+        context.beginPath();
+        context.moveTo(x - 21.5 * scale, y - 5 * scale);
+        context.quadraticCurveTo(
+          x - 22 * scale + flameFlicker * 0.5, y - 10 * scale,
+          x - 22 * scale, y - 16 * scale + flameFlicker2
+        );
+        context.quadraticCurveTo(
+          x - 22 * scale - flameFlicker2 * 0.5, y - 9 * scale,
+          x - 20.5 * scale, y - 5 * scale
+        );
+        context.closePath();
+        context.fill();
+
+        // Right flame (outer orange)
+        context.fillStyle = `rgba(255, 100, 0, ${flameIntensity})`;
+        context.beginPath();
+        context.moveTo(x + 20 * scale, y - 5 * scale);
+        context.quadraticCurveTo(
+          x + 22 * scale - flameFlicker, y - 15 * scale,
+          x + 24 * scale, y - 22 * scale - flameFlicker2
+        );
+        context.quadraticCurveTo(
+          x + 22 * scale + flameFlicker2, y - 12 * scale,
+          x + 22 * scale, y - 5 * scale
+        );
+        context.closePath();
+        context.fill();
+
+        // Right inner flame (yellow core)
+        context.fillStyle = `rgba(255, 220, 0, ${flameIntensity})`;
+        context.beginPath();
+        context.moveTo(x + 20.5 * scale, y - 5 * scale);
+        context.quadraticCurveTo(
+          x + 22 * scale - flameFlicker * 0.5, y - 10 * scale,
+          x + 22 * scale, y - 16 * scale - flameFlicker2
+        );
+        context.quadraticCurveTo(
+          x + 22 * scale + flameFlicker2 * 0.5, y - 9 * scale,
+          x + 21.5 * scale, y - 5 * scale
+        );
+        context.closePath();
+        context.fill();
+
         // Truck bed (back)
         context.fillStyle = "#f39c12";
         context.fillRect(x - 20 * scale, y + 5 * scale, 40 * scale, 15 * scale);
@@ -1219,7 +1317,84 @@ let game = {
   coinsThisGame: 0, // Track coins collected this game
   consecutiveBombDeaths: 0, // Track consecutive deaths from bombs
   lastDeathWasBomb: false, // Track if last death was from bomb
+  particles: [], // Particle effects array
 };
+
+// Default particle config (fallback for worlds without particles defined)
+const DEFAULT_PARTICLE_CONFIG = {
+  color: "rgba(120, 120, 120, ",
+  colorAlt: "rgba(100, 100, 100, ",
+  size: { min: 2, max: 4 },
+  speed: { min: 1, max: 3 },
+  lifetime: { min: 20, max: 40 },
+  spread: 15,
+  spawnRate: 0.15,
+  drift: { x: 0.2, y: -0.5 },
+};
+
+// Spawn particles behind the vehicle
+function spawnParticles() {
+  const world = WORLDS[currentWorld];
+  const config = world?.theme?.particles || DEFAULT_PARTICLE_CONFIG;
+
+  // Get vehicle position
+  const vehicleX = game.motorcycle.lane * game.laneWidth + game.laneWidth / 2;
+  const vehicleY = game.motorcycle.row * TILE_HEIGHT + TILE_HEIGHT / 2;
+
+  // Spawn rate increases when boosting
+  const spawnChance = game.isBoosting ? config.spawnRate * 2 : config.spawnRate;
+
+  // Spawn particles from behind the vehicle (both wheel positions)
+  const wheelOffsets = [-12, 12]; // Left and right wheel positions
+
+  wheelOffsets.forEach(offset => {
+    if (Math.random() < spawnChance) {
+      const useAltColor = Math.random() > 0.5;
+      game.particles.push({
+        x: vehicleX + offset + (Math.random() - 0.5) * config.spread,
+        y: vehicleY + 20, // Behind the vehicle
+        vx: (Math.random() - 0.5) * config.speed.max + config.drift.x,
+        vy: Math.random() * (config.speed.max - config.speed.min) + config.speed.min + config.drift.y,
+        size: Math.random() * (config.size.max - config.size.min) + config.size.min,
+        lifetime: Math.random() * (config.lifetime.max - config.lifetime.min) + config.lifetime.min,
+        maxLifetime: 0, // Will be set below
+        color: useAltColor ? config.colorAlt : config.color,
+      });
+      // Store max lifetime for opacity calculation
+      game.particles[game.particles.length - 1].maxLifetime = game.particles[game.particles.length - 1].lifetime;
+    }
+  });
+}
+
+// Update particles
+function updateParticles(deltaMultiplier = 1) {
+  for (let i = game.particles.length - 1; i >= 0; i--) {
+    const p = game.particles[i];
+
+    // Move particle
+    p.x += p.vx * deltaMultiplier;
+    p.y += p.vy * deltaMultiplier;
+
+    // Age particle
+    p.lifetime -= deltaMultiplier;
+
+    // Remove dead particles
+    if (p.lifetime <= 0) {
+      game.particles.splice(i, 1);
+    }
+  }
+}
+
+// Draw particles
+function drawParticles() {
+  game.particles.forEach(p => {
+    const opacity = Math.max(0, p.lifetime / p.maxLifetime) * 0.6;
+    ctx.fillStyle = p.color + opacity + ")";
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+    ctx.fill();
+  });
+}
 
 // Load achievements from localStorage on game start
 loadAchievements();
@@ -1736,6 +1911,10 @@ function update(deltaMultiplier = 1) {
   spawnHeart(spawnDelta);
   spawnCoin(spawnDelta);
 
+  // Spawn and update particles
+  spawnParticles();
+  updateParticles(clampedDelta);
+
   // Update obstacles
   game.obstacles.forEach((obstacle) => {
     obstacle.y += actualSpeed;
@@ -2005,6 +2184,9 @@ function render() {
   game.powerups.forEach((powerup) => {
     drawPowerup(powerup);
   });
+
+  // Draw particles (behind vehicle)
+  drawParticles();
 
   // Draw motorcycle
   drawMotorcycle();
@@ -2494,6 +2676,7 @@ function restart() {
     },
     obstacles: [],
     powerups: [],
+    particles: [],
     hasShield: startWithShield,
     shieldHits: startWithShield ? shieldHits : 0,
     keys: {},
@@ -2589,6 +2772,7 @@ function startGame() {
     },
     obstacles: [],
     powerups: [],
+    particles: [],
     hasShield: startWithShield,
     shieldHits: startWithShield ? shieldHits : 0,
     keys: {},

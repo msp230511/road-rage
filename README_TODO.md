@@ -46,6 +46,8 @@ The game is in a fully playable state with all core mechanics, powerups, difficu
   - World unlock system (score 10,000 in previous world)
 - [x] Per-world high score tracking
 - [x] World-aware vehicle and mod storage (localStorage migration)
+- [x] **Vehicle animations** (Monster Truck exhaust flames, Ornithopter wing flutter)
+- [x] **World-specific particle effects** (Highway dust, Desert sand trails)
 
 ## Known Issues
 
@@ -75,7 +77,7 @@ The game is in a fully playable state with all core mechanics, powerups, difficu
 - [ ] Settings menu (volume control, key bindings)
 - [ ] Tutorial/instructions screen
 - [ ] Animated transitions between screens
-- [ ] Particle effects (explosions, sparks)
+- [x] ~~Particle effects~~ (World-specific dust/sand trails behind vehicles)
 - [ ] Better mobile support (touch controls)
 - [ ] Responsive canvas sizing
 
