@@ -1268,3 +1268,227 @@ body {
     opacity: 0;
   }
 }
+
+/* World Map Screen */
+.world-map-screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #1a4a2e 0%, #2d5a3d 50%, #1a4a2e 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  overflow: hidden;
+}
+
+.world-map-screen.hidden {
+  display: none !important;
+}
+
+.world-map-screen .game-title {
+  margin-bottom: 10px;
+  font-size: 48px;
+}
+
+.world-map-container {
+  position: relative;
+  width: 800px;
+  height: 600px;
+  background: linear-gradient(180deg,
+    #87CEEB 0%,
+    #87CEEB 40%,
+    #90EE90 40%,
+    #228B22 100%);
+  border: 4px solid #8B4513;
+  border-radius: 15px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), inset 0 0 100px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+.world-path {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.path-line {
+  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.5));
+}
+
+/* World Nodes */
+.world-node {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  border: 4px solid #8B4513;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+  transform: translate(-50%, -50%);
+}
+
+.world-node:hover {
+  transform: translate(-50%, -50%) scale(1.15);
+  box-shadow: 0 6px 25px rgba(255, 215, 0, 0.6);
+}
+
+.world-node.selected {
+  transform: translate(-50%, -50%) scale(1.2);
+  border-color: #FFD700;
+  box-shadow: 0 0 30px rgba(255, 215, 0, 0.8), 0 6px 25px rgba(0, 0, 0, 0.4);
+}
+
+.world-node.locked {
+  background: linear-gradient(135deg, #666 0%, #444 100%);
+  border-color: #333;
+  cursor: not-allowed;
+}
+
+.world-node.locked:hover {
+  transform: translate(-50%, -50%) scale(1.05);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+.world-icon {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.world-node.locked .world-icon {
+  filter: grayscale(100%) opacity(0.3);
+}
+
+.world-number {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 24px;
+  height: 24px;
+  background: #e74c3c;
+  border: 2px solid white;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: bold;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Courier New", monospace;
+}
+
+.world-node.locked .world-number {
+  background: #555;
+}
+
+.world-name {
+  font-size: 8px;
+  font-weight: bold;
+  color: #333;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 2px;
+  font-family: "Courier New", monospace;
+  text-align: center;
+}
+
+.world-node.locked .world-name {
+  color: #888;
+}
+
+.world-lock-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.world-lock-icon {
+  width: 30px;
+  height: 30px;
+  filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
+}
+
+/* World Info Panel */
+.world-info-panel {
+  background: rgba(0, 0, 0, 0.8);
+  border: 3px solid #FFD700;
+  border-radius: 10px;
+  padding: 15px 30px;
+  margin-top: 15px;
+  text-align: center;
+  min-width: 400px;
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+}
+
+.world-info-panel h2 {
+  color: #FFD700;
+  font-size: 28px;
+  margin: 0 0 10px 0;
+  font-family: "Courier New", monospace;
+  letter-spacing: 3px;
+}
+
+.world-info-panel p {
+  color: #bdc3c7;
+  font-size: 14px;
+  margin: 0 0 15px 0;
+  font-family: Arial, sans-serif;
+  line-height: 1.4;
+}
+
+.world-info-panel .menu-btn {
+  padding: 10px 30px;
+  font-size: 16px;
+}
+
+.world-info-panel .menu-btn:disabled {
+  background: #555;
+  border-color: #777;
+  cursor: not-allowed;
+}
+
+/* Worlds Button on Menu */
+.worlds-btn {
+  position: absolute;
+  top: 30px;
+  right: 30px;
+  padding: 15px 25px;
+  font-size: 18px;
+  background: #27ae60;
+  color: white;
+  border: 3px solid white;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-weight: bold;
+  letter-spacing: 1px;
+  font-family: "Courier New", monospace;
+  box-shadow: 0 0 20px rgba(39, 174, 96, 0.5);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.worlds-btn:hover {
+  background: #2ecc71;
+  transform: scale(1.05);
+  box-shadow: 0 0 30px rgba(39, 174, 96, 0.7);
+}
