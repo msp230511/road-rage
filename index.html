@@ -11,6 +11,9 @@
       <div class="game-container">
         <!-- Menu Screen -->
         <div id="menuScreen" class="menu-screen">
+          <button id="thingsToKnowBtn" class="things-to-know-btn">
+            ℹ️ Things To Know
+          </button>
           <div id="menuCoinDisplay" class="menu-coin-display">
             <span class="menu-coin-icon">💰</span>
             <span id="menuCoins">0</span>
@@ -230,6 +233,34 @@
       </div>
       <!-- Achievement Notification Container -->
       <div id="achievementContainer" class="achievement-container"></div>
+
+      <!-- Things To Know Overlay -->
+      <div id="thingsToKnowOverlay" class="things-to-know-overlay hidden">
+        <div class="things-to-know-content">
+          <h2 class="things-to-know-title">Things You Should Know</h2>
+          <ul class="things-to-know-list">
+            <li>
+              This game is hard and there is no difficulty setting. This game is
+              called road rage, not road meditation. Bombs can be hidden behind
+              powerups, impossible to beat states are a feature not a bug.
+            </li>
+            <li>
+              This game uses your local browser cookies to store state - if you
+              wipe your browser data you lose progress.
+            </li>
+            <li>
+              I do not own rights to music or sound effects - don't send me
+              money, I don't want to get sued for copyright infringement.
+            </li>
+          </ul>
+          <p class="things-to-know-note">
+            Try to hit at least 10,000 score to experience the full game.
+            Gameplay changes as score gets higher.
+          </p>
+          <p class="things-to-know-signature">~ Max</p>
+          <button id="closeThingsToKnowBtn" class="menu-btn">CLOSE</button>
+        </div>
+      </div>
 
       <!-- Debug Mode Overlay -->
       <div id="debugOverlay" class="debug-overlay hidden">
