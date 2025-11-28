@@ -42,6 +42,11 @@ const menuBtn = document.getElementById("menuBtn");
 const menuFromGameOverBtn = document.getElementById("menuFromGameOverBtn");
 const menuCoinsDisplay = document.getElementById("menuCoins");
 
+// Things To Know elements
+const thingsToKnowBtn = document.getElementById("thingsToKnowBtn");
+const thingsToKnowOverlay = document.getElementById("thingsToKnowOverlay");
+const closeThingsToKnowBtn = document.getElementById("closeThingsToKnowBtn");
+
 // Achievements screen elements
 const achievementsBtn = document.getElementById("achievementsBtn");
 const achievementsScreen = document.getElementById("achievementsScreen");
@@ -2124,6 +2129,22 @@ function populateAchievementsScreen() {
   // Update coins display
   achievementsCoinsDisplay.textContent = totalCoins;
 }
+
+// Things To Know overlay
+thingsToKnowBtn.addEventListener("click", () => {
+  thingsToKnowOverlay.classList.remove("hidden");
+});
+
+closeThingsToKnowBtn.addEventListener("click", (e) => {
+  thingsToKnowOverlay.classList.add("hidden");
+});
+
+// Close overlay when clicking outside the content
+thingsToKnowOverlay.addEventListener("click", (e) => {
+  if (e.target === thingsToKnowOverlay) {
+    thingsToKnowOverlay.classList.add("hidden");
+  }
+});
 
 // Open achievements screen
 achievementsBtn.addEventListener("click", () => {
