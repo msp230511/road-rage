@@ -39,6 +39,18 @@ const menuBtn = document.getElementById("menuBtn");
 const menuFromGameOverBtn = document.getElementById("menuFromGameOverBtn");
 const menuCoinsDisplay = document.getElementById("menuCoins");
 
+// Achievements screen elements
+const achievementsBtn = document.getElementById("achievementsBtn");
+const achievementsScreen = document.getElementById("achievementsScreen");
+const achievementsCoinsDisplay = document.getElementById("achievementsCoins");
+const backToMenuFromAchievements = document.getElementById(
+  "backToMenuFromAchievements"
+);
+const unlockedAchievementsList = document.getElementById(
+  "unlockedAchievements"
+);
+const lockedAchievementsList = document.getElementById("lockedAchievements");
+
 // Modification screen elements
 const modScreen = document.getElementById("modScreen");
 const backToMenuBtn = document.getElementById("backToMenuBtn");
@@ -54,6 +66,30 @@ let roastTimeout = null;
 
 // Achievement elements
 const achievementContainer = document.getElementById("achievementContainer");
+
+// Debug mode elements
+const debugOverlay = document.getElementById("debugOverlay");
+const debugHealthInput = document.getElementById("debugHealthInput");
+const debugApplyHealthBtn = document.getElementById("debugApplyHealthBtn");
+const debugCoinsInput = document.getElementById("debugCoinsInput");
+const debugAddCoinsBtn = document.getElementById("debugAddCoinsBtn");
+const debugResetCoinsBtn = document.getElementById("debugResetCoinsBtn");
+const debugResetVehiclesBtn = document.getElementById("debugResetVehiclesBtn");
+const debugResetAchievementsBtn = document.getElementById(
+  "debugResetAchievementsBtn"
+);
+const debugStatus = document.getElementById("debugStatus");
+const debugInvincibilityCheckbox = document.getElementById(
+  "debugInvincibilityCheckbox"
+);
+
+// Debug mode state
+let debugMode = {
+  active: false,
+  keysPressed: new Set(),
+  customStartHealth: null, // null means use default/mod-based health
+  invincibility: false, // Invincibility mode
+};
 
 // Array of roasts the banana man says when you take damage
 const BANANA_ROASTS = [
@@ -526,6 +562,97 @@ let game = {
 // Load achievements from localStorage on game start
 loadAchievements();
 
+// ==================== DEBUG MODE FUNCTIONS ====================
+
+// Show debug status message
+function showDebugStatus(message, duration = 3000) {
+  debugStatus.textContent = message;
+  debugStatus.classList.add("show");
+  setTimeout(() => {
+    debugStatus.classList.remove("show");
+  }, duration);
+}
+
+// Debug: Apply custom starting health
+debugApplyHealthBtn.addEventListener("click", () => {
+  const healthValue = parseInt(debugHealthInput.value);
+  if (healthValue > 0 && healthValue <= 100) {
+    debugMode.customStartHealth = healthValue;
+    showDebugStatus(`✓ Starting health set to ${healthValue}`);
+  } else {
+    showDebugStatus("✗ Health must be 1-100", 2000);
+  }
+});
+
+// Debug: Toggle invincibility
+debugInvincibilityCheckbox.addEventListener("change", (e) => {
+  debugMode.invincibility = e.target.checked;
+  if (debugMode.invincibility) {
+    showDebugStatus("✓ Invincibility enabled");
+  } else {
+    showDebugStatus("✓ Invincibility disabled");
+  }
+});
+
+// Debug: Give coins
+debugAddCoinsBtn.addEventListener("click", () => {
+  const coinsToAdd = parseInt(debugCoinsInput.value);
+  if (coinsToAdd > 0) {
+    totalCoins += coinsToAdd;
+    saveTotalCoins(totalCoins);
+    updateCoinsDisplay();
+    showDebugStatus(`✓ Added ${coinsToAdd} coins`);
+  } else {
+    showDebugStatus("✗ Coin amount must be > 0", 2000);
+  }
+});
+
+// Debug: Reset coins to 0
+debugResetCoinsBtn.addEventListener("click", () => {
+  totalCoins = 0;
+  saveTotalCoins(totalCoins);
+  updateCoinsDisplay();
+  showDebugStatus("✓ Coins reset to 0");
+});
+
+// Debug: Lock all vehicles and reset mods
+debugResetVehiclesBtn.addEventListener("click", () => {
+  // Lock all vehicles except motorcycle
+  localStorage.setItem(
+    "motorcycleUnlockedVehicles",
+    JSON.stringify(["motorcycle"])
+  );
+
+  // Reset all vehicle mods to locked
+  localStorage.setItem(
+    "motorcycleUnlockedMods",
+    JSON.stringify({
+      motorcycle: [],
+      car: [],
+      truck: [],
+    })
+  );
+
+  showDebugStatus("✓ Vehicles locked & mods reset - Reloading...", 1500);
+
+  // Reload the page after a short delay so user sees the message
+  setTimeout(() => {
+    location.reload();
+  }, 1500);
+});
+
+// Debug: Reset all achievements
+debugResetAchievementsBtn.addEventListener("click", () => {
+  // Reset all achievements to unlocked: false
+  Object.keys(ACHIEVEMENTS).forEach((key) => {
+    ACHIEVEMENTS[key].unlocked = false;
+  });
+  saveAchievements();
+  showDebugStatus("✓ All achievements reset");
+});
+
+// ==================== END DEBUG MODE FUNCTIONS ====================
+
 // Audio control
 bgMusic.volume = 0.5; // Set volume to 50%
 
@@ -638,6 +765,22 @@ function updateLaneExpansion() {
 
 // Handle keyboard input
 document.addEventListener("keydown", (e) => {
+  // Track keys for debug mode (A+W+D)
+  const key = e.key.toLowerCase();
+  debugMode.keysPressed.add(key);
+
+  // Check if A+W+D are all pressed
+  if (
+    debugMode.keysPressed.has("a") &&
+    debugMode.keysPressed.has("w") &&
+    debugMode.keysPressed.has("d")
+  ) {
+    if (!debugMode.active) {
+      debugMode.active = true;
+      debugOverlay.classList.remove("hidden");
+    }
+  }
+
   if (e.key === "ArrowLeft" || e.key === "a" || e.key === "A") {
     moveLane(-1);
   } else if (e.key === "ArrowRight" || e.key === "d" || e.key === "D") {
@@ -648,6 +791,16 @@ document.addEventListener("keydown", (e) => {
 });
 
 document.addEventListener("keyup", (e) => {
+  // Track key release for debug mode
+  const key = e.key.toLowerCase();
+  debugMode.keysPressed.delete(key);
+
+  // Hide debug overlay if any of A, W, or D is released
+  if (debugMode.active && (key === "a" || key === "w" || key === "d")) {
+    debugMode.active = false;
+    debugOverlay.classList.add("hidden");
+  }
+
   if (e.key === "ArrowUp" || e.key === "w" || e.key === "W") {
     game.isBoosting = false;
   }
@@ -860,6 +1013,12 @@ function update() {
             .catch((e) => console.log("Bubble sound error:", e));
         }
       } else if (powerup.type === "bomb") {
+        // Debug invincibility mode - ignore bomb damage
+        if (debugMode.invincibility) {
+          // Remove bomb but don't take damage
+          return false;
+        }
+
         // Check survival chance before fatal bomb damage
         let survived = false;
 
@@ -953,6 +1112,11 @@ function update() {
       obstacle.y >= motorcycleY - TILE_HEIGHT &&
       obstacle.y <= motorcycleY + TILE_HEIGHT
     ) {
+      // Debug invincibility mode - ignore all obstacle damage
+      if (debugMode.invincibility) {
+        return false; // Remove obstacle but take no damage
+      }
+
       // Shield absorbs the hit
       if (game.hasShield) {
         game.shieldHits--;
@@ -1037,6 +1201,24 @@ function update() {
       if (game.score > game.highScore) {
         game.highScore = game.score;
         saveHighScore(game.highScore);
+      }
+
+      // Check score-based achievements during gameplay
+      if (!game.damageTaken) {
+        // Kinda Crazy: Reach 500 score without taking damage
+        if (game.score >= 500 && !isAchievementUnlocked("kindaCrazy")) {
+          unlockAchievement("kindaCrazy");
+        }
+
+        // Touch Grass: Reach 1000 score without taking damage
+        if (game.score >= 1000 && !isAchievementUnlocked("touchGrass")) {
+          unlockAchievement("touchGrass");
+        }
+      }
+
+      // No Life: Reach 10000 score (no damage requirement)
+      if (game.score >= 10000 && !isAchievementUnlocked("noLife")) {
+        unlockAchievement("noLife");
       }
 
       return false;
@@ -1359,27 +1541,19 @@ function checkGameOverAchievements() {
   // Demolitionist: Die 3 times in a row due to a bomb
   if (game.lastDeathWasBomb) {
     game.consecutiveBombDeaths++;
-    if (game.consecutiveBombDeaths >= 3 && !isAchievementUnlocked("demolitionist")) {
+    if (
+      game.consecutiveBombDeaths >= 3 &&
+      !isAchievementUnlocked("demolitionist")
+    ) {
       unlockAchievement("demolitionist");
     }
   } else {
     game.consecutiveBombDeaths = 0;
   }
 
-  // Kinda Crazy: Take no damage until 500 score
-  if (game.score >= 500 && !game.damageTaken && !isAchievementUnlocked("kindaCrazy")) {
-    unlockAchievement("kindaCrazy");
-  }
-
-  // Touch Grass: Take no damage until 1000 score
-  if (game.score >= 1000 && !game.damageTaken && !isAchievementUnlocked("touchGrass")) {
-    unlockAchievement("touchGrass");
-  }
-
-  // No Life: Reach 10000 score
-  if (game.score >= 10000 && !isAchievementUnlocked("noLife")) {
-    unlockAchievement("noLife");
-  }
+  // Note: Score-based achievements ("Kinda Crazy", "Touch Grass", "No Life")
+  // are now checked during gameplay in the update() function when score increases,
+  // not here on game over. This allows them to trigger immediately during gameplay.
 
   // Uncle Scrooge: Collect 25 coins in one game
   if (game.coinsThisGame >= 25 && !isAchievementUnlocked("uncleScrooge")) {
@@ -1395,9 +1569,12 @@ function restart() {
   // Reset canvas to initial width
   canvas.width = 800;
 
-  // Calculate initial health based on mods
+  // Calculate initial health based on mods or debug mode
   let initialHealth = 3;
-  if (hasModEffect("maxHealth5")) {
+  if (debugMode.customStartHealth !== null) {
+    // Debug mode override
+    initialHealth = debugMode.customStartHealth;
+  } else if (hasModEffect("maxHealth5")) {
     initialHealth = 5;
   }
 
@@ -1475,9 +1652,12 @@ function startGame() {
   // Reset canvas to initial width
   canvas.width = 800;
 
-  // Calculate initial health based on mods
+  // Calculate initial health based on mods or debug mode
   let initialHealth = 3;
-  if (hasModEffect("maxHealth5")) {
+  if (debugMode.customStartHealth !== null) {
+    // Debug mode override
+    initialHealth = debugMode.customStartHealth;
+  } else if (hasModEffect("maxHealth5")) {
     initialHealth = 5;
   }
 
@@ -1879,6 +2059,87 @@ backToMenuBtn.addEventListener("click", () => {
   }
   closeModScreen();
 });
+
+// ==================== ACHIEVEMENTS SCREEN ====================
+
+// Function to create achievement card element
+function createAchievementCard(achievement, isUnlocked) {
+  const card = document.createElement("div");
+  card.className = `achievement-card ${isUnlocked ? "" : "locked"}`;
+  card.innerHTML = `
+    <div class="achievement-card-icon">🏆</div>
+    <div class="achievement-card-content">
+      <h3 class="achievement-card-title">${achievement.name}</h3>
+      <p class="achievement-card-description">${achievement.description}</p>
+    </div>
+  `;
+  return card;
+}
+
+// Function to populate achievements screen
+function populateAchievementsScreen() {
+  // Clear existing lists
+  unlockedAchievementsList.innerHTML = "";
+  lockedAchievementsList.innerHTML = "";
+
+  const unlockedAchievements = [];
+  const lockedAchievements = [];
+
+  // Separate achievements into unlocked and locked
+  Object.values(ACHIEVEMENTS).forEach((achievement) => {
+    if (achievement.unlocked) {
+      unlockedAchievements.push(achievement);
+    } else {
+      lockedAchievements.push(achievement);
+    }
+  });
+
+  // Populate unlocked achievements
+  if (unlockedAchievements.length > 0) {
+    unlockedAchievements.forEach((achievement) => {
+      unlockedAchievementsList.appendChild(
+        createAchievementCard(achievement, true)
+      );
+    });
+  } else {
+    unlockedAchievementsList.innerHTML =
+      '<div class="achievements-empty">No achievements unlocked yet. Start playing to unlock them!</div>';
+  }
+
+  // Populate locked achievements
+  if (lockedAchievements.length > 0) {
+    lockedAchievements.forEach((achievement) => {
+      lockedAchievementsList.appendChild(
+        createAchievementCard(achievement, false)
+      );
+    });
+  } else {
+    lockedAchievementsList.innerHTML =
+      '<div class="achievements-empty">All achievements unlocked! 🎉</div>';
+  }
+
+  // Update coins display
+  achievementsCoinsDisplay.textContent = totalCoins;
+}
+
+// Open achievements screen
+achievementsBtn.addEventListener("click", () => {
+  menuScreen.classList.add("hidden");
+  menuCoinDisplay.style.display = "none";
+  achievementsBtn.style.display = "none";
+  achievementsScreen.classList.remove("hidden");
+  populateAchievementsScreen();
+});
+
+// Back to menu from achievements
+backToMenuFromAchievements.addEventListener("click", () => {
+  achievementsScreen.classList.add("hidden");
+  menuScreen.classList.remove("hidden");
+  menuCoinDisplay.style.display = "flex";
+  achievementsBtn.style.display = "flex";
+});
+
+// ==================== END ACHIEVEMENTS SCREEN ====================
 
 // Draw vehicle previews in menu
 function drawVehiclePreviews() {
