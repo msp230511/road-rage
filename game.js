@@ -47,6 +47,45 @@ const modVehicleName = document.getElementById("modVehicleName");
 const modVehicleCanvas = document.getElementById("modVehicleCanvas");
 let currentModVehicle = "motorcycle"; // Track which vehicle is being modified
 
+// Banana roast elements
+const bananaSpeechBubble = document.getElementById("bananaSpeechBubble");
+const roastText = document.getElementById("roastText");
+let roastTimeout = null;
+
+// Array of roasts the banana man says when you take damage
+const BANANA_ROASTS = [
+  "Why would you do that?",
+  "Are you even trying?",
+  "My grandma drives better than you!",
+  "That was embarrassing...",
+  "Did you close your eyes?",
+  "You call that dodging?",
+  "I've seen better from a blindfolded toddler!",
+  "Maybe try using your eyes next time?",
+  "That's gonna leave a mark... on your ego!",
+  "Even I could've avoided that!",
+  "Pathetic.",
+  "Are you playing with your feet?",
+  "This is painful to watch.",
+  "Do you need glasses?",
+  "Yikes.",
+  "That was tragic.",
+  "You're making this too easy for them!",
+  "Is this your first time?",
+  "Were you distracted by my good looks?",
+  "Bro what the f*** was that?",
+  "Holy s***, that was awful!",
+  "You absolute muppet!",
+  "Jesus Christ, pay attention!",
+  "What the hell are you doing?!",
+  "That was some next-level stupidity!",
+  "Are you f***ing kidding me?",
+  "Get good, scrub!",
+  "You're an embarrassment!",
+  "Uninstall, please.",
+  "Delete your account.",
+];
+
 // Game constants
 const TILE_HEIGHT = 50;
 const TOTAL_TILES = 18;
@@ -532,6 +571,27 @@ function moveLane(direction) {
   }
 }
 
+// Show banana roast when player takes damage
+function showBananaRoast() {
+  // Clear any existing timeout
+  if (roastTimeout) {
+    clearTimeout(roastTimeout);
+  }
+
+  // Pick a random roast
+  const randomRoast =
+    BANANA_ROASTS[Math.floor(Math.random() * BANANA_ROASTS.length)];
+  roastText.textContent = randomRoast;
+
+  // Show the speech bubble
+  bananaSpeechBubble.classList.remove("hidden");
+
+  // Hide after 2.5 seconds
+  roastTimeout = setTimeout(() => {
+    bananaSpeechBubble.classList.add("hidden");
+  }, 2500);
+}
+
 // Initialize obstacles
 function spawnObstacle() {
   if (Math.random() < game.currentSpawnChance) {
@@ -710,6 +770,10 @@ function update() {
           // Fatal bomb damage
           game.health = 0;
           healthDisplay.textContent = game.health;
+
+          // Show banana roast
+          showBananaRoast();
+
           // Play explosion sound
           if (!game.isMuted) {
             explosionSound.currentTime = 0;
@@ -807,6 +871,10 @@ function update() {
         // Take damage
         game.health--;
         healthDisplay.textContent = game.health;
+
+        // Show banana roast
+        showBananaRoast();
+
         // Play hitmarker sound on damage
         if (!game.isMuted) {
           hitmarkerSound.currentTime = 0;
