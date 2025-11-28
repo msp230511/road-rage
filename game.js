@@ -28,6 +28,9 @@ const gameOverSounds = [
   document.getElementById("gameOverSound4"),
   document.getElementById("gameOverSound5"),
   document.getElementById("gameOverSound6"),
+  document.getElementById("gameOverSound7"),
+  document.getElementById("gameOverSound8"),
+  document.getElementById("gameOverSound9"),
 ];
 
 // Menu elements
