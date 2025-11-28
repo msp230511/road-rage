@@ -21,19 +21,30 @@
           <h1 class="game-title">ROAD RAGE</h1>
           <h2 class="vehicle-select-title">SELECT YOUR VEHICLE</h2>
           <div class="vehicle-selection">
-            <div class="vehicle-option" data-vehicle="motorcycle">
+            <div class="vehicle-option selected" data-vehicle="motorcycle">
               <div class="vehicle-preview-container">
                 <canvas
                   class="vehicle-preview"
                   width="150"
                   height="150"
                 ></canvas>
+                <div class="lock-overlay" style="display: none;">
+                  <svg class="lock-icon" viewBox="0 0 24 24" fill="white">
+                    <path
+                      d="M12 2C9.243 2 7 4.243 7 7v3H6c-1.103 0-2 .897-2 2v8c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2v-8c0-1.103-.897-2-2-2h-1V7c0-2.757-2.243-5-5-5zm6 10 .002 8H6v-8h12zm-9-2V7c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9z"
+                    />
+                  </svg>
+                </div>
               </div>
               <p>MOTORCYCLE</p>
+              <button class="vehicle-unlock-btn" style="display: none;">
+                <span class="coin-icon">💰</span>
+                <span class="unlock-price">0</span>
+              </button>
               <button class="vehicle-modify-btn">MODIFY</button>
             </div>
             <div class="vehicle-option" data-vehicle="car">
-              <div class="vehicle-preview-container">
+              <div class="vehicle-preview-container locked">
                 <canvas
                   class="vehicle-preview"
                   width="150"
@@ -52,10 +63,10 @@
                 <span class="coin-icon">💰</span>
                 <span class="unlock-price">50</span>
               </button>
-              <button class="vehicle-modify-btn hidden">MODIFY</button>
+              <button class="vehicle-modify-btn" style="display: none;">MODIFY</button>
             </div>
             <div class="vehicle-option" data-vehicle="truck">
-              <div class="vehicle-preview-container">
+              <div class="vehicle-preview-container locked">
                 <canvas
                   class="vehicle-preview"
                   width="150"
@@ -74,7 +85,7 @@
                 <span class="coin-icon">💰</span>
                 <span class="unlock-price">100</span>
               </button>
-              <button class="vehicle-modify-btn hidden">MODIFY</button>
+              <button class="vehicle-modify-btn" style="display: none;">MODIFY</button>
             </div>
           </div>
           <button id="startGameBtn" class="menu-btn">START GAME</button>
@@ -507,6 +518,6 @@
         type="audio/mpeg"
       />
     </audio>
-    <script src="game.js"></script>
+    <script type="module" src="game.js"></script>
   </body>
 </html>
