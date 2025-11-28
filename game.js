@@ -785,11 +785,12 @@ document.addEventListener("keydown", (e) => {
   const key = e.key.toLowerCase();
   debugMode.keysPressed.add(key);
 
-  // Check if A+W+D are all pressed
+  // Check if A+W+D+Space are all pressed
   if (
     debugMode.keysPressed.has("a") &&
     debugMode.keysPressed.has("w") &&
-    debugMode.keysPressed.has("d")
+    debugMode.keysPressed.has("d") &&
+    debugMode.keysPressed.has(" ")
   ) {
     if (!debugMode.active) {
       debugMode.active = true;
@@ -811,8 +812,11 @@ document.addEventListener("keyup", (e) => {
   const key = e.key.toLowerCase();
   debugMode.keysPressed.delete(key);
 
-  // Hide debug overlay if any of A, W, or D is released
-  if (debugMode.active && (key === "a" || key === "w" || key === "d")) {
+  // Hide debug overlay if any of A, W, D, or Space is released
+  if (
+    debugMode.active &&
+    (key === "a" || key === "w" || key === "d" || key === " ")
+  ) {
     debugMode.active = false;
     debugOverlay.classList.add("hidden");
   }
