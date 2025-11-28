@@ -1,0 +1,44 @@
+name: Version Check
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  check-version:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check version was updated
+        run: |
+          # Get version from main branch (may not exist yet)
+          MAIN_VERSION=$(git show origin/main:game.js | grep -oP 'const GAME_VERSION = "\K[^"]+' || echo "")
+
+          # Get version from PR branch
+          PR_VERSION=$(grep -oP 'const GAME_VERSION = "\K[^"]+' game.js || echo "")
+
+          echo "Main version: ${MAIN_VERSION:-'(not found)'}"
+          echo "PR version: ${PR_VERSION:-'(not found)'}"
+
+          # If PR doesn't have a version, fail
+          if [ -z "$PR_VERSION" ]; then
+            echo "::error::GAME_VERSION not found in game.js! Please add version constant."
+            exit 1
+          fi
+
+          # If main doesn't have a version yet, this is the initial setup - pass
+          if [ -z "$MAIN_VERSION" ]; then
+            echo "Initial version setup: $PR_VERSION"
+            exit 0
+          fi
+
+          # Both have versions - they must be different
+          if [ "$MAIN_VERSION" = "$PR_VERSION" ]; then
+            echo "::error::GAME_VERSION has not been updated! Please bump the version in game.js (line 5)"
+            exit 1
+          fi
+
+          echo "Version updated: $MAIN_VERSION → $PR_VERSION"

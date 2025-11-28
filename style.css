@@ -139,6 +139,18 @@ body {
   color: #aaa;
 }
 
+/* Version Display */
+.version-display {
+  position: fixed;
+  bottom: 140px;
+  right: 20px;
+  z-index: 100;
+  color: rgba(255, 255, 255, 0.6);
+  font-family: "Arial", sans-serif;
+  font-size: 11px;
+  text-align: right;
+}
+
 /* Controls Guide */
 .controls-guide {
   position: fixed;
