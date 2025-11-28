@@ -364,7 +364,7 @@ const DIFFICULTY_CONFIG = {
   6500: { speed: 20, spawnChance: 0.6 },
   7000: { speed: 20, spawnChance: 0.6 },
   7500: { speed: 20, spawnChance: 0.6 },
-  8000: { speed: 22, spawnChance: 0.6 },
+  8000: { speed: 20, spawnChance: 0.6 },
   8500: { speed: 22, spawnChance: 0.6 },
   9000: { speed: 22, spawnChance: 0.6 },
   9500: { speed: 22, spawnChance: 0.6 },
