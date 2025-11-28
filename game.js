@@ -2428,8 +2428,12 @@ function update(deltaMultiplier = 1) {
           unlockAchievement("touchGrass");
         }
 
-        // Untouchable: Reach 2000 score without taking damage
-        if (game.score >= 2000 && !isAchievementUnlocked("untouchable")) {
+        // Untouchable: Reach 2000 score without taking damage and with full health
+        if (
+          game.score >= 2000 &&
+          !isAchievementUnlocked("untouchable") &&
+          game.health === getStartingHealth()
+        ) {
           unlockAchievement("untouchable");
         }
       }
