@@ -238,10 +238,19 @@ const DIFFICULTY_CONFIG = {
   2500: { speed: 14, spawnChance: 0.4 },
   3000: { speed: 16, spawnChance: 0.45 },
   3500: { speed: 18, spawnChance: 0.5 },
-  4000: { speed: 20, spawnChance: 0.6 }, // Max difficulty
-  4500: { speed: 20, spawnChance: 0.65 },
-  5000: { speed: 20, spawnChance: 0.7 },
-  5500: { speed: 22, spawnChance: 0.7 },
+  4000: { speed: 18, spawnChance: 0.5 }, // Max difficulty
+  4500: { speed: 18, spawnChance: 0.5 },
+  5000: { speed: 18, spawnChance: 0.5 },
+  5500: { speed: 18, spawnChance: 0.5 },
+  6000: { speed: 18, spawnChance: 0.6 },
+  6500: { speed: 18, spawnChance: 0.6 },
+  7000: { speed: 18, spawnChance: 0.6 },
+  7500: { speed: 20, spawnChance: 0.6 },
+  8000: { speed: 20, spawnChance: 0.6 },
+  8500: { speed: 20, spawnChance: 0.6 },
+  9000: { speed: 20, spawnChance: 0.6 },
+  9500: { speed: 20, spawnChance: 0.6 },
+  10000: { speed: 20, spawnChance: 0.7 }, // Beyond max difficulty
 };
 
 // Vehicle types with drawing functions
@@ -403,14 +412,14 @@ const VEHICLE_MODS = {
     {
       id: "mod2",
       name: "Double Money",
-      price: 50,
+      price: 35,
       description: "Coins are worth 2x",
       effect: "coinValue2x",
     },
     {
       id: "mod3",
       name: "Score Master",
-      price: 75,
+      price: 50,
       description: "Score multiplier 1.5x",
       effect: "scoreMultiplier1_5x",
     },
@@ -419,21 +428,21 @@ const VEHICLE_MODS = {
     {
       id: "mod1",
       name: "Time Lord",
-      price: 40,
+      price: 35,
       description: "Start with 5 hearts instead of 3",
       effect: "maxHealth5",
     },
     {
       id: "mod2",
       name: "Reinforced Shield",
-      price: 65,
+      price: 45,
       description: "Shields protect against 2 hits",
       effect: "shieldDoubleHit",
     },
     {
       id: "mod3",
       name: "Tank Mode",
-      price: 80,
+      price: 65,
       description: "35% chance to survive fatal hit",
       effect: "survivalChance35",
     },
@@ -764,9 +773,9 @@ function updateLaneExpansion() {
 
     game.laneWidth = canvas.width / EXPANDED_LANES;
 
-    // Adjust motorcycle position to keep it in a valid lane
-    // Center the motorcycle in the middle lane of the expanded lanes
-    game.motorcycle.lane = Math.floor(EXPANDED_LANES / 2); // Center lane (lane 2 for 5 lanes)
+    // Adjust motorcycle position to keep it in the same physical lane
+    // Lanes are added on the outside, so old lanes 0,1,2 become 1,2,3
+    game.motorcycle.lane = game.motorcycle.lane + 1;
   }
 }
 
@@ -776,11 +785,12 @@ document.addEventListener("keydown", (e) => {
   const key = e.key.toLowerCase();
   debugMode.keysPressed.add(key);
 
-  // Check if A+W+D are all pressed
+  // Check if A+W+D+Space are all pressed
   if (
     debugMode.keysPressed.has("a") &&
     debugMode.keysPressed.has("w") &&
-    debugMode.keysPressed.has("d")
+    debugMode.keysPressed.has("d") &&
+    debugMode.keysPressed.has(" ")
   ) {
     if (!debugMode.active) {
       debugMode.active = true;
@@ -802,8 +812,11 @@ document.addEventListener("keyup", (e) => {
   const key = e.key.toLowerCase();
   debugMode.keysPressed.delete(key);
 
-  // Hide debug overlay if any of A, W, or D is released
-  if (debugMode.active && (key === "a" || key === "w" || key === "d")) {
+  // Hide debug overlay if any of A, W, D, or Space is released
+  if (
+    debugMode.active &&
+    (key === "a" || key === "w" || key === "d" || key === " ")
+  ) {
     debugMode.active = false;
     debugOverlay.classList.add("hidden");
   }
@@ -2328,7 +2341,13 @@ function renderLegend() {
     // Add shine effect
     ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
     ctx.beginPath();
-    ctx.arc(centerX - heartSize * 0.3, centerY - heartSize * 0.1, heartSize * 0.2, 0, Math.PI * 2);
+    ctx.arc(
+      centerX - heartSize * 0.3,
+      centerY - heartSize * 0.1,
+      heartSize * 0.2,
+      0,
+      Math.PI * 2
+    );
     ctx.fill();
   }
 
