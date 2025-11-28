@@ -924,8 +924,11 @@ function showAchievementNotification(achievement) {
 }
 
 // Initialize obstacles
-function spawnObstacle() {
-  if (Math.random() < game.currentSpawnChance) {
+function spawnObstacle(deltaMultiplier = 1) {
+  // Adjust spawn chance for frame rate: at 120fps (delta=0.5), halve the chance per frame
+  // This maintains consistent spawn rate regardless of refresh rate
+  const adjustedChance = game.currentSpawnChance * deltaMultiplier;
+  if (Math.random() < adjustedChance) {
     // Check which lanes are safe to spawn in
     const safeLanes = getSafeLanes();
 
@@ -944,8 +947,9 @@ function spawnObstacle() {
 }
 
 // Spawn shield powerup
-function spawnShieldPowerup() {
-  if (Math.random() < SHIELD_SPAWN_CHANCE) {
+function spawnShieldPowerup(deltaMultiplier = 1) {
+  const adjustedChance = SHIELD_SPAWN_CHANCE * deltaMultiplier;
+  if (Math.random() < adjustedChance) {
     const lane = Math.floor(Math.random() * game.lanes);
     game.powerups.push({
       type: "shield",
@@ -956,8 +960,9 @@ function spawnShieldPowerup() {
 }
 
 // Spawn bomb
-function spawnBomb() {
-  if (Math.random() < BOMB_SPAWN_CHANCE) {
+function spawnBomb(deltaMultiplier = 1) {
+  const adjustedChance = BOMB_SPAWN_CHANCE * deltaMultiplier;
+  if (Math.random() < adjustedChance) {
     const lane = Math.floor(Math.random() * game.lanes);
     game.powerups.push({
       type: "bomb",
@@ -968,10 +973,10 @@ function spawnBomb() {
 }
 
 // Spawn heart powerup
-function spawnHeart() {
+function spawnHeart(deltaMultiplier = 1) {
   // Apply heart spawn boost mod
   const heartSpawnChance =
-    HEART_SPAWN_CHANCE * getModEffectValue("heartSpawnBoost", 1);
+    HEART_SPAWN_CHANCE * getModEffectValue("heartSpawnBoost", 1) * deltaMultiplier;
 
   if (Math.random() < heartSpawnChance) {
     const lane = Math.floor(Math.random() * game.lanes);
@@ -984,8 +989,9 @@ function spawnHeart() {
 }
 
 // Spawn coin collectible
-function spawnCoin() {
-  if (Math.random() < COIN_SPAWN_CHANCE) {
+function spawnCoin(deltaMultiplier = 1) {
+  const adjustedChance = COIN_SPAWN_CHANCE * deltaMultiplier;
+  if (Math.random() < adjustedChance) {
     const lane = Math.floor(Math.random() * game.lanes);
     game.powerups.push({
       type: "coin",
@@ -1016,8 +1022,11 @@ function getSafeLanes() {
 }
 
 // Update game state
-function update() {
+function update(deltaMultiplier = 1) {
   if (!game.isRunning || game.isPaused) return;
+
+  // Clamp delta multiplier to prevent extreme values on first frame or tab switches
+  const clampedDelta = Math.min(Math.max(deltaMultiplier, 0.1), 3);
 
   // Update difficulty based on score
   updateDifficulty();
@@ -1032,17 +1041,19 @@ function update() {
   const boostMultiplier = game.isBoosting
     ? 2 * getModEffectValue("boostSpeed25", 1)
     : 1;
-  const actualSpeed = game.currentSpeed * boostMultiplier;
+  const actualSpeed = game.currentSpeed * boostMultiplier * clampedDelta;
 
   // Update scroll offset
   game.scrollOffset += actualSpeed;
 
-  // Spawn obstacles and powerups
-  spawnObstacle();
-  spawnShieldPowerup();
-  spawnBomb();
-  spawnHeart();
-  spawnCoin();
+  // Spawn obstacles and powerups (spawn chances adjusted for frame rate)
+  // At higher frame rates, we have more chances to spawn, so we reduce probability per frame
+  const spawnDelta = clampedDelta;
+  spawnObstacle(spawnDelta);
+  spawnShieldPowerup(spawnDelta);
+  spawnBomb(spawnDelta);
+  spawnHeart(spawnDelta);
+  spawnCoin(spawnDelta);
 
   // Update obstacles
   game.obstacles.forEach((obstacle) => {
@@ -2469,15 +2480,29 @@ if (legendToggle && legendContent) {
   });
 }
 
-// Game loop
-function gameLoop() {
-  update();
+// Frame-rate independent timing
+let lastFrameTime = 0;
+const TARGET_FPS = 60;
+const TARGET_FRAME_TIME = 1000 / TARGET_FPS; // ~16.67ms per frame at 60fps
+
+// Game loop with delta time for frame-rate independence
+function gameLoop(currentTime) {
+  // Calculate delta time (time since last frame)
+  const deltaTime = currentTime - lastFrameTime;
+  lastFrameTime = currentTime;
+
+  // Calculate delta multiplier (1.0 at 60fps, 0.5 at 120fps, 2.0 at 30fps)
+  // This normalizes all movement to be consistent regardless of refresh rate
+  const deltaMultiplier = deltaTime / TARGET_FRAME_TIME;
+
+  update(deltaMultiplier);
   render();
   requestAnimationFrame(gameLoop);
 }
 
 // Start game and music
-gameLoop();
+// Use requestAnimationFrame for first call to get proper timestamp
+requestAnimationFrame(gameLoop);
 
 // Start music when user interacts with the page (browser requirement)
 document.addEventListener(
