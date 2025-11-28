@@ -24,7 +24,6 @@ const milestone3000Sound = document.getElementById("milestone3000Sound");
 const gameOverSounds = [
   document.getElementById("gameOverSound1"),
   document.getElementById("gameOverSound2"),
-  document.getElementById("gameOverSound3"),
   document.getElementById("gameOverSound4"),
   document.getElementById("gameOverSound5"),
   document.getElementById("gameOverSound6"),
@@ -374,14 +373,14 @@ const VEHICLE_MODS = {
     {
       id: "mod1",
       name: "Shield Start",
-      price: 25,
+      price: 15,
       description: "Start each life with a shield",
       effect: "startWithShield",
     },
     {
       id: "mod2",
       name: "Heart Boost",
-      price: 40,
+      price: 30,
       description: "Hearts spawn 50% more often",
       effect: "heartSpawnBoost",
     },
@@ -397,7 +396,7 @@ const VEHICLE_MODS = {
     {
       id: "mod1",
       name: "Turbo Boost",
-      price: 30,
+      price: 10,
       description: "50% faster boost speed",
       effect: "boostSpeed25",
     },
@@ -434,7 +433,7 @@ const VEHICLE_MODS = {
     {
       id: "mod3",
       name: "Tank Mode",
-      price: 100,
+      price: 80,
       description: "35% chance to survive fatal hit",
       effect: "survivalChance35",
     },
@@ -844,6 +843,48 @@ function showBananaRoast() {
   }, 2500);
 }
 
+// Show golden sparkle animation when survival chance mod triggers
+function showGoldenSparkle() {
+  const gameContainer = document.querySelector(".game-container");
+
+  // Calculate motorcycle position on screen
+  const x = game.motorcycle.lane * game.laneWidth + game.laneWidth / 2;
+  const y = game.motorcycle.row * TILE_HEIGHT + TILE_HEIGHT / 2;
+
+  // Create sparkle container
+  const sparkleContainer = document.createElement("div");
+  sparkleContainer.className = "golden-sparkle";
+  sparkleContainer.style.left = `${x}px`;
+  sparkleContainer.style.top = `${y + 20}px`; // Offset by game-info height
+  sparkleContainer.style.fontSize = "48px";
+  sparkleContainer.textContent = "✨";
+
+  // Create multiple sparkle particles
+  const particleCount = 20;
+  for (let i = 0; i < particleCount; i++) {
+    const particle = document.createElement("div");
+    particle.className = "sparkle-particle";
+
+    // Random direction for each particle
+    const angle = (Math.PI * 2 * i) / particleCount;
+    const distance = 80 + Math.random() * 40;
+    const tx = Math.cos(angle) * distance;
+    const ty = Math.sin(angle) * distance;
+
+    particle.style.setProperty("--tx", `${tx}px`);
+    particle.style.setProperty("--ty", `${ty}px`);
+
+    sparkleContainer.appendChild(particle);
+  }
+
+  gameContainer.appendChild(sparkleContainer);
+
+  // Remove after animation completes
+  setTimeout(() => {
+    sparkleContainer.remove();
+  }, 1000);
+}
+
 // Show achievement notification
 function showAchievementNotification(achievement) {
   // Create notification element
@@ -1042,7 +1083,8 @@ function update() {
         }
 
         if (survived) {
-          // Survived the bomb! Play Heroes Never Die sound
+          // Survived the bomb! Play Heroes Never Die sound and show golden sparkle
+          showGoldenSparkle();
           if (!game.isMuted) {
             heroesNeverDieSound.currentTime = 0;
             heroesNeverDieSound
@@ -1160,7 +1202,8 @@ function update() {
 
       if (survived) {
         // Survived the critical hit, don't take damage
-        // Play Heroes Never Die sound as feedback
+        // Play Heroes Never Die sound and show golden sparkle as feedback
+        showGoldenSparkle();
         if (!game.isMuted) {
           heroesNeverDieSound.currentTime = 0;
           heroesNeverDieSound

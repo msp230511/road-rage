@@ -1039,3 +1039,47 @@ body {
 .debug-status.show {
   display: block;
 }
+
+/* Golden Sparkle Animation (Survival Chance) */
+.golden-sparkle {
+  position: absolute;
+  pointer-events: none;
+  z-index: 100;
+  animation: sparkleExplosion 1s ease-out forwards;
+}
+
+@keyframes sparkleExplosion {
+  0% {
+    transform: scale(0) rotate(0deg);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.5) rotate(180deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+.sparkle-particle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: radial-gradient(circle, #ffd700 0%, #ffed4e 50%, transparent 100%);
+  border-radius: 50%;
+  box-shadow: 0 0 10px #ffd700, 0 0 20px #ffed4e;
+  animation: particleFly 0.8s ease-out forwards;
+}
+
+@keyframes particleFly {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--tx), var(--ty)) scale(0);
+    opacity: 0;
+  }
+}
