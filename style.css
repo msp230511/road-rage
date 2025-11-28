@@ -632,10 +632,18 @@ body {
   transform: scale(1.05);
 }
 
-.menu-btn:disabled {
+.menu-btn:disabled,
+.menu-btn.disabled {
   background: #7f8c8d;
   cursor: not-allowed;
   opacity: 0.6;
+  transform: none;
+}
+
+.menu-btn:disabled:hover,
+.menu-btn.disabled:hover {
+  background: #7f8c8d;
+  transform: none;
 }
 
 /* Achievements Button */

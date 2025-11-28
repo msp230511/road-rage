@@ -2,7 +2,7 @@
 // MAJOR: Breaking changes or major feature overhauls
 // MINOR: New features, new worlds, new vehicles, significant additions
 // PATCH: Bug fixes, balance tweaks, small improvements
-const GAME_VERSION = "1.1.2";
+const GAME_VERSION = "1.1.4";
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
@@ -20,6 +20,7 @@ const invincibilitySecondsDisplay = document.getElementById(
   "invincibilitySeconds"
 );
 const coinSound = document.getElementById("coinSound");
+const cashRegisterSound = document.getElementById("cashRegisterSound");
 const explosionSound = document.getElementById("explosionSound");
 const hitmarkerSound = document.getElementById("hitmarkerSound");
 const bubbleSound = document.getElementById("bubbleSound");
@@ -3724,10 +3725,10 @@ function setupModUnlockButtons() {
         updateModUI();
         updateCoinsDisplay();
 
-        // Play coin sound
+        // Play cash register sound
         if (!game.isMuted) {
-          coinSound.currentTime = 0;
-          coinSound
+          cashRegisterSound.currentTime = 0;
+          cashRegisterSound
             .play()
             .catch((e) => console.log("Purchase sound error:", e));
         }
@@ -3929,6 +3930,15 @@ function setupVehicleCarouselEvents() {
           unlockVehicle(vehicleType);
           updateCoinsDisplay();
           buildVehicleCarousel(); // Rebuild to show updated state
+          updateStartButtonState(); // Update start button in case we unlocked last vehicle
+
+          // Play cash register sound
+          if (!game.isMuted) {
+            cashRegisterSound.currentTime = 0;
+            cashRegisterSound
+              .play()
+              .catch((e) => console.log("Cash register sound error:", e));
+          }
 
           // Auto-select the newly unlocked vehicle
           selectedVehicle = vehicleType;
@@ -3956,14 +3966,58 @@ function setupVehicleCarouselEvents() {
   });
 }
 
+// Check if all vehicles in the previous world are unlocked
+function arePreviousWorldVehiclesUnlocked() {
+  // World 1 (Highway) has no requirements
+  if (currentWorld === 1) return true;
+
+  // Get previous world
+  const previousWorldId = currentWorld - 1;
+  const previousWorld = WORLDS[previousWorldId];
+  if (!previousWorld) return true; // No previous world
+
+  const previousWorldKey = previousWorld.key;
+  const previousVehicleIds = previousWorld.vehicles || [];
+
+  // Check if ALL vehicles from previous world are unlocked
+  return previousVehicleIds.every((vehicleId) =>
+    isVehicleUnlocked(vehicleId, previousWorldKey)
+  );
+}
+
+// Update start button state based on previous world completion
+function updateStartButtonState() {
+  const canStart = arePreviousWorldVehiclesUnlocked();
+
+  if (canStart) {
+    startGameBtn.disabled = false;
+    startGameBtn.classList.remove("disabled");
+    startGameBtn.textContent = "START GAME";
+  } else {
+    startGameBtn.disabled = true;
+    startGameBtn.classList.add("disabled");
+    const previousWorld = WORLDS[currentWorld - 1];
+    startGameBtn.textContent = `🔒 UNLOCK ALL ${previousWorld.name.toUpperCase()} VEHICLES FIRST`;
+  }
+}
+
 // Initial build of vehicle carousel
 buildVehicleCarousel();
 
 // Set initial website background based on current world
 updateWorldBackground();
 
+// Update start button state
+updateStartButtonState();
+
 // Start game button
-startGameBtn.addEventListener("click", startGame);
+startGameBtn.addEventListener("click", (e) => {
+  if (startGameBtn.disabled) {
+    e.preventDefault();
+    return;
+  }
+  startGame();
+});
 
 // Resume button
 resumeBtn.addEventListener("click", () => {
@@ -4206,6 +4260,9 @@ function confirmWorldSelection() {
 
   // Rebuild carousel with new world's vehicles
   buildVehicleCarousel();
+
+  // Update start button state for new world
+  updateStartButtonState();
 
   // Update website background for the new world
   updateWorldBackground();
