@@ -4,6 +4,8 @@
 
 The game is in a fully playable state with all core mechanics, powerups, difficulty scaling, polish features, vehicle unlocking system, and **fully functional vehicle modification system** implemented. All 9 mods (3 per vehicle) have active gameplay effects. Players can unlock vehicles with coins, purchase mods, and experience meaningful gameplay changes.
 
+
+
 ## Completed Features
 
 - [x] Core game loop and rendering
