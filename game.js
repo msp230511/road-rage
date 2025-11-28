@@ -1350,18 +1350,17 @@ function spawnParticles() {
   wheelOffsets.forEach(offset => {
     if (Math.random() < spawnChance) {
       const useAltColor = Math.random() > 0.5;
+      const lifetime = Math.random() * (config.lifetime.max - config.lifetime.min) + config.lifetime.min;
       game.particles.push({
         x: vehicleX + offset + (Math.random() - 0.5) * config.spread,
         y: vehicleY + 20, // Behind the vehicle
         vx: (Math.random() - 0.5) * config.speed.max + config.drift.x,
         vy: Math.random() * (config.speed.max - config.speed.min) + config.speed.min + config.drift.y,
         size: Math.random() * (config.size.max - config.size.min) + config.size.min,
-        lifetime: Math.random() * (config.lifetime.max - config.lifetime.min) + config.lifetime.min,
-        maxLifetime: 0, // Will be set below
+        lifetime: lifetime,
+        maxLifetime: lifetime,
         color: useAltColor ? config.colorAlt : config.color,
       });
-      // Store max lifetime for opacity calculation
-      game.particles[game.particles.length - 1].maxLifetime = game.particles[game.particles.length - 1].lifetime;
     }
   });
 }
