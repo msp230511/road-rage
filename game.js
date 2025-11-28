@@ -15,6 +15,7 @@ const hitmarkerSound = document.getElementById("hitmarkerSound");
 const bubbleSound = document.getElementById("bubbleSound");
 const pauseMenuSound = document.getElementById("pauseMenuSound");
 const heroesNeverDieSound = document.getElementById("heroesNeverDieSound");
+const heartPickupSound = document.getElementById("heartPickupSound");
 const milestone1000Sound = document.getElementById("milestone1000Sound");
 const milestone2000Sound = document.getElementById("milestone2000Sound");
 const milestone3000Sound = document.getElementById("milestone3000Sound");
@@ -722,6 +723,13 @@ function update() {
         // Add 1 health point
         game.health++;
         healthDisplay.textContent = game.health;
+        // Play heart pickup sound
+        if (!game.isMuted) {
+          heartPickupSound.currentTime = 0;
+          heartPickupSound
+            .play()
+            .catch((e) => console.log("Heart pickup sound error:", e));
+        }
       } else if (powerup.type === "coin") {
         // Collect coin and add to total (with coin value multiplier)
         const coinValue = Math.floor(getModEffectValue("coinValue2x", 1));
