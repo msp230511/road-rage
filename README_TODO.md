@@ -41,7 +41,7 @@ The game is in a fully playable state with all core mechanics, powerups, difficu
   - Desert-themed background image
   - Desert-specific background music
   - Cactus obstacles (replaces crates)
-  - 3 Dune-themed vehicles (Jeep, Sandworm, Ornithopter)
+  - 3 Desert vehicles (Jeep, Dune Buggy, Ornithopter)
   - 9 Dune-themed mods with unique names
   - World unlock system (score 10,000 in previous world)
 - [x] Per-world high score tracking
@@ -119,7 +119,7 @@ The game is in a fully playable state with all core mechanics, powerups, difficu
 
 - **6 vehicles across 2 worlds**:
   - Highway: Motorcycle (free), Sports Car (150 coins), Monster Truck (300 coins)
-  - Desert: Jeep (free when world unlocked), Sandworm (200 coins), Ornithopter (400 coins)
+  - Desert: Jeep (free when world unlocked), Dune Buggy (200 coins), Ornithopter (400 coins)
 - **18 total mods**: 3 unique mods per vehicle, each with gameplay effects
 - **World-aware localStorage persistence**: Separate unlock state per world and vehicle
 - **Modification screen**: Accessible via MODIFY button on each unlocked vehicle
@@ -170,10 +170,10 @@ The game is in a fully playable state with all core mechanics, powerups, difficu
 - Mod 2 (35 coins): **Oasis Finder** - Hearts spawn 50% more frequently
 - Mod 3 (55 coins): **Desert Survival** - 20% chance to survive fatal hit
 
-**Sandworm (Speed/Risk-Reward)** ✅
-- Mod 1 (45 coins): **Spice Boost** - 50% faster boost speed
-- Mod 2 (80 coins): **Spice Mining** - Coins worth 2x
-- Mod 3 (160 coins): **Prescience** - Score multiplier 1.5x
+**Dune Buggy (Speed/Risk-Reward)** ✅
+- Mod 1 (45 coins): **Turbo Charger** - 50% faster boost speed
+- Mod 2 (80 coins): **Salvage Expert** - Coins worth 2x
+- Mod 3 (160 coins): **Rally Master** - Score multiplier 1.5x
 
 **Ornithopter (Tank/Durability)** ✅
 - Mod 1 (80 coins): **Reinforced Hull** - Start with 5 hearts instead of 3
@@ -212,7 +212,7 @@ The game is in a fully playable state with all core mechanics, powerups, difficu
 - Difficulty thresholds defined in DIFFICULTY_CONFIG (game.js:513-536)
 - Vehicle prices vary by world:
   - Highway: Motorcycle (0), Sports Car (150), Monster Truck (300)
-  - Desert: Jeep (0 when world unlocked), Sandworm (200), Ornithopter (400)
+  - Desert: Jeep (0 when world unlocked), Dune Buggy (200), Ornithopter (400)
 - Mod prices range from 15-320 coins depending on vehicle and tier
 - World unlock requirement: 10,000 score in previous world
 - Testing utilities in `scripts/` folder (give coins, reset coins, lock vehicles - all world-aware)

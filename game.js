@@ -186,6 +186,90 @@ const ACHIEVEMENTS = {
     description: "Collect 25 coins in one game",
     unlocked: false,
   },
+  untouchable: {
+    id: "untouchable",
+    name: "Untouchable",
+    description: "Take no damage until 2000 score",
+    unlocked: false,
+  },
+  desertExplorer: {
+    id: "desertExplorer",
+    name: "Desert Explorer",
+    description: "Unlock the Desert world",
+    unlocked: false,
+  },
+  forestRanger: {
+    id: "forestRanger",
+    name: "Forest Ranger",
+    description: "Unlock the Forest world",
+    unlocked: false,
+  },
+  beachBum: {
+    id: "beachBum",
+    name: "Beach Bum",
+    description: "Unlock the Beach world",
+    unlocked: false,
+  },
+  mountainClimber: {
+    id: "mountainClimber",
+    name: "Mountain Climber",
+    description: "Unlock the Mountain world",
+    unlocked: false,
+  },
+  citySlicker: {
+    id: "citySlicker",
+    name: "City Slicker",
+    description: "Unlock the City world",
+    unlocked: false,
+  },
+  arcticExplorer: {
+    id: "arcticExplorer",
+    name: "Arctic Explorer",
+    description: "Unlock the Arctic world",
+    unlocked: false,
+  },
+  volcanoDiver: {
+    id: "volcanoDiver",
+    name: "Volcano Diver",
+    description: "Unlock the Volcano world",
+    unlocked: false,
+  },
+  spaceRacer: {
+    id: "spaceRacer",
+    name: "Space Racer",
+    description: "Unlock the Space world",
+    unlocked: false,
+  },
+  whenInDubai: {
+    id: "whenInDubai",
+    name: "When In Dubai",
+    description: "Unlock all vehicles in a world",
+    unlocked: false,
+  },
+  fullyLoaded: {
+    id: "fullyLoaded",
+    name: "Fully Loaded",
+    description: "Unlock all mods for one vehicle",
+    unlocked: false,
+  },
+  lucky: {
+    id: "lucky",
+    name: "Lucky",
+    description: "Survive a fatal hit with a survival chance mod",
+    unlocked: false,
+  },
+  bombDodger: {
+    id: "bombDodger",
+    name: "Bomb Dodger",
+    description: "Pass by 10 bombs in one game without hitting any",
+    unlocked: false,
+  },
+  billGates: {
+    id: "billGates",
+    name: "Bill Gates",
+    description: "Have a total balance of 100 coins or more",
+    unlocked: false,
+  },
 };
 
 // Load achievements from localStorage
@@ -272,7 +356,7 @@ const WORLDS = {
         drift: { x: 0.5, y: -0.3 },
       },
     },
-    vehicles: ["jeep", "sandworm", "ornithopter"],
+    vehicles: ["jeep", "dunebuggy", "ornithopter"],
   },
   3: {
     id: 3,
@@ -779,57 +863,190 @@ const WORLD_VEHICLES = {
         context.fill();
       },
     },
-    sandworm: {
-      name: "SANDWORM",
+    dunebuggy: {
+      name: "DUNE BUGGY",
       price: 200,
       draw: function (context, x, y, scale = 1) {
-        // Segmented body - orange/tan colors (Shai-Hulud inspired)
-        const segments = 5;
-        const segmentSize = 12 * scale;
+        // Camo-style dune buggy with roll cage
 
-        for (let i = 0; i < segments; i++) {
-          const segY = y + (i - 2) * segmentSize * 0.8;
-          const segWidth = segmentSize * (1 - Math.abs(i - 2) * 0.15);
+        // Large knobby wheels (4 total)
+        const wheelRadius = 10 * scale;
+        const wheelColor = "#1a1a1a";
+        const hubColor = "#444";
 
-          // Segment body
-          context.fillStyle = i % 2 === 0 ? "#D4A35A" : "#C49350";
+        // Rear wheels
+        context.fillStyle = wheelColor;
+        context.beginPath();
+        context.arc(x - 18 * scale, y + 12 * scale, wheelRadius, 0, Math.PI * 2);
+        context.fill();
+        context.beginPath();
+        context.arc(x + 18 * scale, y + 12 * scale, wheelRadius, 0, Math.PI * 2);
+        context.fill();
+
+        // Front wheels
+        context.beginPath();
+        context.arc(x - 14 * scale, y - 18 * scale, wheelRadius * 0.8, 0, Math.PI * 2);
+        context.fill();
+        context.beginPath();
+        context.arc(x + 14 * scale, y - 18 * scale, wheelRadius * 0.8, 0, Math.PI * 2);
+        context.fill();
+
+        // Wheel hubs
+        context.fillStyle = hubColor;
+        context.beginPath();
+        context.arc(x - 18 * scale, y + 12 * scale, wheelRadius * 0.4, 0, Math.PI * 2);
+        context.fill();
+        context.beginPath();
+        context.arc(x + 18 * scale, y + 12 * scale, wheelRadius * 0.4, 0, Math.PI * 2);
+        context.fill();
+        context.beginPath();
+        context.arc(x - 14 * scale, y - 18 * scale, wheelRadius * 0.35, 0, Math.PI * 2);
+        context.fill();
+        context.beginPath();
+        context.arc(x + 14 * scale, y - 18 * scale, wheelRadius * 0.35, 0, Math.PI * 2);
+        context.fill();
+
+        // Wheel treads (knobby pattern)
+        context.strokeStyle = "#333";
+        context.lineWidth = 2 * scale;
+        for (let i = 0; i < 6; i++) {
+          const angle = (i / 6) * Math.PI * 2;
+          // Rear wheels treads
           context.beginPath();
-          context.ellipse(x, segY, segWidth, segmentSize * 0.6, 0, 0, Math.PI * 2);
-          context.fill();
-
-          // Segment ridge
-          context.strokeStyle = "#A67B3D";
-          context.lineWidth = 2 * scale;
+          context.moveTo(
+            x - 18 * scale + Math.cos(angle) * wheelRadius * 0.6,
+            y + 12 * scale + Math.sin(angle) * wheelRadius * 0.6
+          );
+          context.lineTo(
+            x - 18 * scale + Math.cos(angle) * wheelRadius,
+            y + 12 * scale + Math.sin(angle) * wheelRadius
+          );
+          context.stroke();
           context.beginPath();
-          context.ellipse(x, segY, segWidth * 0.8, segmentSize * 0.4, 0, 0, Math.PI * 2);
+          context.moveTo(
+            x + 18 * scale + Math.cos(angle) * wheelRadius * 0.6,
+            y + 12 * scale + Math.sin(angle) * wheelRadius * 0.6
+          );
+          context.lineTo(
+            x + 18 * scale + Math.cos(angle) * wheelRadius,
+            y + 12 * scale + Math.sin(angle) * wheelRadius
+          );
           context.stroke();
         }
 
-        // Head (front)
-        context.fillStyle = "#E8C078";
+        // Body frame - camo pattern base (tan)
+        context.fillStyle = "#C4A76C";
         context.beginPath();
-        context.arc(x, y - segmentSize * 2.5, segmentSize * 0.8, 0, Math.PI * 2);
-        context.fill();
-
-        // Mouth opening (three-part like in Dune)
-        context.fillStyle = "#8B0000";
-        context.beginPath();
-        context.moveTo(x, y - segmentSize * 3);
-        context.lineTo(x - 8 * scale, y - segmentSize * 2);
-        context.lineTo(x + 8 * scale, y - segmentSize * 2);
+        context.moveTo(x - 20 * scale, y + 5 * scale);
+        context.lineTo(x - 15 * scale, y - 20 * scale);
+        context.lineTo(x + 15 * scale, y - 20 * scale);
+        context.lineTo(x + 20 * scale, y + 5 * scale);
+        context.lineTo(x + 15 * scale, y + 15 * scale);
+        context.lineTo(x - 15 * scale, y + 15 * scale);
         context.closePath();
         context.fill();
 
-        // Teeth/crystalline teeth
-        context.fillStyle = "#FFE4B5";
-        for (let i = -2; i <= 2; i++) {
-          context.beginPath();
-          context.moveTo(x + i * 3 * scale, y - segmentSize * 2.8);
-          context.lineTo(x + i * 3 * scale - 2 * scale, y - segmentSize * 2.2);
-          context.lineTo(x + i * 3 * scale + 2 * scale, y - segmentSize * 2.2);
-          context.closePath();
-          context.fill();
-        }
+        // Camo patches - olive
+        context.fillStyle = "#6B8E23";
+        context.beginPath();
+        context.ellipse(x - 8 * scale, y - 5 * scale, 8 * scale, 5 * scale, 0.3, 0, Math.PI * 2);
+        context.fill();
+        context.beginPath();
+        context.ellipse(x + 5 * scale, y + 8 * scale, 6 * scale, 4 * scale, -0.5, 0, Math.PI * 2);
+        context.fill();
+
+        // Camo patches - brown
+        context.fillStyle = "#8B7355";
+        context.beginPath();
+        context.ellipse(x + 10 * scale, y - 10 * scale, 5 * scale, 4 * scale, 0.8, 0, Math.PI * 2);
+        context.fill();
+        context.beginPath();
+        context.ellipse(x - 5 * scale, y + 5 * scale, 4 * scale, 3 * scale, -0.2, 0, Math.PI * 2);
+        context.fill();
+
+        // Roll cage frame
+        context.strokeStyle = "#333";
+        context.lineWidth = 3 * scale;
+
+        // Main roll cage bars
+        // Front bar
+        context.beginPath();
+        context.moveTo(x - 12 * scale, y - 15 * scale);
+        context.lineTo(x - 10 * scale, y - 25 * scale);
+        context.lineTo(x + 10 * scale, y - 25 * scale);
+        context.lineTo(x + 12 * scale, y - 15 * scale);
+        context.stroke();
+
+        // Side bars
+        context.beginPath();
+        context.moveTo(x - 12 * scale, y - 15 * scale);
+        context.lineTo(x - 14 * scale, y + 10 * scale);
+        context.stroke();
+        context.beginPath();
+        context.moveTo(x + 12 * scale, y - 15 * scale);
+        context.lineTo(x + 14 * scale, y + 10 * scale);
+        context.stroke();
+
+        // Cross bar
+        context.beginPath();
+        context.moveTo(x - 13 * scale, y - 3 * scale);
+        context.lineTo(x + 13 * scale, y - 3 * scale);
+        context.stroke();
+
+        // Rear roll bar
+        context.beginPath();
+        context.moveTo(x - 14 * scale, y + 10 * scale);
+        context.lineTo(x - 12 * scale, y + 2 * scale);
+        context.lineTo(x + 12 * scale, y + 2 * scale);
+        context.lineTo(x + 14 * scale, y + 10 * scale);
+        context.stroke();
+
+        // Exposed engine at rear
+        context.fillStyle = "#555";
+        context.fillRect(x - 8 * scale, y + 5 * scale, 16 * scale, 8 * scale);
+        context.fillStyle = "#333";
+        context.fillRect(x - 6 * scale, y + 6 * scale, 4 * scale, 3 * scale);
+        context.fillRect(x + 2 * scale, y + 6 * scale, 4 * scale, 3 * scale);
+
+        // Exhaust pipes
+        context.fillStyle = "#666";
+        context.beginPath();
+        context.ellipse(x - 10 * scale, y + 10 * scale, 2 * scale, 3 * scale, 0, 0, Math.PI * 2);
+        context.fill();
+        context.beginPath();
+        context.ellipse(x + 10 * scale, y + 10 * scale, 2 * scale, 3 * scale, 0, 0, Math.PI * 2);
+        context.fill();
+
+        // Front headlights
+        context.fillStyle = "#FFFF99";
+        context.beginPath();
+        context.arc(x - 8 * scale, y - 22 * scale, 3 * scale, 0, Math.PI * 2);
+        context.fill();
+        context.beginPath();
+        context.arc(x + 8 * scale, y - 22 * scale, 3 * scale, 0, Math.PI * 2);
+        context.fill();
+
+        // Headlight glow
+        context.fillStyle = "rgba(255, 255, 150, 0.3)";
+        context.beginPath();
+        context.arc(x - 8 * scale, y - 22 * scale, 5 * scale, 0, Math.PI * 2);
+        context.fill();
+        context.beginPath();
+        context.arc(x + 8 * scale, y - 22 * scale, 5 * scale, 0, Math.PI * 2);
+        context.fill();
+
+        // Driver seat hint
+        context.fillStyle = "#222";
+        context.beginPath();
+        context.ellipse(x, y - 8 * scale, 5 * scale, 4 * scale, 0, 0, Math.PI * 2);
+        context.fill();
+
+        // Steering wheel
+        context.strokeStyle = "#444";
+        context.lineWidth = 2 * scale;
+        context.beginPath();
+        context.arc(x, y - 15 * scale, 3 * scale, 0, Math.PI * 2);
+        context.stroke();
       },
     },
     ornithopter: {
@@ -941,7 +1158,7 @@ const VEHICLES = {
   car: WORLD_VEHICLES.highway.car,
   truck: WORLD_VEHICLES.highway.truck,
   jeep: WORLD_VEHICLES.desert.jeep,
-  sandworm: WORLD_VEHICLES.desert.sandworm,
+  dunebuggy: WORLD_VEHICLES.desert.dunebuggy,
   ornithopter: WORLD_VEHICLES.desert.ornithopter,
 };
 
@@ -1065,24 +1282,24 @@ const WORLD_VEHICLE_MODS = {
         effect: "survivalChance20",
       },
     ],
-    sandworm: [
+    dunebuggy: [
       {
         id: "mod1",
-        name: "Spice Boost",
+        name: "Turbo Charger",
         price: 45,
         description: "50% faster boost speed",
         effect: "boostSpeed25",
       },
       {
         id: "mod2",
-        name: "Spice Mining",
+        name: "Salvage Expert",
         price: 80,
         description: "Coins are worth 2x",
         effect: "coinValue2x",
       },
       {
         id: "mod3",
-        name: "Prescience",
+        name: "Rally Master",
         price: 160,
         description: "Score multiplier 1.5x",
         effect: "scoreMultiplier1_5x",
@@ -1120,7 +1337,7 @@ const VEHICLE_MODS = {
   car: WORLD_VEHICLE_MODS.highway.car,
   truck: WORLD_VEHICLE_MODS.highway.truck,
   jeep: WORLD_VEHICLE_MODS.desert.jeep,
-  sandworm: WORLD_VEHICLE_MODS.desert.sandworm,
+  dunebuggy: WORLD_VEHICLE_MODS.desert.dunebuggy,
   ornithopter: WORLD_VEHICLE_MODS.desert.ornithopter,
 };
 
@@ -1141,6 +1358,13 @@ function loadUnlockedVehicles() {
     // Ensure all world keys exist
     if (!parsed.highway) parsed.highway = ["motorcycle"];
     if (!parsed.desert) parsed.desert = [];
+
+    // Migrate sandworm -> dunebuggy for existing players
+    if (parsed.desert && parsed.desert.includes("sandworm")) {
+      parsed.desert = parsed.desert.map((v) => (v === "sandworm" ? "dunebuggy" : v));
+      localStorage.setItem("motorcycleUnlockedVehicles", JSON.stringify(parsed));
+    }
+
     return parsed;
   }
   // Default for new players
@@ -1193,6 +1417,17 @@ function unlockVehicle(vehicleType) {
     }
     unlockedVehicles[worldKey].push(vehicleType);
     saveUnlockedVehicles(unlockedVehicles);
+
+    // When In Dubai achievement: Unlock all vehicles in a world
+    const worldVehicles = WORLDS[vehicleWorldId]?.vehicles || [];
+    const unlockedInWorld = unlockedVehicles[worldKey] || [];
+    if (
+      worldVehicles.length > 0 &&
+      worldVehicles.every((v) => unlockedInWorld.includes(v)) &&
+      !isAchievementUnlocked("whenInDubai")
+    ) {
+      unlockAchievement("whenInDubai");
+    }
   }
 }
 
@@ -1205,20 +1440,28 @@ function loadUnlockedMods() {
     if (parsed.motorcycle !== undefined && !parsed.highway) {
       const newFormat = {
         highway: parsed, // Old mods belong to highway vehicles
-        desert: { jeep: [], sandworm: [], ornithopter: [] },
+        desert: { jeep: [], dunebuggy: [], ornithopter: [] },
       };
       localStorage.setItem("motorcycleUnlockedMods", JSON.stringify(newFormat));
       return newFormat;
     }
     // Ensure all world keys exist
     if (!parsed.highway) parsed.highway = { motorcycle: [], car: [], truck: [] };
-    if (!parsed.desert) parsed.desert = { jeep: [], sandworm: [], ornithopter: [] };
+    if (!parsed.desert) parsed.desert = { jeep: [], dunebuggy: [], ornithopter: [] };
+
+    // Migrate sandworm -> dunebuggy mods for existing players
+    if (parsed.desert && parsed.desert.sandworm) {
+      parsed.desert.dunebuggy = parsed.desert.sandworm;
+      delete parsed.desert.sandworm;
+      localStorage.setItem("motorcycleUnlockedMods", JSON.stringify(parsed));
+    }
+
     return parsed;
   }
   // Default for new players
   return {
     highway: { motorcycle: [], car: [], truck: [] },
-    desert: { jeep: [], sandworm: [], ornithopter: [] },
+    desert: { jeep: [], dunebuggy: [], ornithopter: [] },
   };
 }
 
@@ -1248,6 +1491,17 @@ function unlockMod(vehicleType, modId) {
     }
     unlockedMods[worldKey][vehicleType].push(modId);
     saveUnlockedMods(unlockedMods);
+
+    // Fully Loaded achievement: Unlock all mods for one vehicle
+    const vehicleMods = VEHICLE_MODS[vehicleType] || [];
+    const unlockedModIds = unlockedMods[worldKey][vehicleType] || [];
+    if (
+      vehicleMods.length > 0 &&
+      vehicleMods.every((mod) => unlockedModIds.includes(mod.id)) &&
+      !isAchievementUnlocked("fullyLoaded")
+    ) {
+      unlockAchievement("fullyLoaded");
+    }
   }
 }
 
@@ -1317,6 +1571,7 @@ let game = {
   coinsThisGame: 0, // Track coins collected this game
   consecutiveBombDeaths: 0, // Track consecutive deaths from bombs
   lastDeathWasBomb: false, // Track if last death was from bomb
+  bombsPassed: 0, // Track bombs passed for Bomb Dodger achievement
   particles: [], // Particle effects array
 };
 
@@ -1437,6 +1692,12 @@ debugAddCoinsBtn.addEventListener("click", () => {
     totalCoins += coinsToAdd;
     saveTotalCoins(totalCoins);
     updateCoinsDisplay();
+
+    // Bill Gates achievement: Have 100 coins or more
+    if (totalCoins >= 100 && !isAchievementUnlocked("billGates")) {
+      unlockAchievement("billGates");
+    }
+
     showDebugStatus(`✓ Added ${coinsToAdd} coins`);
   } else {
     showDebugStatus("✗ Coin amount must be > 0", 2000);
@@ -1467,7 +1728,7 @@ debugResetVehiclesBtn.addEventListener("click", () => {
     "motorcycleUnlockedMods",
     JSON.stringify({
       highway: { motorcycle: [], car: [], truck: [] },
-      desert: { jeep: [], sandworm: [], ornithopter: [] },
+      desert: { jeep: [], dunebuggy: [], ornithopter: [] },
     })
   );
 
@@ -1974,6 +2235,10 @@ function update(deltaMultiplier = 1) {
               .play()
               .catch((e) => console.log("Survival sound error:", e));
           }
+          // Lucky achievement: Survive a fatal hit with a survival chance mod
+          if (!isAchievementUnlocked("lucky")) {
+            unlockAchievement("lucky");
+          }
         } else {
           // Fatal bomb damage
           game.health = 0;
@@ -2020,6 +2285,12 @@ function update(deltaMultiplier = 1) {
         // Track coins collected this game for achievements
         game.coinsThisGame += coinValue;
         updateCoinsDisplay();
+
+        // Bill Gates achievement: Have 100 coins or more
+        if (totalCoins >= 100 && !isAchievementUnlocked("billGates")) {
+          unlockAchievement("billGates");
+        }
+
         // Play coin sound
         if (!game.isMuted) {
           coinSound.currentTime = 0;
@@ -2031,6 +2302,14 @@ function update(deltaMultiplier = 1) {
 
     // Remove powerups that are off screen
     if (powerup.y > canvas.height) {
+      // Track bombs that scroll off screen (dodged successfully)
+      if (powerup.type === "bomb") {
+        game.bombsPassed++;
+        // Bomb Dodger achievement: Pass by 10 bombs in one game
+        if (game.bombsPassed >= 10 && !isAchievementUnlocked("bombDodger")) {
+          unlockAchievement("bombDodger");
+        }
+      }
       return false;
     }
 
@@ -2147,6 +2426,15 @@ function update(deltaMultiplier = 1) {
         // Touch Grass: Reach 1000 score without taking damage
         if (game.score >= 1000 && !isAchievementUnlocked("touchGrass")) {
           unlockAchievement("touchGrass");
+        }
+
+        // Untouchable: Reach 2000 score without taking damage and with full health
+        if (
+          game.score >= 2000 &&
+          !isAchievementUnlocked("untouchable") &&
+          game.health === getStartingHealth()
+        ) {
+          unlockAchievement("untouchable");
         }
       }
 
@@ -2592,6 +2880,24 @@ function gameOver() {
   if (game.score > (worldHighScores[currentWorld] || 0)) {
     worldHighScores[currentWorld] = game.score;
     saveWorldHighScores(worldHighScores);
+
+    // World unlock achievements: Trigger when scoring 10,000 in a world unlocks the next
+    if (game.score >= WORLD_UNLOCK_SCORE) {
+      const worldUnlockAchievements = {
+        1: "desertExplorer",   // Highway -> Desert
+        2: "forestRanger",     // Desert -> Forest
+        3: "beachBum",         // Forest -> Beach
+        4: "mountainClimber",  // Beach -> Mountain
+        5: "citySlicker",      // Mountain -> City
+        6: "arcticExplorer",   // City -> Arctic
+        7: "volcanoDiver",     // Arctic -> Volcano
+        8: "spaceRacer",       // Volcano -> Space
+      };
+      const achievementId = worldUnlockAchievements[currentWorld];
+      if (achievementId && !isAchievementUnlocked(achievementId)) {
+        unlockAchievement(achievementId);
+      }
+    }
   }
 
   // Check achievements on game over
@@ -2692,6 +2998,7 @@ function restart() {
     coinsThisGame: 0,
     consecutiveBombDeaths: game.consecutiveBombDeaths || 0, // Preserve bomb death streak
     lastDeathWasBomb: false,
+    bombsPassed: 0, // Track bombs passed for Bomb Dodger achievement
   };
 
   healthDisplay.textContent = game.health;
@@ -2788,6 +3095,7 @@ function startGame() {
     coinsThisGame: 0,
     consecutiveBombDeaths: 0,
     lastDeathWasBomb: false,
+    bombsPassed: 0, // Track bombs passed for Bomb Dodger achievement
   };
 
   healthDisplay.textContent = game.health;
