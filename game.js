@@ -1692,10 +1692,22 @@ function showMenu() {
   game.isPaused = false;
   bgMusic.pause();
   bgMusic.currentTime = 0;
+
+  // Show legend when returning to menu
+  const gameLegend = document.querySelector(".game-legend");
+  if (gameLegend) {
+    gameLegend.classList.remove("hidden");
+  }
 }
 
 function startGame() {
   menuScreen.classList.add("hidden");
+
+  // Hide legend when game starts
+  const gameLegend = document.querySelector(".game-legend");
+  if (gameLegend) {
+    gameLegend.classList.add("hidden");
+  }
 
   const wasMuted = game.isMuted;
   const currentHighScore = game.highScore;
@@ -2238,6 +2250,205 @@ updateVehicleUI();
 
 // Initialize coins display
 updateCoinsDisplay();
+
+// ==================== LEGEND RENDERING ====================
+
+// Render sprites in the game legend
+function renderLegend() {
+  // Obstacle
+  const obstacleCanvas = document.getElementById("legendObstacle");
+  if (obstacleCanvas) {
+    const ctx = obstacleCanvas.getContext("2d");
+    const centerX = 20;
+    const centerY = 20;
+    const size = 24;
+
+    // Draw red crate
+    ctx.fillStyle = "#e74c3c";
+    ctx.fillRect(centerX - size / 2, centerY - size / 2, size, size);
+
+    // Add border
+    ctx.strokeStyle = "#c0392b";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(centerX - size / 2, centerY - size / 2, size, size);
+  }
+
+  // Heart
+  const heartCanvas = document.getElementById("legendHeart");
+  if (heartCanvas) {
+    const ctx = heartCanvas.getContext("2d");
+    const centerX = 20;
+    const centerY = 20;
+    const heartSize = 12;
+
+    ctx.fillStyle = "#FF0000";
+    ctx.beginPath();
+
+    // Draw heart using bezier curves
+    ctx.moveTo(centerX, centerY + heartSize * 0.3);
+
+    // Left side
+    ctx.bezierCurveTo(
+      centerX,
+      centerY,
+      centerX - heartSize * 0.5,
+      centerY - heartSize * 0.5,
+      centerX - heartSize,
+      centerY
+    );
+    ctx.bezierCurveTo(
+      centerX - heartSize,
+      centerY + heartSize * 0.3,
+      centerX - heartSize * 0.5,
+      centerY + heartSize * 0.7,
+      centerX,
+      centerY + heartSize
+    );
+
+    // Right side
+    ctx.bezierCurveTo(
+      centerX + heartSize * 0.5,
+      centerY + heartSize * 0.7,
+      centerX + heartSize,
+      centerY + heartSize * 0.3,
+      centerX + heartSize,
+      centerY
+    );
+    ctx.bezierCurveTo(
+      centerX + heartSize * 0.5,
+      centerY - heartSize * 0.5,
+      centerX,
+      centerY,
+      centerX,
+      centerY + heartSize * 0.3
+    );
+
+    ctx.fill();
+
+    // Add shine effect
+    ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
+    ctx.beginPath();
+    ctx.arc(centerX - heartSize * 0.3, centerY - heartSize * 0.1, heartSize * 0.2, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Coin
+  const coinCanvas = document.getElementById("legendCoin");
+  if (coinCanvas) {
+    const ctx = coinCanvas.getContext("2d");
+    const centerX = 20;
+    const centerY = 20;
+    const coinRadius = 14;
+
+    // Draw gold coin
+    ctx.fillStyle = "#FFD700";
+    ctx.strokeStyle = "#DAA520";
+    ctx.lineWidth = 2;
+
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, coinRadius, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    // Add inner circle
+    ctx.strokeStyle = "#DAA520";
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, coinRadius * 0.7, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Add $ symbol
+    ctx.fillStyle = "#8B6914";
+    ctx.font = "bold 16px Arial";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("$", centerX, centerY);
+  }
+
+  // Shield
+  const shieldCanvas = document.getElementById("legendShield");
+  if (shieldCanvas) {
+    const ctx = shieldCanvas.getContext("2d");
+    const centerX = 20;
+    const centerY = 20;
+    const shieldRadius = 16;
+
+    // Draw light blue bubble
+    ctx.fillStyle = "rgba(173, 216, 230, 0.6)";
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, shieldRadius, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Add border
+    ctx.strokeStyle = "#87CEEB";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, shieldRadius, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Add shine effect
+    ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
+    ctx.beginPath();
+    ctx.arc(centerX - 5, centerY - 5, 6, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Bomb
+  const bombCanvas = document.getElementById("legendBomb");
+  if (bombCanvas) {
+    const ctx = bombCanvas.getContext("2d");
+    const centerX = 20;
+    const centerY = 20;
+    const bombRadius = 14;
+
+    // Draw black cannonball
+    ctx.fillStyle = "#1a1a1a";
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, bombRadius, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Add shadow/3D effect
+    ctx.fillStyle = "rgba(255, 255, 255, 0.2)";
+    ctx.beginPath();
+    ctx.arc(centerX - 5, centerY - 5, 6, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Draw fuse
+    ctx.strokeStyle = "#8B4513";
+    ctx.lineWidth = 2;
+    ctx.lineCap = "round";
+    ctx.beginPath();
+    ctx.moveTo(centerX + 8, centerY - bombRadius * 0.7);
+    ctx.lineTo(centerX + 15, centerY - bombRadius * 1.1);
+    ctx.stroke();
+
+    // Draw spark at end of fuse
+    ctx.fillStyle = "#FF4500";
+    ctx.beginPath();
+    ctx.arc(centerX + 15, centerY - bombRadius * 1.1, 3, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Add flicker effect
+    ctx.fillStyle = "#FFD700";
+    ctx.beginPath();
+    ctx.arc(centerX + 16, centerY - bombRadius * 1.15, 2, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+// Render legend on page load
+renderLegend();
+
+// Legend toggle functionality
+const legendToggle = document.getElementById("legendToggle");
+const legendContent = document.getElementById("legendContent");
+
+if (legendToggle && legendContent) {
+  legendToggle.addEventListener("click", () => {
+    legendContent.classList.toggle("collapsed");
+    legendToggle.classList.toggle("collapsed");
+  });
+}
 
 // Game loop
 function gameLoop() {
