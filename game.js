@@ -2,7 +2,7 @@
 // MAJOR: Breaking changes or major feature overhauls
 // MINOR: New features, new worlds, new vehicles, significant additions
 // PATCH: Bug fixes, balance tweaks, small improvements
-const GAME_VERSION = "1.0.0";
+const GAME_VERSION = "1.1.4";
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
@@ -15,7 +15,12 @@ const restartBtn = document.getElementById("restartBtn");
 const bgMusic = document.getElementById("bgMusic");
 const muteBtn = document.getElementById("muteBtn");
 const pauseBtn = document.getElementById("pauseBtn");
+const invincibilityTimerDisplay = document.getElementById("invincibilityTimer");
+const invincibilitySecondsDisplay = document.getElementById(
+  "invincibilitySeconds"
+);
 const coinSound = document.getElementById("coinSound");
+const cashRegisterSound = document.getElementById("cashRegisterSound");
 const explosionSound = document.getElementById("explosionSound");
 const hitmarkerSound = document.getElementById("hitmarkerSound");
 const bubbleSound = document.getElementById("bubbleSound");
@@ -351,8 +356,7 @@ const WORLDS = {
     name: "DESERT",
     key: "desert",
     icon: "🏜️",
-    description:
-      "Scorching sands and mirages await. Watch out for cacti!",
+    description: "Scorching sands and mirages await. Watch out for cacti!",
     unlockRequirement: 10000, // Need 10000 score in World 1
     theme: {
       backgroundImage: "media/images/desert-bg.png",
@@ -577,12 +581,13 @@ function updateWorldBackground() {
 
   if (bgPath) {
     document.body.style.backgroundImage = `url('${bgPath}')`;
-    document.body.style.backgroundSize = 'cover';
-    document.body.style.backgroundPosition = 'center';
-    document.body.style.backgroundRepeat = 'no-repeat';
+    document.body.style.backgroundSize = "cover";
+    document.body.style.backgroundPosition = "center";
+    document.body.style.backgroundRepeat = "no-repeat";
   } else {
     // Fallback to default gradient
-    document.body.style.backgroundImage = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+    document.body.style.backgroundImage =
+      "linear-gradient(135deg, #667eea 0%, #764ba2 100%)";
   }
 }
 
@@ -592,7 +597,9 @@ let currentMusicSource = null;
 // Switch music based on world
 function loadWorldMusic(worldId) {
   const world = WORLDS[worldId];
-  const musicPath = world?.theme?.music || "media/sounds/the-return-of-the-8-bit-era-301292.mp3";
+  const musicPath =
+    world?.theme?.music ||
+    "media/sounds/the-return-of-the-8-bit-era-301292.mp3";
 
   // Only switch if different
   if (currentMusicSource !== musicPath) {
@@ -690,7 +697,12 @@ const WORLD_VEHICLES = {
       draw: function (context, x, y, scale = 1) {
         // Car body (sleek sports car shape)
         context.fillStyle = "#e74c3c";
-        context.fillRect(x - 18 * scale, y - 10 * scale, 36 * scale, 30 * scale);
+        context.fillRect(
+          x - 18 * scale,
+          y - 10 * scale,
+          36 * scale,
+          30 * scale
+        );
 
         // Car hood (front triangle)
         context.fillStyle = "#c0392b";
@@ -733,8 +745,18 @@ const WORLD_VEHICLES = {
 
         // Pipe highlights
         context.fillStyle = "#bdc3c7";
-        context.fillRect(x - 23 * scale, y - 5 * scale, 1.5 * scale, 20 * scale);
-        context.fillRect(x + 21 * scale, y - 5 * scale, 1.5 * scale, 20 * scale);
+        context.fillRect(
+          x - 23 * scale,
+          y - 5 * scale,
+          1.5 * scale,
+          20 * scale
+        );
+        context.fillRect(
+          x + 21 * scale,
+          y - 5 * scale,
+          1.5 * scale,
+          20 * scale
+        );
 
         // Animated flames from exhaust pipes
         // Left flame (outer orange)
@@ -742,12 +764,16 @@ const WORLD_VEHICLES = {
         context.beginPath();
         context.moveTo(x - 22 * scale, y - 5 * scale);
         context.quadraticCurveTo(
-          x - 22 * scale + flameFlicker, y - 15 * scale,
-          x - 24 * scale, y - 22 * scale + flameFlicker2
+          x - 22 * scale + flameFlicker,
+          y - 15 * scale,
+          x - 24 * scale,
+          y - 22 * scale + flameFlicker2
         );
         context.quadraticCurveTo(
-          x - 22 * scale - flameFlicker2, y - 12 * scale,
-          x - 20 * scale, y - 5 * scale
+          x - 22 * scale - flameFlicker2,
+          y - 12 * scale,
+          x - 20 * scale,
+          y - 5 * scale
         );
         context.closePath();
         context.fill();
@@ -757,12 +783,16 @@ const WORLD_VEHICLES = {
         context.beginPath();
         context.moveTo(x - 21.5 * scale, y - 5 * scale);
         context.quadraticCurveTo(
-          x - 22 * scale + flameFlicker * 0.5, y - 10 * scale,
-          x - 22 * scale, y - 16 * scale + flameFlicker2
+          x - 22 * scale + flameFlicker * 0.5,
+          y - 10 * scale,
+          x - 22 * scale,
+          y - 16 * scale + flameFlicker2
         );
         context.quadraticCurveTo(
-          x - 22 * scale - flameFlicker2 * 0.5, y - 9 * scale,
-          x - 20.5 * scale, y - 5 * scale
+          x - 22 * scale - flameFlicker2 * 0.5,
+          y - 9 * scale,
+          x - 20.5 * scale,
+          y - 5 * scale
         );
         context.closePath();
         context.fill();
@@ -772,12 +802,16 @@ const WORLD_VEHICLES = {
         context.beginPath();
         context.moveTo(x + 20 * scale, y - 5 * scale);
         context.quadraticCurveTo(
-          x + 22 * scale - flameFlicker, y - 15 * scale,
-          x + 24 * scale, y - 22 * scale - flameFlicker2
+          x + 22 * scale - flameFlicker,
+          y - 15 * scale,
+          x + 24 * scale,
+          y - 22 * scale - flameFlicker2
         );
         context.quadraticCurveTo(
-          x + 22 * scale + flameFlicker2, y - 12 * scale,
-          x + 22 * scale, y - 5 * scale
+          x + 22 * scale + flameFlicker2,
+          y - 12 * scale,
+          x + 22 * scale,
+          y - 5 * scale
         );
         context.closePath();
         context.fill();
@@ -787,12 +821,16 @@ const WORLD_VEHICLES = {
         context.beginPath();
         context.moveTo(x + 20.5 * scale, y - 5 * scale);
         context.quadraticCurveTo(
-          x + 22 * scale - flameFlicker * 0.5, y - 10 * scale,
-          x + 22 * scale, y - 16 * scale - flameFlicker2
+          x + 22 * scale - flameFlicker * 0.5,
+          y - 10 * scale,
+          x + 22 * scale,
+          y - 16 * scale - flameFlicker2
         );
         context.quadraticCurveTo(
-          x + 22 * scale + flameFlicker2 * 0.5, y - 9 * scale,
-          x + 21.5 * scale, y - 5 * scale
+          x + 22 * scale + flameFlicker2 * 0.5,
+          y - 9 * scale,
+          x + 21.5 * scale,
+          y - 5 * scale
         );
         context.closePath();
         context.fill();
@@ -803,7 +841,12 @@ const WORLD_VEHICLES = {
 
         // Truck cab (front)
         context.fillStyle = "#e67e22";
-        context.fillRect(x - 18 * scale, y - 15 * scale, 36 * scale, 20 * scale);
+        context.fillRect(
+          x - 18 * scale,
+          y - 15 * scale,
+          36 * scale,
+          20 * scale
+        );
 
         // Cab roof
         context.fillStyle = "#d35400";
@@ -836,7 +879,12 @@ const WORLD_VEHICLES = {
       draw: function (context, x, y, scale = 1) {
         // Body - tan/khaki color
         context.fillStyle = "#C4A35A";
-        context.fillRect(x - 20 * scale, y - 10 * scale, 40 * scale, 25 * scale);
+        context.fillRect(
+          x - 20 * scale,
+          y - 10 * scale,
+          40 * scale,
+          25 * scale
+        );
 
         // Hood (front)
         context.fillStyle = "#A68B4B";
@@ -890,33 +938,81 @@ const WORLD_VEHICLES = {
         // Rear wheels
         context.fillStyle = wheelColor;
         context.beginPath();
-        context.arc(x - 18 * scale, y + 12 * scale, wheelRadius, 0, Math.PI * 2);
+        context.arc(
+          x - 18 * scale,
+          y + 12 * scale,
+          wheelRadius,
+          0,
+          Math.PI * 2
+        );
         context.fill();
         context.beginPath();
-        context.arc(x + 18 * scale, y + 12 * scale, wheelRadius, 0, Math.PI * 2);
+        context.arc(
+          x + 18 * scale,
+          y + 12 * scale,
+          wheelRadius,
+          0,
+          Math.PI * 2
+        );
         context.fill();
 
         // Front wheels
         context.beginPath();
-        context.arc(x - 14 * scale, y - 18 * scale, wheelRadius * 0.8, 0, Math.PI * 2);
+        context.arc(
+          x - 14 * scale,
+          y - 18 * scale,
+          wheelRadius * 0.8,
+          0,
+          Math.PI * 2
+        );
         context.fill();
         context.beginPath();
-        context.arc(x + 14 * scale, y - 18 * scale, wheelRadius * 0.8, 0, Math.PI * 2);
+        context.arc(
+          x + 14 * scale,
+          y - 18 * scale,
+          wheelRadius * 0.8,
+          0,
+          Math.PI * 2
+        );
         context.fill();
 
         // Wheel hubs
         context.fillStyle = hubColor;
         context.beginPath();
-        context.arc(x - 18 * scale, y + 12 * scale, wheelRadius * 0.4, 0, Math.PI * 2);
+        context.arc(
+          x - 18 * scale,
+          y + 12 * scale,
+          wheelRadius * 0.4,
+          0,
+          Math.PI * 2
+        );
         context.fill();
         context.beginPath();
-        context.arc(x + 18 * scale, y + 12 * scale, wheelRadius * 0.4, 0, Math.PI * 2);
+        context.arc(
+          x + 18 * scale,
+          y + 12 * scale,
+          wheelRadius * 0.4,
+          0,
+          Math.PI * 2
+        );
         context.fill();
         context.beginPath();
-        context.arc(x - 14 * scale, y - 18 * scale, wheelRadius * 0.35, 0, Math.PI * 2);
+        context.arc(
+          x - 14 * scale,
+          y - 18 * scale,
+          wheelRadius * 0.35,
+          0,
+          Math.PI * 2
+        );
         context.fill();
         context.beginPath();
-        context.arc(x + 14 * scale, y - 18 * scale, wheelRadius * 0.35, 0, Math.PI * 2);
+        context.arc(
+          x + 14 * scale,
+          y - 18 * scale,
+          wheelRadius * 0.35,
+          0,
+          Math.PI * 2
+        );
         context.fill();
 
         // Wheel treads (knobby pattern)
@@ -962,19 +1058,51 @@ const WORLD_VEHICLES = {
         // Camo patches - olive
         context.fillStyle = "#6B8E23";
         context.beginPath();
-        context.ellipse(x - 8 * scale, y - 5 * scale, 8 * scale, 5 * scale, 0.3, 0, Math.PI * 2);
+        context.ellipse(
+          x - 8 * scale,
+          y - 5 * scale,
+          8 * scale,
+          5 * scale,
+          0.3,
+          0,
+          Math.PI * 2
+        );
         context.fill();
         context.beginPath();
-        context.ellipse(x + 5 * scale, y + 8 * scale, 6 * scale, 4 * scale, -0.5, 0, Math.PI * 2);
+        context.ellipse(
+          x + 5 * scale,
+          y + 8 * scale,
+          6 * scale,
+          4 * scale,
+          -0.5,
+          0,
+          Math.PI * 2
+        );
         context.fill();
 
         // Camo patches - brown
         context.fillStyle = "#8B7355";
         context.beginPath();
-        context.ellipse(x + 10 * scale, y - 10 * scale, 5 * scale, 4 * scale, 0.8, 0, Math.PI * 2);
+        context.ellipse(
+          x + 10 * scale,
+          y - 10 * scale,
+          5 * scale,
+          4 * scale,
+          0.8,
+          0,
+          Math.PI * 2
+        );
         context.fill();
         context.beginPath();
-        context.ellipse(x - 5 * scale, y + 5 * scale, 4 * scale, 3 * scale, -0.2, 0, Math.PI * 2);
+        context.ellipse(
+          x - 5 * scale,
+          y + 5 * scale,
+          4 * scale,
+          3 * scale,
+          -0.2,
+          0,
+          Math.PI * 2
+        );
         context.fill();
 
         // Roll cage frame
@@ -1024,10 +1152,26 @@ const WORLD_VEHICLES = {
         // Exhaust pipes
         context.fillStyle = "#666";
         context.beginPath();
-        context.ellipse(x - 10 * scale, y + 10 * scale, 2 * scale, 3 * scale, 0, 0, Math.PI * 2);
+        context.ellipse(
+          x - 10 * scale,
+          y + 10 * scale,
+          2 * scale,
+          3 * scale,
+          0,
+          0,
+          Math.PI * 2
+        );
         context.fill();
         context.beginPath();
-        context.ellipse(x + 10 * scale, y + 10 * scale, 2 * scale, 3 * scale, 0, 0, Math.PI * 2);
+        context.ellipse(
+          x + 10 * scale,
+          y + 10 * scale,
+          2 * scale,
+          3 * scale,
+          0,
+          0,
+          Math.PI * 2
+        );
         context.fill();
 
         // Front headlights
@@ -1051,7 +1195,15 @@ const WORLD_VEHICLES = {
         // Driver seat hint
         context.fillStyle = "#222";
         context.beginPath();
-        context.ellipse(x, y - 8 * scale, 5 * scale, 4 * scale, 0, 0, Math.PI * 2);
+        context.ellipse(
+          x,
+          y - 8 * scale,
+          5 * scale,
+          4 * scale,
+          0,
+          0,
+          Math.PI * 2
+        );
         context.fill();
 
         // Steering wheel
@@ -1078,12 +1230,16 @@ const WORLD_VEHICLES = {
         context.beginPath();
         context.moveTo(x - 5 * scale, y - 5 * scale);
         context.quadraticCurveTo(
-          x - 30 * scale, y - 15 * scale + wingFlutter,
-          x - 35 * scale, y + wingFlutter
+          x - 30 * scale,
+          y - 15 * scale + wingFlutter,
+          x - 35 * scale,
+          y + wingFlutter
         );
         context.quadraticCurveTo(
-          x - 30 * scale, y + 5 * scale + wingFlutter,
-          x - 5 * scale, y
+          x - 30 * scale,
+          y + 5 * scale + wingFlutter,
+          x - 5 * scale,
+          y
         );
         context.closePath();
         context.fill();
@@ -1093,12 +1249,16 @@ const WORLD_VEHICLES = {
         context.beginPath();
         context.moveTo(x - 5 * scale, y + 5 * scale);
         context.quadraticCurveTo(
-          x - 28 * scale, y + 10 * scale - wingFlutter,
-          x - 32 * scale, y + 5 * scale - wingFlutter
+          x - 28 * scale,
+          y + 10 * scale - wingFlutter,
+          x - 32 * scale,
+          y + 5 * scale - wingFlutter
         );
         context.quadraticCurveTo(
-          x - 25 * scale, y + 15 * scale - wingFlutter,
-          x - 5 * scale, y + 8 * scale
+          x - 25 * scale,
+          y + 15 * scale - wingFlutter,
+          x - 5 * scale,
+          y + 8 * scale
         );
         context.closePath();
         context.fill();
@@ -1108,12 +1268,16 @@ const WORLD_VEHICLES = {
         context.beginPath();
         context.moveTo(x + 5 * scale, y - 5 * scale);
         context.quadraticCurveTo(
-          x + 30 * scale, y - 15 * scale + wingFlutter,
-          x + 35 * scale, y + wingFlutter
+          x + 30 * scale,
+          y - 15 * scale + wingFlutter,
+          x + 35 * scale,
+          y + wingFlutter
         );
         context.quadraticCurveTo(
-          x + 30 * scale, y + 5 * scale + wingFlutter,
-          x + 5 * scale, y
+          x + 30 * scale,
+          y + 5 * scale + wingFlutter,
+          x + 5 * scale,
+          y
         );
         context.closePath();
         context.fill();
@@ -1123,12 +1287,16 @@ const WORLD_VEHICLES = {
         context.beginPath();
         context.moveTo(x + 5 * scale, y + 5 * scale);
         context.quadraticCurveTo(
-          x + 28 * scale, y + 10 * scale - wingFlutter,
-          x + 32 * scale, y + 5 * scale - wingFlutter
+          x + 28 * scale,
+          y + 10 * scale - wingFlutter,
+          x + 32 * scale,
+          y + 5 * scale - wingFlutter
         );
         context.quadraticCurveTo(
-          x + 25 * scale, y + 15 * scale - wingFlutter,
-          x + 5 * scale, y + 8 * scale
+          x + 25 * scale,
+          y + 15 * scale - wingFlutter,
+          x + 5 * scale,
+          y + 8 * scale
         );
         context.closePath();
         context.fill();
@@ -1143,7 +1311,15 @@ const WORLD_VEHICLES = {
         // Cockpit
         context.fillStyle = "#3498db";
         context.beginPath();
-        context.ellipse(x, y - 12 * scale, 6 * scale, 8 * scale, 0, 0, Math.PI * 2);
+        context.ellipse(
+          x,
+          y - 12 * scale,
+          6 * scale,
+          8 * scale,
+          0,
+          0,
+          Math.PI * 2
+        );
         context.fill();
 
         // Tail
@@ -1196,7 +1372,6 @@ function loadTotalCoins() {
 function saveTotalCoins(coins) {
   localStorage.setItem("motorcycleTotalCoins", coins.toString());
 }
-
 
 // World-based vehicle modifications configuration
 const WORLD_VEHICLE_MODS = {
@@ -1282,15 +1457,15 @@ const WORLD_VEHICLE_MODS = {
       },
       {
         id: "mod2",
-        name: "Oasis Finder",
-        price: 35,
-        description: "Hearts spawn 50% more often",
-        effect: "heartSpawnBoost",
+        name: "Salvage Expert",
+        price: 40,
+        description: "15% chance obstacles turn into coins",
+        effect: "obstacleToCoin15",
       },
       {
         id: "mod3",
         name: "Desert Survival",
-        price: 55,
+        price: 60,
         description: "20% chance to survive fatal hit",
         effect: "survivalChance20",
       },
@@ -1298,22 +1473,23 @@ const WORLD_VEHICLE_MODS = {
     dunebuggy: [
       {
         id: "mod1",
-        name: "Turbo Charger",
-        price: 45,
-        description: "50% faster boost speed",
-        effect: "boostSpeed25",
+        name: "Charged Up",
+        price: 50,
+        description:
+          "3 seconds invincibility on score milestones (1000, 2000, etc.)",
+        effect: "milestoneInvincibility",
       },
       {
         id: "mod2",
-        name: "Salvage Expert",
-        price: 80,
-        description: "Coins are worth 2x",
-        effect: "coinValue2x",
+        name: "Spice Harvester",
+        price: 90,
+        description: "25% chance bomb gives coin instead of killing",
+        effect: "bombToCoin25",
       },
       {
         id: "mod3",
         name: "Rally Master",
-        price: 160,
+        price: 180,
         description: "Score multiplier 1.5x",
         effect: "scoreMultiplier1_5x",
       },
@@ -1321,22 +1497,22 @@ const WORLD_VEHICLE_MODS = {
     ornithopter: [
       {
         id: "mod1",
-        name: "Reinforced Hull",
-        price: 80,
-        description: "Start with 5 hearts instead of 3",
-        effect: "maxHealth5",
+        name: "Converter",
+        price: 90,
+        description: "35% chance bomb gives heart instead of killing",
+        effect: "bombToHeart35",
       },
       {
         id: "mod2",
         name: "Shield Generator",
-        price: 160,
-        description: "Shields protect against 2 hits",
-        effect: "shieldDoubleHit",
+        price: 180,
+        description: "Shield regenerates every 30 seconds",
+        effect: "shieldRegen30s",
       },
       {
         id: "mod3",
         name: "Suspensor Field",
-        price: 320,
+        price: 360,
         description: "35% chance to survive fatal hit",
         effect: "survivalChance35",
       },
@@ -1365,7 +1541,10 @@ function loadUnlockedVehicles() {
         highway: parsed, // Old vehicles belong to highway
         desert: [],
       };
-      localStorage.setItem("motorcycleUnlockedVehicles", JSON.stringify(newFormat));
+      localStorage.setItem(
+        "motorcycleUnlockedVehicles",
+        JSON.stringify(newFormat)
+      );
       return newFormat;
     }
     // Ensure all world keys exist
@@ -1374,8 +1553,13 @@ function loadUnlockedVehicles() {
 
     // Migrate sandworm -> dunebuggy for existing players
     if (parsed.desert && parsed.desert.includes("sandworm")) {
-      parsed.desert = parsed.desert.map((v) => (v === "sandworm" ? "dunebuggy" : v));
-      localStorage.setItem("motorcycleUnlockedVehicles", JSON.stringify(parsed));
+      parsed.desert = parsed.desert.map((v) =>
+        v === "sandworm" ? "dunebuggy" : v
+      );
+      localStorage.setItem(
+        "motorcycleUnlockedVehicles",
+        JSON.stringify(parsed)
+      );
     }
 
     return parsed;
@@ -1459,8 +1643,10 @@ function loadUnlockedMods() {
       return newFormat;
     }
     // Ensure all world keys exist
-    if (!parsed.highway) parsed.highway = { motorcycle: [], car: [], truck: [] };
-    if (!parsed.desert) parsed.desert = { jeep: [], dunebuggy: [], ornithopter: [] };
+    if (!parsed.highway)
+      parsed.highway = { motorcycle: [], car: [], truck: [] };
+    if (!parsed.desert)
+      parsed.desert = { jeep: [], dunebuggy: [], ornithopter: [] };
 
     // Migrate sandworm -> dunebuggy mods for existing players
     if (parsed.desert && parsed.desert.sandworm) {
@@ -1545,6 +1731,11 @@ function getModEffectValue(effectName, defaultValue = 1) {
     scoreMultiplier1_5x: 1.5,
     boostSpeed25: 1.5,
     heartSpawnBoost: 1.5,
+    milestoneInvincibility: 3000, // 3 seconds in ms
+    shieldRegen30s: 30000, // 30 seconds in ms
+    obstacleToCoin15: 0.15, // 15% chance
+    bombToHeart35: 0.35, // 35% chance
+    bombToCoin25: 0.25, // 25% chance
   };
 
   return effectValues[effectName] || defaultValue;
@@ -1586,6 +1777,10 @@ let game = {
   lastDeathWasBomb: false, // Track if last death was from bomb
   bombsPassed: 0, // Track bombs passed for Bomb Dodger achievement
   particles: [], // Particle effects array
+  // New mod-related state
+  isInvincible: false, // Milestone invincibility state
+  invincibilityTimer: 0, // Timer in ms for invincibility duration
+  shieldRegenTimer: 30000, // Timer for shield regeneration (30s)
 };
 
 // Default particle config (fallback for worlds without particles defined)
@@ -1615,16 +1810,22 @@ function spawnParticles() {
   // Spawn particles from behind the vehicle (both wheel positions)
   const wheelOffsets = [-12, 12]; // Left and right wheel positions
 
-  wheelOffsets.forEach(offset => {
+  wheelOffsets.forEach((offset) => {
     if (Math.random() < spawnChance) {
       const useAltColor = Math.random() > 0.5;
-      const lifetime = Math.random() * (config.lifetime.max - config.lifetime.min) + config.lifetime.min;
+      const lifetime =
+        Math.random() * (config.lifetime.max - config.lifetime.min) +
+        config.lifetime.min;
       game.particles.push({
         x: vehicleX + offset + (Math.random() - 0.5) * config.spread,
         y: vehicleY + 20, // Behind the vehicle
         vx: (Math.random() - 0.5) * config.speed.max + config.drift.x,
-        vy: Math.random() * (config.speed.max - config.speed.min) + config.speed.min + config.drift.y,
-        size: Math.random() * (config.size.max - config.size.min) + config.size.min,
+        vy:
+          Math.random() * (config.speed.max - config.speed.min) +
+          config.speed.min +
+          config.drift.y,
+        size:
+          Math.random() * (config.size.max - config.size.min) + config.size.min,
         lifetime: lifetime,
         maxLifetime: lifetime,
         color: useAltColor ? config.colorAlt : config.color,
@@ -1654,7 +1855,7 @@ function updateParticles(deltaMultiplier = 1) {
 
 // Draw particles
 function drawParticles() {
-  game.particles.forEach(p => {
+  game.particles.forEach((p) => {
     const opacity = Math.max(0, p.lifetime / p.maxLifetime) * 0.6;
     ctx.fillStyle = p.color + opacity + ")";
     ctx.beginPath();
@@ -1872,6 +2073,11 @@ function checkMilestones() {
         .play()
         .catch((e) => console.log("Milestone sound error:", e));
     }
+    // Activate milestone invincibility mod if equipped
+    if (hasModEffect("milestoneInvincibility")) {
+      game.isInvincible = true;
+      game.invincibilityTimer = getModEffectValue("milestoneInvincibility", 0);
+    }
   }
 
   // Check for 2000 score milestone - "messi"
@@ -1883,6 +2089,11 @@ function checkMilestones() {
         .play()
         .catch((e) => console.log("Milestone sound error:", e));
     }
+    // Activate milestone invincibility mod if equipped
+    if (hasModEffect("milestoneInvincibility")) {
+      game.isInvincible = true;
+      game.invincibilityTimer = getModEffectValue("milestoneInvincibility", 0);
+    }
   }
 
   // Check for 3000 score milestone - "cheering"
@@ -1893,6 +2104,143 @@ function checkMilestones() {
       milestone3000Sound
         .play()
         .catch((e) => console.log("Milestone sound error:", e));
+    }
+    // Activate milestone invincibility mod if equipped
+    if (hasModEffect("milestoneInvincibility")) {
+      game.isInvincible = true;
+      game.invincibilityTimer = getModEffectValue("milestoneInvincibility", 0);
+    }
+  }
+
+  // Check for 3000 score milestone - "cheering"
+  if (game.score >= 4000 && !game.milestonesReached[4000]) {
+    game.milestonesReached[4000] = true;
+    // if (!game.isMuted) {
+    //   milestone3000Sound.currentTime = 0;
+    //   milestone3000Sound
+    //     .play()
+    //     .catch((e) => console.log("Milestone sound error:", e));
+    // }
+    // Activate milestone invincibility mod if equipped
+    if (hasModEffect("milestoneInvincibility")) {
+      game.isInvincible = true;
+      game.invincibilityTimer = getModEffectValue("milestoneInvincibility", 0);
+    }
+  }
+
+  if (game.score >= 5000 && !game.milestonesReached[5000]) {
+    game.milestonesReached[5000] = true;
+    // if (!game.isMuted) {
+    //   milestone3000Sound.currentTime = 0;
+    //   milestone3000Sound
+    //     .play()
+    //     .catch((e) => console.log("Milestone sound error:", e));
+    // }
+    // Activate milestone invincibility mod if equipped
+    if (hasModEffect("milestoneInvincibility")) {
+      game.isInvincible = true;
+      game.invincibilityTimer = getModEffectValue("milestoneInvincibility", 0);
+    }
+  }
+
+  if (game.score >= 6000 && !game.milestonesReached[6000]) {
+    game.milestonesReached[6000] = true;
+    // if (!game.isMuted) {
+    //   milestone3000Sound.currentTime = 0;
+    //   milestone3000Sound
+    //     .play()
+    //     .catch((e) => console.log("Milestone sound error:", e));
+    // }
+    // Activate milestone invincibility mod if equipped
+    if (hasModEffect("milestoneInvincibility")) {
+      game.isInvincible = true;
+      game.invincibilityTimer = getModEffectValue("milestoneInvincibility", 0);
+    }
+  }
+
+  if (game.score >= 7000 && !game.milestonesReached[7000]) {
+    game.milestonesReached[7000] = true;
+    // if (!game.isMuted) {
+    //   milestone3000Sound.currentTime = 0;
+    //   milestone3000Sound
+    //     .play()
+    //     .catch((e) => console.log("Milestone sound error:", e));
+    // }
+    // Activate milestone invincibility mod if equipped
+    if (hasModEffect("milestoneInvincibility")) {
+      game.isInvincible = true;
+      game.invincibilityTimer = getModEffectValue("milestoneInvincibility", 0);
+    }
+  }
+
+  if (game.score >= 8000 && !game.milestonesReached[8000]) {
+    game.milestonesReached[8000] = true;
+    // if (!game.isMuted) {
+    //   milestone3000Sound.currentTime = 0;
+    //   milestone3000Sound
+    //     .play()
+    //     .catch((e) => console.log("Milestone sound error:", e));
+    // }
+    // Activate milestone invincibility mod if equipped
+    if (hasModEffect("milestoneInvincibility")) {
+      game.isInvincible = true;
+      game.invincibilityTimer = getModEffectValue("milestoneInvincibility", 0);
+    }
+  }
+  if (game.score >= 9000 && !game.milestonesReached[9000]) {
+    game.milestonesReached[9000] = true;
+    // if (!game.isMuted) {
+    //   milestone3000Sound.currentTime = 0;
+    //   milestone3000Sound
+    //     .play()
+    //     .catch((e) => console.log("Milestone sound error:", e));
+    // }
+    // Activate milestone invincibility mod if equipped
+    if (hasModEffect("milestoneInvincibility")) {
+      game.isInvincible = true;
+      game.invincibilityTimer = getModEffectValue("milestoneInvincibility", 0);
+    }
+  }
+  if (game.score >= 10000 && !game.milestonesReached[10000]) {
+    game.milestonesReached[10000] = true;
+    // if (!game.isMuted) {
+    //   milestone3000Sound.currentTime = 0;
+    //   milestone3000Sound
+    //     .play()
+    //     .catch((e) => console.log("Milestone sound error:", e));
+    // }
+    // Activate milestone invincibility mod if equipped
+    if (hasModEffect("milestoneInvincibility")) {
+      game.isInvincible = true;
+      game.invincibilityTimer = getModEffectValue("milestoneInvincibility", 0);
+    }
+  }
+  if (game.score >= 11000 && !game.milestonesReached[11000]) {
+    game.milestonesReached[11000] = true;
+    // if (!game.isMuted) {
+    //   milestone3000Sound.currentTime = 0;
+    //   milestone3000Sound
+    //     .play()
+    //     .catch((e) => console.log("Milestone sound error:", e));
+    // }
+    // Activate milestone invincibility mod if equipped
+    if (hasModEffect("milestoneInvincibility")) {
+      game.isInvincible = true;
+      game.invincibilityTimer = getModEffectValue("milestoneInvincibility", 0);
+    }
+  }
+  if (game.score >= 12000 && !game.milestonesReached[12000]) {
+    game.milestonesReached[12000] = true;
+    // if (!game.isMuted) {
+    //   milestone3000Sound.currentTime = 0;
+    //   milestone3000Sound
+    //     .play()
+    //     .catch((e) => console.log("Milestone sound error:", e));
+    // }
+    // Activate milestone invincibility mod if equipped
+    if (hasModEffect("milestoneInvincibility")) {
+      game.isInvincible = true;
+      game.invincibilityTimer = getModEffectValue("milestoneInvincibility", 0);
     }
   }
 }
@@ -2168,6 +2516,49 @@ function update(deltaMultiplier = 1) {
   // Clamp delta multiplier to prevent extreme values on first frame or tab switches
   const clampedDelta = Math.min(Math.max(deltaMultiplier, 0.1), 3);
 
+  // Calculate frame time (assuming 60 FPS ideal, scale with delta)
+  const frameTime = (1000 / 60) * clampedDelta;
+
+  // Update invincibility timer
+  if (game.isInvincible && game.invincibilityTimer > 0) {
+    game.invincibilityTimer -= frameTime;
+
+    // Update display
+    const secondsLeft = Math.max(0, game.invincibilityTimer / 1000);
+    invincibilitySecondsDisplay.textContent = secondsLeft.toFixed(2);
+    invincibilityTimerDisplay.classList.remove("hidden");
+
+    if (game.invincibilityTimer <= 0) {
+      game.isInvincible = false;
+      game.invincibilityTimer = 0;
+      invincibilityTimerDisplay.classList.add("hidden");
+    }
+  } else {
+    // Make sure timer is hidden when not invincible
+    invincibilityTimerDisplay.classList.add("hidden");
+  }
+
+  // Update shield regeneration timer (if mod is active and no shield)
+  if (
+    hasModEffect("shieldRegen30s") &&
+    !game.hasShield &&
+    game.shieldRegenTimer > 0
+  ) {
+    game.shieldRegenTimer -= frameTime;
+    if (game.shieldRegenTimer <= 0) {
+      game.hasShield = true;
+      game.shieldHits = 1;
+      game.shieldRegenTimer = getModEffectValue("shieldRegen30s", 30000);
+      // Play bubble sound for shield regen
+      if (!game.isMuted) {
+        bubbleSound.currentTime = 0;
+        bubbleSound
+          .play()
+          .catch((e) => console.log("Shield regen sound error:", e));
+      }
+    }
+  }
+
   // Update difficulty based on score
   updateDifficulty();
 
@@ -2234,6 +2625,51 @@ function update(deltaMultiplier = 1) {
         if (debugMode.invincibility) {
           // Remove bomb but don't take damage
           return false;
+        }
+
+        // Check milestone invincibility
+        if (game.isInvincible) {
+          // Invincible - bomb has no effect, just remove it
+          return false;
+        }
+
+        // Check bomb-to-coin conversion mod (Spice Harvester)
+        if (hasModEffect("bombToCoin25")) {
+          const conversionChance = getModEffectValue("bombToCoin25", 0);
+          if (Math.random() < conversionChance) {
+            // Convert bomb to coin!
+            const coinValue = 1 * getModEffectValue("coinValue2x", 1);
+            totalCoins += coinValue;
+            game.coinsThisGame += coinValue;
+            saveTotalCoins(totalCoins);
+            updateCoinsDisplay();
+            // Play coin sound
+            if (!game.isMuted) {
+              coinSound.currentTime = 0;
+              coinSound
+                .play()
+                .catch((e) => console.log("Coin sound error:", e));
+            }
+            return false; // Remove bomb
+          }
+        }
+
+        // Check bomb-to-heart conversion mod (Converter)
+        if (hasModEffect("bombToHeart35")) {
+          const conversionChance = getModEffectValue("bombToHeart35", 0);
+          if (Math.random() < conversionChance) {
+            // Convert bomb to heart!
+            game.health = Math.min(game.health + 1, 5);
+            healthDisplay.textContent = game.health;
+            // Play heart pickup sound
+            if (!game.isMuted) {
+              heartPickupSound.currentTime = 0;
+              heartPickupSound
+                .play()
+                .catch((e) => console.log("Heart sound error:", e));
+            }
+            return false; // Remove bomb
+          }
         }
 
         // Check survival chance before fatal bomb damage
@@ -2351,6 +2787,31 @@ function update(deltaMultiplier = 1) {
       // Debug invincibility mode - ignore all obstacle damage
       if (debugMode.invincibility) {
         return false; // Remove obstacle but take no damage
+      }
+
+      // Check milestone invincibility
+      if (game.isInvincible) {
+        // Invincible - obstacle has no effect, just remove it
+        return false;
+      }
+
+      // Check obstacle-to-coin conversion mod (Salvage Expert)
+      if (hasModEffect("obstacleToCoin15")) {
+        const conversionChance = getModEffectValue("obstacleToCoin15", 0);
+        if (Math.random() < conversionChance) {
+          // Convert obstacle to coin!
+          const coinValue = 1 * getModEffectValue("coinValue2x", 1);
+          totalCoins += coinValue;
+          game.coinsThisGame += coinValue;
+          saveTotalCoins(totalCoins);
+          updateCoinsDisplay();
+          // Play coin sound
+          if (!game.isMuted) {
+            coinSound.currentTime = 0;
+            coinSound.play().catch((e) => console.log("Coin sound error:", e));
+          }
+          return false; // Remove obstacle
+        }
       }
 
       // Shield absorbs the hit
@@ -2640,13 +3101,7 @@ const OBSTACLE_STYLES = {
 
     // Right arm (lower)
     ctx.beginPath();
-    ctx.roundRect(
-      x + cactusWidth * 1,
-      y,
-      cactusWidth,
-      cactusHeight * 0.3,
-      3
-    );
+    ctx.roundRect(x + cactusWidth * 1, y, cactusWidth, cactusHeight * 0.3, 3);
     ctx.fill();
     // Right arm connector
     ctx.fillRect(
@@ -2908,14 +3363,14 @@ function gameOver() {
     // World unlock achievements: Trigger when scoring 10,000 in a world unlocks the next
     if (game.score >= WORLD_UNLOCK_SCORE) {
       const worldUnlockAchievements = {
-        1: "desertExplorer",   // Highway -> Desert
-        2: "forestRanger",     // Desert -> Forest
-        3: "beachBum",         // Forest -> Beach
-        4: "mountainClimber",  // Beach -> Mountain
-        5: "citySlicker",      // Mountain -> City
-        6: "arcticExplorer",   // City -> Arctic
-        7: "volcanoDiver",     // Arctic -> Volcano
-        8: "spaceRacer",       // Volcano -> Space
+        1: "desertExplorer", // Highway -> Desert
+        2: "forestRanger", // Desert -> Forest
+        3: "beachBum", // Forest -> Beach
+        4: "mountainClimber", // Beach -> Mountain
+        5: "citySlicker", // Mountain -> City
+        6: "arcticExplorer", // City -> Arctic
+        7: "volcanoDiver", // Arctic -> Volcano
+        8: "spaceRacer", // Volcano -> Space
       };
       const achievementId = worldUnlockAchievements[currentWorld];
       if (achievementId && !isAchievementUnlocked(achievementId)) {
@@ -2987,7 +3442,8 @@ function restart() {
   }
 
   // Calculate initial score based on debug mode
-  let initialScore = debugMode.customStartScore !== null ? debugMode.customStartScore : 0;
+  let initialScore =
+    debugMode.customStartScore !== null ? debugMode.customStartScore : 0;
 
   // Check if should start with shield
   const startWithShield = hasModEffect("startWithShield");
@@ -3087,7 +3543,8 @@ function startGame() {
   }
 
   // Calculate initial score based on debug mode
-  let initialScore = debugMode.customStartScore !== null ? debugMode.customStartScore : 0;
+  let initialScore =
+    debugMode.customStartScore !== null ? debugMode.customStartScore : 0;
 
   // Check if should start with shield
   const startWithShield = hasModEffect("startWithShield");
@@ -3129,6 +3586,10 @@ function startGame() {
     consecutiveBombDeaths: 0,
     lastDeathWasBomb: false,
     bombsPassed: 0, // Track bombs passed for Bomb Dodger achievement
+    // New mod-related state
+    isInvincible: false,
+    invincibilityTimer: 0,
+    shieldRegenTimer: 30000,
   };
 
   healthDisplay.textContent = game.health;
@@ -3264,10 +3725,10 @@ function setupModUnlockButtons() {
         updateModUI();
         updateCoinsDisplay();
 
-        // Play coin sound
+        // Play cash register sound
         if (!game.isMuted) {
-          coinSound.currentTime = 0;
-          coinSound
+          cashRegisterSound.currentTime = 0;
+          cashRegisterSound
             .play()
             .catch((e) => console.log("Purchase sound error:", e));
         }
@@ -3340,8 +3801,12 @@ function buildVehicleCarousel() {
 
   // Update world indicator
   if (currentWorldIndicator) {
-    const iconSpan = currentWorldIndicator.querySelector(".world-indicator-icon");
-    const nameSpan = currentWorldIndicator.querySelector(".world-indicator-name");
+    const iconSpan = currentWorldIndicator.querySelector(
+      ".world-indicator-icon"
+    );
+    const nameSpan = currentWorldIndicator.querySelector(
+      ".world-indicator-name"
+    );
     if (iconSpan) iconSpan.textContent = world.icon;
     if (nameSpan) nameSpan.textContent = world.name;
   }
@@ -3355,28 +3820,40 @@ function buildVehicleCarousel() {
     const price = vehicle.price || 0;
 
     const card = document.createElement("div");
-    card.className = `vehicle-option ${selectedVehicle === vehicleId ? "selected" : ""}`;
+    card.className = `vehicle-option ${
+      selectedVehicle === vehicleId ? "selected" : ""
+    }`;
     card.dataset.vehicle = vehicleId;
     card.dataset.world = worldKey;
 
     card.innerHTML = `
       <div class="vehicle-preview-container ${unlocked ? "" : "locked"}">
         <canvas class="vehicle-preview" width="150" height="150"></canvas>
-        ${!unlocked ? `
+        ${
+          !unlocked
+            ? `
           <div class="lock-overlay">
             <svg class="lock-icon" viewBox="0 0 24 24" fill="white">
               <path d="M12 2C9.243 2 7 4.243 7 7v3H6c-1.103 0-2 .897-2 2v8c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2v-8c0-1.103-.897-2-2-2h-1V7c0-2.757-2.243-5-5-5zm6 10 .002 8H6v-8h12zm-9-2V7c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9z"/>
             </svg>
           </div>
-        ` : ""}
+        `
+            : ""
+        }
       </div>
       <p>${vehicle.name}</p>
-      ${!unlocked && price > 0 ? `
-        <button class="vehicle-unlock-btn" ${totalCoins >= price ? "" : "disabled"}>
+      ${
+        !unlocked && price > 0
+          ? `
+        <button class="vehicle-unlock-btn" ${
+          totalCoins >= price ? "" : "disabled"
+        }>
           <span class="coin-icon">💰</span>
           <span class="unlock-price">${price}</span>
         </button>
-      ` : ""}
+      `
+          : ""
+      }
       ${unlocked ? `<button class="vehicle-modify-btn">MODIFY</button>` : ""}
     `;
 
@@ -3396,11 +3873,18 @@ function buildVehicleCarousel() {
 
   // Auto-select first unlocked vehicle if current selection is invalid
   const currentWorldVehicles = world.vehicles || [];
-  if (!currentWorldVehicles.includes(selectedVehicle) || !isVehicleUnlocked(selectedVehicle)) {
-    const firstUnlocked = currentWorldVehicles.find((v) => isVehicleUnlocked(v, worldKey));
+  if (
+    !currentWorldVehicles.includes(selectedVehicle) ||
+    !isVehicleUnlocked(selectedVehicle)
+  ) {
+    const firstUnlocked = currentWorldVehicles.find((v) =>
+      isVehicleUnlocked(v, worldKey)
+    );
     if (firstUnlocked) {
       selectedVehicle = firstUnlocked;
-      const selectedCard = vehicleCarousel.querySelector(`[data-vehicle="${firstUnlocked}"]`);
+      const selectedCard = vehicleCarousel.querySelector(
+        `[data-vehicle="${firstUnlocked}"]`
+      );
       if (selectedCard) selectedCard.classList.add("selected");
     }
   }
@@ -3414,7 +3898,10 @@ function setupVehicleCarouselEvents() {
     // Click to select vehicle
     option.addEventListener("click", (e) => {
       // Don't select if clicking on buttons
-      if (e.target.closest(".vehicle-unlock-btn") || e.target.closest(".vehicle-modify-btn")) {
+      if (
+        e.target.closest(".vehicle-unlock-btn") ||
+        e.target.closest(".vehicle-modify-btn")
+      ) {
         return;
       }
 
@@ -3443,12 +3930,25 @@ function setupVehicleCarouselEvents() {
           unlockVehicle(vehicleType);
           updateCoinsDisplay();
           buildVehicleCarousel(); // Rebuild to show updated state
+          updateStartButtonState(); // Update start button in case we unlocked last vehicle
+
+          // Play cash register sound
+          if (!game.isMuted) {
+            cashRegisterSound.currentTime = 0;
+            cashRegisterSound
+              .play()
+              .catch((e) => console.log("Cash register sound error:", e));
+          }
 
           // Auto-select the newly unlocked vehicle
           selectedVehicle = vehicleType;
-          const selectedCard = vehicleCarousel.querySelector(`[data-vehicle="${vehicleType}"]`);
+          const selectedCard = vehicleCarousel.querySelector(
+            `[data-vehicle="${vehicleType}"]`
+          );
           if (selectedCard) {
-            vehicleCarousel.querySelectorAll(".vehicle-option").forEach((opt) => opt.classList.remove("selected"));
+            vehicleCarousel
+              .querySelectorAll(".vehicle-option")
+              .forEach((opt) => opt.classList.remove("selected"));
             selectedCard.classList.add("selected");
           }
         }
@@ -3466,14 +3966,58 @@ function setupVehicleCarouselEvents() {
   });
 }
 
+// Check if all vehicles in the previous world are unlocked
+function arePreviousWorldVehiclesUnlocked() {
+  // World 1 (Highway) has no requirements
+  if (currentWorld === 1) return true;
+
+  // Get previous world
+  const previousWorldId = currentWorld - 1;
+  const previousWorld = WORLDS[previousWorldId];
+  if (!previousWorld) return true; // No previous world
+
+  const previousWorldKey = previousWorld.key;
+  const previousVehicleIds = previousWorld.vehicles || [];
+
+  // Check if ALL vehicles from previous world are unlocked
+  return previousVehicleIds.every((vehicleId) =>
+    isVehicleUnlocked(vehicleId, previousWorldKey)
+  );
+}
+
+// Update start button state based on previous world completion
+function updateStartButtonState() {
+  const canStart = arePreviousWorldVehiclesUnlocked();
+
+  if (canStart) {
+    startGameBtn.disabled = false;
+    startGameBtn.classList.remove("disabled");
+    startGameBtn.textContent = "START GAME";
+  } else {
+    startGameBtn.disabled = true;
+    startGameBtn.classList.add("disabled");
+    const previousWorld = WORLDS[currentWorld - 1];
+    startGameBtn.textContent = `🔒 UNLOCK ALL ${previousWorld.name.toUpperCase()} VEHICLES FIRST`;
+  }
+}
+
 // Initial build of vehicle carousel
 buildVehicleCarousel();
 
 // Set initial website background based on current world
 updateWorldBackground();
 
+// Update start button state
+updateStartButtonState();
+
 // Start game button
-startGameBtn.addEventListener("click", startGame);
+startGameBtn.addEventListener("click", (e) => {
+  if (startGameBtn.disabled) {
+    e.preventDefault();
+    return;
+  }
+  startGame();
+});
 
 // Resume button
 resumeBtn.addEventListener("click", () => {
@@ -3707,13 +4251,18 @@ function confirmWorldSelection() {
   // Auto-select first unlocked vehicle of this world
   const worldKey = world.key;
   const worldVehicles = world.vehicles || [];
-  const firstUnlocked = worldVehicles.find((v) => isVehicleUnlocked(v, worldKey));
+  const firstUnlocked = worldVehicles.find((v) =>
+    isVehicleUnlocked(v, worldKey)
+  );
   if (firstUnlocked) {
     selectedVehicle = firstUnlocked;
   }
 
   // Rebuild carousel with new world's vehicles
   buildVehicleCarousel();
+
+  // Update start button state for new world
+  updateStartButtonState();
 
   // Update website background for the new world
   updateWorldBackground();
