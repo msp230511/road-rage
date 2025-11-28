@@ -52,6 +52,9 @@ const bananaSpeechBubble = document.getElementById("bananaSpeechBubble");
 const roastText = document.getElementById("roastText");
 let roastTimeout = null;
 
+// Achievement elements
+const achievementContainer = document.getElementById("achievementContainer");
+
 // Array of roasts the banana man says when you take damage
 const BANANA_ROASTS = [
   "Why would you do that?",
@@ -85,6 +88,86 @@ const BANANA_ROASTS = [
   "Uninstall, please.",
   "Delete your account.",
 ];
+
+// Achievement definitions
+const ACHIEVEMENTS = {
+  idiot: {
+    id: "idiot",
+    name: "Idiot",
+    description: "Die without scoring any points",
+    unlocked: false,
+  },
+  demolitionist: {
+    id: "demolitionist",
+    name: "Demolitionist",
+    description: "Die 3 times in a row due to a bomb",
+    unlocked: false,
+  },
+  kindaCrazy: {
+    id: "kindaCrazy",
+    name: "Kinda Crazy",
+    description: "Take no damage until 500 score",
+    unlocked: false,
+  },
+  touchGrass: {
+    id: "touchGrass",
+    name: "Touch Grass",
+    description: "Take no damage until 1000 score",
+    unlocked: false,
+  },
+  noLife: {
+    id: "noLife",
+    name: "No Life",
+    description: "Reach 10000 score",
+    unlocked: false,
+  },
+  lovesCardio: {
+    id: "lovesCardio",
+    name: "Loves Cardio",
+    description: "Hit a balance of 10 hearts in any game",
+    unlocked: false,
+  },
+  uncleScrooge: {
+    id: "uncleScrooge",
+    name: "Uncle Scrooge",
+    description: "Collect 25 coins in one game",
+    unlocked: false,
+  },
+};
+
+// Load achievements from localStorage
+function loadAchievements() {
+  const saved = localStorage.getItem("motorcycleAchievements");
+  if (saved) {
+    const savedAchievements = JSON.parse(saved);
+    // Merge saved achievements with default achievements
+    Object.keys(ACHIEVEMENTS).forEach((key) => {
+      if (savedAchievements[key]) {
+        ACHIEVEMENTS[key].unlocked = savedAchievements[key].unlocked;
+      }
+    });
+  }
+}
+
+// Save achievements to localStorage
+function saveAchievements() {
+  localStorage.setItem("motorcycleAchievements", JSON.stringify(ACHIEVEMENTS));
+}
+
+// Check if an achievement is unlocked
+function isAchievementUnlocked(achievementId) {
+  return ACHIEVEMENTS[achievementId]?.unlocked || false;
+}
+
+// Unlock an achievement and show notification
+function unlockAchievement(achievementId) {
+  const achievement = ACHIEVEMENTS[achievementId];
+  if (!achievement || achievement.unlocked) return;
+
+  achievement.unlocked = true;
+  saveAchievements();
+  showAchievementNotification(achievement);
+}
 
 // Game constants
 const TILE_HEIGHT = 50;
@@ -433,7 +516,15 @@ let game = {
   laneWidth: canvas.width / INITIAL_LANES, // Dynamic lane width
   vehicleType: "motorcycle", // Current vehicle
   milestonesReached: {}, // Track which milestone sounds have been played
+  // Achievement tracking
+  damageTaken: false, // Track if player has taken damage this game
+  coinsThisGame: 0, // Track coins collected this game
+  consecutiveBombDeaths: 0, // Track consecutive deaths from bombs
+  lastDeathWasBomb: false, // Track if last death was from bomb
 };
+
+// Load achievements from localStorage on game start
+loadAchievements();
 
 // Audio control
 bgMusic.volume = 0.5; // Set volume to 50%
@@ -590,6 +681,31 @@ function showBananaRoast() {
   roastTimeout = setTimeout(() => {
     bananaSpeechBubble.classList.add("hidden");
   }, 2500);
+}
+
+// Show achievement notification
+function showAchievementNotification(achievement) {
+  // Create notification element
+  const notification = document.createElement("div");
+  notification.className = "achievement-notification";
+  notification.innerHTML = `
+    <div class="achievement-icon">🏆</div>
+    <div class="achievement-content">
+      <h3 class="achievement-title">${achievement.name}</h3>
+      <p class="achievement-description">${achievement.description}</p>
+    </div>
+  `;
+
+  // Add to container
+  achievementContainer.appendChild(notification);
+
+  // Auto-remove after 4 seconds
+  setTimeout(() => {
+    notification.classList.add("slide-out");
+    setTimeout(() => {
+      notification.remove();
+    }, 500);
+  }, 4000);
 }
 
 // Initialize obstacles
@@ -771,6 +887,9 @@ function update() {
           game.health = 0;
           healthDisplay.textContent = game.health;
 
+          // Mark that this death was from a bomb (for achievement tracking)
+          game.lastDeathWasBomb = true;
+
           // Show banana roast
           showBananaRoast();
 
@@ -787,6 +906,12 @@ function update() {
         // Add 1 health point
         game.health++;
         healthDisplay.textContent = game.health;
+
+        // Check Loves Cardio achievement: Hit a balance of 10 hearts in any game
+        if (game.health >= 10 && !isAchievementUnlocked("lovesCardio")) {
+          unlockAchievement("lovesCardio");
+        }
+
         // Play heart pickup sound
         if (!game.isMuted) {
           heartPickupSound.currentTime = 0;
@@ -799,6 +924,9 @@ function update() {
         const coinValue = Math.floor(getModEffectValue("coinValue2x", 1));
         totalCoins += coinValue;
         saveTotalCoins(totalCoins);
+
+        // Track coins collected this game for achievements
+        game.coinsThisGame += coinValue;
         updateCoinsDisplay();
         // Play coin sound
         if (!game.isMuted) {
@@ -871,6 +999,12 @@ function update() {
         // Take damage
         game.health--;
         healthDisplay.textContent = game.health;
+
+        // Mark that damage was taken (for no-damage achievements)
+        game.damageTaken = true;
+
+        // This death was NOT from a bomb (reset bomb death streak)
+        game.lastDeathWasBomb = false;
 
         // Show banana roast
         showBananaRoast();
@@ -1203,12 +1337,53 @@ function gameOver() {
   gameOverScreen.classList.remove("hidden");
   bgMusic.pause();
 
+  // Check achievements on game over
+  checkGameOverAchievements();
+
   // Play random game over sound effect
   if (!game.isMuted) {
     const randomSound =
       gameOverSounds[Math.floor(Math.random() * gameOverSounds.length)];
     randomSound.currentTime = 0;
     randomSound.play().catch((e) => console.log("Game over sound error:", e));
+  }
+}
+
+// Check achievements when game ends
+function checkGameOverAchievements() {
+  // Idiot: Die without scoring any points
+  if (game.score === 0 && !isAchievementUnlocked("idiot")) {
+    unlockAchievement("idiot");
+  }
+
+  // Demolitionist: Die 3 times in a row due to a bomb
+  if (game.lastDeathWasBomb) {
+    game.consecutiveBombDeaths++;
+    if (game.consecutiveBombDeaths >= 3 && !isAchievementUnlocked("demolitionist")) {
+      unlockAchievement("demolitionist");
+    }
+  } else {
+    game.consecutiveBombDeaths = 0;
+  }
+
+  // Kinda Crazy: Take no damage until 500 score
+  if (game.score >= 500 && !game.damageTaken && !isAchievementUnlocked("kindaCrazy")) {
+    unlockAchievement("kindaCrazy");
+  }
+
+  // Touch Grass: Take no damage until 1000 score
+  if (game.score >= 1000 && !game.damageTaken && !isAchievementUnlocked("touchGrass")) {
+    unlockAchievement("touchGrass");
+  }
+
+  // No Life: Reach 10000 score
+  if (game.score >= 10000 && !isAchievementUnlocked("noLife")) {
+    unlockAchievement("noLife");
+  }
+
+  // Uncle Scrooge: Collect 25 coins in one game
+  if (game.coinsThisGame >= 25 && !isAchievementUnlocked("uncleScrooge")) {
+    unlockAchievement("uncleScrooge");
   }
 }
 
@@ -1259,6 +1434,11 @@ function restart() {
     laneWidth: canvas.width / INITIAL_LANES,
     vehicleType: currentVehicle,
     milestonesReached: {},
+    // Reset achievement tracking for new game
+    damageTaken: false,
+    coinsThisGame: 0,
+    consecutiveBombDeaths: game.consecutiveBombDeaths || 0, // Preserve bomb death streak
+    lastDeathWasBomb: false,
   };
 
   healthDisplay.textContent = game.health;
