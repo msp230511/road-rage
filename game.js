@@ -49,7 +49,6 @@ const closeThingsToKnowBtn = document.getElementById("closeThingsToKnowBtn");
 // Achievements screen elements
 const achievementsBtn = document.getElementById("achievementsBtn");
 const achievementsScreen = document.getElementById("achievementsScreen");
-const achievementsCoinsDisplay = document.getElementById("achievementsCoins");
 const backToMenuFromAchievements = document.getElementById(
   "backToMenuFromAchievements"
 );
@@ -870,12 +869,6 @@ function saveTotalCoins(coins) {
   localStorage.setItem("motorcycleTotalCoins", coins.toString());
 }
 
-// Vehicle unlock prices
-const VEHICLE_PRICES = {
-  motorcycle: 0, // Free by default
-  car: 150,
-  truck: 300,
-};
 
 // World-based vehicle modifications configuration
 const WORLD_VEHICLE_MODS = {
@@ -2607,6 +2600,11 @@ function startGame() {
     laneWidth: canvas.width / INITIAL_LANES,
     vehicleType: selectedVehicle,
     milestonesReached: {},
+    // Achievement tracking
+    damageTaken: false,
+    coinsThisGame: 0,
+    consecutiveBombDeaths: 0,
+    lastDeathWasBomb: false,
   };
 
   healthDisplay.textContent = game.health;
@@ -2620,60 +2618,6 @@ function startGame() {
     bgMusic.currentTime = 0;
     bgMusic.play();
   }
-}
-
-// Update vehicle UI based on unlock state
-function updateVehicleUI() {
-  vehicleOptions.forEach((option) => {
-    const vehicleType = option.dataset.vehicle;
-    const unlocked = isVehicleUnlocked(vehicleType);
-    const lockOverlay = option.querySelector(".lock-overlay");
-    const unlockBtn = option.querySelector(".vehicle-unlock-btn");
-    const modifyBtn = option.querySelector(".vehicle-modify-btn");
-    const previewContainer = option.querySelector(".vehicle-preview-container");
-
-    if (unlocked) {
-      // Vehicle is unlocked
-      if (lockOverlay) {
-        lockOverlay.style.display = "none";
-      }
-      if (unlockBtn) {
-        unlockBtn.style.display = "none";
-      }
-      if (modifyBtn) {
-        modifyBtn.style.display = "flex";
-      }
-      if (previewContainer) previewContainer.classList.remove("locked");
-      option.style.pointerEvents = "auto";
-      option.style.opacity = "1";
-    } else {
-      // Vehicle is locked
-      if (lockOverlay) {
-        lockOverlay.style.display = "flex";
-      }
-      if (unlockBtn) {
-        unlockBtn.style.display = "flex";
-      }
-      if (modifyBtn) {
-        modifyBtn.style.display = "none";
-      }
-      if (previewContainer) previewContainer.classList.add("locked");
-      option.style.opacity = "0.6";
-
-      // Update unlock button disabled state based on coins
-      const price = VEHICLE_PRICES[vehicleType];
-      if (unlockBtn) {
-        if (totalCoins >= price) {
-          unlockBtn.disabled = false;
-        } else {
-          unlockBtn.disabled = true;
-        }
-      }
-    }
-  });
-
-  // Update coin display on menu
-  updateCoinsDisplay();
 }
 
 // Update mod UI based on unlock state
@@ -2808,55 +2752,6 @@ function setupModUnlockButtons() {
   });
 }
 
-// Handle unlock button clicks
-function setupUnlockButtons() {
-  const unlockButtons = document.querySelectorAll(".vehicle-unlock-btn");
-  unlockButtons.forEach((btn) => {
-    btn.addEventListener("click", (e) => {
-      e.stopPropagation(); // Prevent vehicle selection
-      const option = btn.closest(".vehicle-option");
-      const vehicleType = option.dataset.vehicle;
-      const price = VEHICLE_PRICES[vehicleType];
-
-      // Check if player has enough coins
-      if (totalCoins >= price) {
-        // Deduct coins
-        totalCoins -= price;
-        saveTotalCoins(totalCoins);
-
-        // Unlock vehicle
-        unlockVehicle(vehicleType);
-
-        // Update UI
-        updateVehicleUI();
-
-        // Play coin sound (but reverse it or use a different sound for purchase)
-        if (!game.isMuted) {
-          coinSound.currentTime = 0;
-          coinSound
-            .play()
-            .catch((e) => console.log("Purchase sound error:", e));
-        }
-      }
-    });
-  });
-}
-
-// Handle modify button clicks
-function setupModifyButtons() {
-  const modifyButtons = document.querySelectorAll(".vehicle-modify-btn");
-  modifyButtons.forEach((btn) => {
-    btn.addEventListener("click", (e) => {
-      e.stopPropagation(); // Prevent vehicle selection
-      const option = btn.closest(".vehicle-option");
-      const vehicleType = option.dataset.vehicle;
-
-      // Open modification screen for this vehicle
-      openModScreen(vehicleType);
-    });
-  });
-}
-
 // Open modification screen for a vehicle
 function openModScreen(vehicleType) {
   currentModVehicle = vehicleType;
@@ -2936,7 +2831,7 @@ function buildVehicleCarousel() {
     const price = vehicle.price || 0;
 
     const card = document.createElement("div");
-    card.className = `vehicle-option ${unlocked ? "" : ""} ${selectedVehicle === vehicleId ? "selected" : ""}`;
+    card.className = `vehicle-option ${selectedVehicle === vehicleId ? "selected" : ""}`;
     card.dataset.vehicle = vehicleId;
     card.dataset.world = worldKey;
 
@@ -3014,7 +2909,8 @@ function setupVehicleCarouselEvents() {
     if (unlockBtn) {
       unlockBtn.addEventListener("click", () => {
         const vehicleType = option.dataset.vehicle;
-        const vehicle = VEHICLES[vehicleType];
+        const worldVehicles = getWorldVehicles(currentWorld);
+        const vehicle = worldVehicles[vehicleType];
         const price = vehicle?.price || 0;
 
         if (totalCoins >= price && !isVehicleUnlocked(vehicleType)) {
@@ -3157,9 +3053,6 @@ function populateAchievementsScreen() {
     lockedAchievementsList.innerHTML =
       '<div class="achievements-empty">All achievements unlocked! 🎉</div>';
   }
-
-  // Update coins display
-  achievementsCoinsDisplay.textContent = totalCoins;
 }
 
 // Things To Know overlay
@@ -3167,7 +3060,7 @@ thingsToKnowBtn.addEventListener("click", () => {
   thingsToKnowOverlay.classList.remove("hidden");
 });
 
-closeThingsToKnowBtn.addEventListener("click", (e) => {
+closeThingsToKnowBtn.addEventListener("click", () => {
   thingsToKnowOverlay.classList.add("hidden");
 });
 
@@ -3181,7 +3074,7 @@ thingsToKnowOverlay.addEventListener("click", (e) => {
 // Open achievements screen
 achievementsBtn.addEventListener("click", () => {
   menuScreen.classList.add("hidden");
-  menuCoinDisplay.style.display = "none";
+  menuCoinsDisplay.style.display = "none";
   achievementsBtn.style.display = "none";
   achievementsScreen.classList.remove("hidden");
   populateAchievementsScreen();
@@ -3191,7 +3084,7 @@ achievementsBtn.addEventListener("click", () => {
 backToMenuFromAchievements.addEventListener("click", () => {
   achievementsScreen.classList.add("hidden");
   menuScreen.classList.remove("hidden");
-  menuCoinDisplay.style.display = "flex";
+  menuCoinsDisplay.style.display = "flex";
   achievementsBtn.style.display = "flex";
 });
 
@@ -3229,12 +3122,20 @@ function updateWorldMapUI() {
   if (world) {
     selectedWorldName.textContent = world.name;
 
+    // Check if world has vehicles implemented
+    const hasVehicles = world.vehicles && world.vehicles.length > 0;
+
     // Show unlock requirement for locked worlds
     if (!isWorldUnlocked(selectedWorld)) {
       const prevWorldName = WORLDS[selectedWorld - 1]?.name || "previous world";
       selectedWorldDescription.textContent = `🔒 LOCKED - Score ${WORLD_UNLOCK_SCORE.toLocaleString()} in ${prevWorldName} to unlock!`;
       selectWorldBtn.disabled = true;
       selectWorldBtn.textContent = "LOCKED";
+    } else if (!hasVehicles) {
+      // World is unlocked but not yet implemented
+      selectedWorldDescription.textContent = `🚧 COMING SOON - This world is not yet available!`;
+      selectWorldBtn.disabled = true;
+      selectWorldBtn.textContent = "COMING SOON";
     } else {
       selectedWorldDescription.textContent = world.description;
       // Show high score for this world if it exists
@@ -3273,10 +3174,13 @@ function closeWorldMap() {
 function confirmWorldSelection() {
   if (!isWorldUnlocked(selectedWorld)) return;
 
+  // Check if world has vehicles implemented
+  const world = WORLDS[selectedWorld];
+  if (!world.vehicles || world.vehicles.length === 0) return;
+
   currentWorld = selectedWorld;
 
   // Auto-select first unlocked vehicle of this world
-  const world = WORLDS[currentWorld];
   const worldKey = world.key;
   const worldVehicles = world.vehicles || [];
   const firstUnlocked = worldVehicles.find((v) => isVehicleUnlocked(v, worldKey));
@@ -3324,31 +3228,8 @@ selectWorldBtn.addEventListener("click", () => {
 
 // ==================== END WORLD MAP SCREEN ====================
 
-// Draw vehicle previews in menu
-function drawVehiclePreviews() {
-  vehicleOptions.forEach((option) => {
-    const previewCanvas = option.querySelector(".vehicle-preview");
-    const previewCtx = previewCanvas.getContext("2d");
-    const vehicleType = option.dataset.vehicle;
-    const vehicle = VEHICLES[vehicleType];
-
-    // Clear canvas
-    previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
-
-    // Draw vehicle in center
-    vehicle.draw(
-      previewCtx,
-      previewCanvas.width / 2,
-      previewCanvas.height / 2,
-      1.5
-    );
-  });
-}
-
 // Initialize menu
 setupModUnlockButtons();
-// Note: Vehicle carousel is built by buildVehicleCarousel() called earlier
-// Legacy functions removed: drawVehiclePreviews, setupUnlockButtons, setupModifyButtons, updateVehicleUI
 
 // Initialize coins display
 updateCoinsDisplay();
