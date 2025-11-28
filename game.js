@@ -494,8 +494,8 @@ function saveTotalCoins(coins) {
 // Vehicle unlock prices
 const VEHICLE_PRICES = {
   motorcycle: 0, // Free by default
-  car: 100,
-  truck: 200,
+  car: 150,
+  truck: 300,
 };
 
 // Vehicle modifications configuration
@@ -527,21 +527,21 @@ const VEHICLE_MODS = {
     {
       id: "mod1",
       name: "Turbo Boost",
-      price: 20,
+      price: 40,
       description: "50% faster boost speed",
       effect: "boostSpeed25",
     },
     {
       id: "mod2",
       name: "Double Money",
-      price: 70,
+      price: 75,
       description: "Coins are worth 2x",
       effect: "coinValue2x",
     },
     {
       id: "mod3",
       name: "Score Master",
-      price: 100,
+      price: 150,
       description: "Score multiplier 1.5x",
       effect: "scoreMultiplier1_5x",
     },
@@ -550,21 +550,21 @@ const VEHICLE_MODS = {
     {
       id: "mod1",
       name: "Time Lord",
-      price: 35,
+      price: 75,
       description: "Start with 5 hearts instead of 3",
       effect: "maxHealth5",
     },
     {
       id: "mod2",
       name: "Reinforced Shield",
-      price: 45,
+      price: 150,
       description: "Shields protect against 2 hits",
       effect: "shieldDoubleHit",
     },
     {
       id: "mod3",
       name: "Tank Mode",
-      price: 65,
+      price: 300,
       description: "35% chance to survive fatal hit",
       effect: "survivalChance35",
     },
