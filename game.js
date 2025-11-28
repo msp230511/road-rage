@@ -1,3 +1,9 @@
+// Game Version (Semantic Versioning: MAJOR.MINOR.PATCH)
+// MAJOR: Breaking changes or major feature overhauls
+// MINOR: New features, new worlds, new vehicles, significant additions
+// PATCH: Bug fixes, balance tweaks, small improvements
+const GAME_VERSION = "1.0.0";
+
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 const healthDisplay = document.getElementById("health");
@@ -88,6 +94,8 @@ const achievementContainer = document.getElementById("achievementContainer");
 const debugOverlay = document.getElementById("debugOverlay");
 const debugHealthInput = document.getElementById("debugHealthInput");
 const debugApplyHealthBtn = document.getElementById("debugApplyHealthBtn");
+const debugScoreInput = document.getElementById("debugScoreInput");
+const debugApplyScoreBtn = document.getElementById("debugApplyScoreBtn");
 const debugCoinsInput = document.getElementById("debugCoinsInput");
 const debugAddCoinsBtn = document.getElementById("debugAddCoinsBtn");
 const debugResetCoinsBtn = document.getElementById("debugResetCoinsBtn");
@@ -100,11 +108,16 @@ const debugInvincibilityCheckbox = document.getElementById(
   "debugInvincibilityCheckbox"
 );
 
+// Version display
+const versionDisplay = document.getElementById("versionDisplay");
+versionDisplay.textContent = `v${GAME_VERSION}`;
+
 // Debug mode state
 let debugMode = {
   active: false,
   keysPressed: new Set(),
   customStartHealth: null, // null means use default/mod-based health
+  customStartScore: null, // null means start at 0
   invincibility: false, // Invincibility mode
 };
 
@@ -1675,6 +1688,17 @@ debugApplyHealthBtn.addEventListener("click", () => {
   }
 });
 
+// Debug: Apply custom starting score
+debugApplyScoreBtn.addEventListener("click", () => {
+  const scoreValue = parseInt(debugScoreInput.value);
+  if (scoreValue >= 0 && scoreValue <= 999999) {
+    debugMode.customStartScore = scoreValue;
+    showDebugStatus(`✓ Starting score set to ${scoreValue}`);
+  } else {
+    showDebugStatus("✗ Score must be 0-999999", 2000);
+  }
+});
+
 // Debug: Toggle invincibility
 debugInvincibilityCheckbox.addEventListener("change", (e) => {
   debugMode.invincibility = e.target.checked;
@@ -2947,6 +2971,9 @@ function restart() {
   const currentHighScore = game.highScore;
   const currentVehicle = game.vehicleType;
 
+  // Ensure selectedVehicle matches so hasModEffect() checks the right vehicle's mods
+  selectedVehicle = currentVehicle;
+
   // Reset canvas to initial width
   canvas.width = 800;
 
@@ -2959,6 +2986,9 @@ function restart() {
     initialHealth = 5;
   }
 
+  // Calculate initial score based on debug mode
+  let initialScore = debugMode.customStartScore !== null ? debugMode.customStartScore : 0;
+
   // Check if should start with shield
   const startWithShield = hasModEffect("startWithShield");
 
@@ -2970,7 +3000,7 @@ function restart() {
 
   game = {
     health: initialHealth,
-    score: 0,
+    score: initialScore,
     highScore: currentHighScore,
     isRunning: true,
     isPaused: false,
@@ -3056,6 +3086,9 @@ function startGame() {
     initialHealth = 5;
   }
 
+  // Calculate initial score based on debug mode
+  let initialScore = debugMode.customStartScore !== null ? debugMode.customStartScore : 0;
+
   // Check if should start with shield
   const startWithShield = hasModEffect("startWithShield");
 
@@ -3067,7 +3100,7 @@ function startGame() {
 
   game = {
     health: initialHealth,
-    score: 0,
+    score: initialScore,
     highScore: currentHighScore,
     isRunning: true,
     isPaused: false,

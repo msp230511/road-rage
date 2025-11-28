@@ -2,6 +2,24 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## CRITICAL: Version Update Requirement
+
+**After ANY significant code change, you MUST update `GAME_VERSION` in game.js (line 5).**
+
+The game uses semantic versioning (MAJOR.MINOR.PATCH):
+- **MAJOR**: Breaking changes, major feature overhauls, save data incompatibilities
+- **MINOR**: New features, new worlds, new vehicles, new mods, significant additions
+- **PATCH**: Bug fixes, balance tweaks, UI improvements, small changes
+
+Examples:
+- Adding a new world → bump MINOR (e.g., 1.0.0 → 1.1.0)
+- Fixing a collision bug → bump PATCH (e.g., 1.1.0 → 1.1.1)
+- Overhauling the mod system → bump MAJOR (e.g., 1.1.1 → 2.0.0)
+
+The version displays in the bottom-right corner of the game screen for bug tracing.
+
+---
+
 ## IMPORTANT: Post-Change Review Checklist
 
 **Before completing any code change, you MUST perform a dependency review:**
@@ -19,7 +37,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
    - `style.css` - CSS class references
    - `CLAUDE.md` - Documentation references
    - `README_TODO.md` - Documentation references
-   - `scripts/*.html` - Testing utilities
 
 3. **Common patterns to verify**:
    - If renaming `foo` to `bar`, search for `foo` across entire codebase
@@ -308,10 +325,6 @@ Each vehicle has 3 unique mods that enhance gameplay. All **18 mods** are fully 
 - [CLAUDE.md](CLAUDE.md): This file - architecture documentation
 - [README_TODO.md](README_TODO.md): Development TODO list and feature ideas
 - [CONTRIBUTING.md](CONTRIBUTING.md): Git workflow and contribution guidelines
-- **scripts/** folder: Testing utilities
-  - `give_coins.html`: Add coins for testing
-  - `reset_coins.html`: Reset coins to 0
-  - `lock_vehicles.html`: Lock all vehicles and reset mods (world-aware)
 - **Assets** (in media/ folder):
   - **images/**: World background images
     - `highway-bg.png`: Highway world background
@@ -356,4 +369,4 @@ Each vehicle has 3 unique mods that enhance gameplay. All **18 mods** are fully 
 - 60 FPS target via `requestAnimationFrame()`
 - Mobile support: Limited (keyboard controls only, could add touch events)
 - Browser compatibility: Modern browsers only (ES6+ features used)
-- Testing utilities in `scripts/` folder for rapid development/testing
+- Debug menu: Hold A+W+D keys to access testing/debug utilities in-game
