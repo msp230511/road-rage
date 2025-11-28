@@ -2,6 +2,37 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## IMPORTANT: Post-Change Review Checklist
+
+**Before completing any code change, you MUST perform a dependency review:**
+
+1. **Search for dangling references**: Use grep/search to find ALL references to any renamed, removed, or modified:
+   - Variable names
+   - Function names
+   - Object keys/properties
+   - String literals (especially in localStorage keys, CSS classes, etc.)
+   - File paths
+
+2. **Files to check**: Always search across ALL files in the project:
+   - `game.js` - Main game logic
+   - `index.html` - HTML structure and inline scripts
+   - `style.css` - CSS class references
+   - `CLAUDE.md` - Documentation references
+   - `README_TODO.md` - Documentation references
+   - `scripts/*.html` - Testing utilities
+
+3. **Common patterns to verify**:
+   - If renaming `foo` to `bar`, search for `foo` across entire codebase
+   - If removing a function, search for all call sites
+   - If changing localStorage keys, update all load/save references
+   - If modifying object structure, update all access patterns
+
+4. **Migration logic**: When renaming stored data (localStorage), add migration code to handle existing user data gracefully.
+
+**This review is MANDATORY. Do not skip it.**
+
+---
+
 ## Project Overview
 
 This is a 2D vertical sidescroller motorcycle game (titled "ROAD RAGE") built with vanilla JavaScript and HTML5 Canvas. The game features dynamic difficulty scaling, powerups, audio, high score tracking, visual polish, a **multi-world system** with 2 playable worlds (Highway and Desert), 6 unlockable vehicles (3 per world), and a comprehensive vehicle modification system with 18 unique mods (3 per vehicle) that provide gameplay enhancements. The game runs entirely in the browser with no build process or dependencies.
@@ -190,9 +221,9 @@ The game features **6 unlockable vehicles** across 2 worlds, with world-specific
    - Balanced desert exploration vehicle
    - Tan/khaki with roll cage
 
-2. **Sandworm** (200 coins)
-   - Speed-focused desert creature
-   - Purple segmented body (Shai-Hulud inspired)
+2. **Dune Buggy** (200 coins)
+   - Speed-focused desert vehicle
+   - Camo-style with roll cage and large knobby wheels
 
 3. **Ornithopter** (400 coins)
    - Maximum durability flying craft
@@ -250,11 +281,11 @@ Each vehicle has 3 unique mods that enhance gameplay. All **18 mods** are fully 
 2. **Oasis Finder** (35 coins, `heartSpawnBoost`)
 3. **Desert Survival** (55 coins, `survivalChance20`)
 
-**Sandworm Mods**
+**Dune Buggy Mods**
 
-1. **Spice Boost** (45 coins, `boostSpeed25`)
-2. **Spice Mining** (80 coins, `coinValue2x`)
-3. **Prescience** (160 coins, `scoreMultiplier1_5x`)
+1. **Turbo Charger** (45 coins, `boostSpeed25`)
+2. **Salvage Expert** (80 coins, `coinValue2x`)
+3. **Rally Master** (160 coins, `scoreMultiplier1_5x`)
 
 **Ornithopter Mods**
 
@@ -263,7 +294,7 @@ Each vehicle has 3 unique mods that enhance gameplay. All **18 mods** are fully 
 3. **Suspensor Field** (320 coins, `survivalChance35`)
 
 **Mod Storage**: World-aware format in localStorage (`motorcycleUnlockedMods`)
-- Format: `{ highway: { motorcycle: [], car: [], truck: [] }, desert: { jeep: [], sandworm: [], ornithopter: [] } }`
+- Format: `{ highway: { motorcycle: [], car: [], truck: [] }, desert: { jeep: [], dunebuggy: [], ornithopter: [] } }`
 **Mod Logic**:
 - `hasModEffect(effectName)` checks if current vehicle has mod unlocked
 - `getModEffectValue(effectName, defaultValue)` returns multiplier values
