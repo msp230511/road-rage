@@ -66,6 +66,15 @@ const modVehicleName = document.getElementById("modVehicleName");
 const modVehicleCanvas = document.getElementById("modVehicleCanvas");
 let currentModVehicle = "motorcycle"; // Track which vehicle is being modified
 
+// World Map screen elements
+const worldMapScreen = document.getElementById("worldMapScreen");
+const worldsBtn = document.getElementById("worldsBtn");
+const backToMenuFromWorlds = document.getElementById("backToMenuFromWorlds");
+const selectedWorldName = document.getElementById("selectedWorldName");
+const selectedWorldDescription = document.getElementById("selectedWorldDescription");
+const selectWorldBtn = document.getElementById("selectWorldBtn");
+const worldNodes = document.querySelectorAll(".world-node")
+
 // Banana roast elements
 const bananaSpeechBubble = document.getElementById("bananaSpeechBubble");
 const roastText = document.getElementById("roastText");
@@ -211,6 +220,108 @@ function unlockAchievement(achievementId) {
   saveAchievements();
   showAchievementNotification(achievement);
 }
+
+// World definitions
+const WORLDS = {
+  1: {
+    id: 1,
+    name: "HIGHWAY",
+    icon: "🛣️",
+    description: "The classic road experience. Dodge traffic and collect coins on the open highway.",
+    unlockRequirement: 0, // Always unlocked
+  },
+  2: {
+    id: 2,
+    name: "DESERT",
+    icon: "🏜️",
+    description: "Scorching sands and mirages await. Watch out for tumbleweeds!",
+    unlockRequirement: 10000, // Need 10000 score in World 1
+  },
+  3: {
+    id: 3,
+    name: "FOREST",
+    icon: "🌲",
+    description: "Dense woods and winding paths. Nature can be unpredictable.",
+    unlockRequirement: 10000,
+  },
+  4: {
+    id: 4,
+    name: "BEACH",
+    icon: "🌊",
+    description: "Sandy shores and crashing waves. Don't get swept away!",
+    unlockRequirement: 10000,
+  },
+  5: {
+    id: 5,
+    name: "MOUNTAIN",
+    icon: "🏔️",
+    description: "Treacherous peaks and thin air. Only the brave venture here.",
+    unlockRequirement: 10000,
+  },
+  6: {
+    id: 6,
+    name: "CITY",
+    icon: "🌃",
+    description: "Urban jungle with heavy traffic. Rush hour never ends.",
+    unlockRequirement: 10000,
+  },
+  7: {
+    id: 7,
+    name: "ARCTIC",
+    icon: "❄️",
+    description: "Frozen tundra and icy roads. One wrong move and you'll slide.",
+    unlockRequirement: 10000,
+  },
+  8: {
+    id: 8,
+    name: "VOLCANO",
+    icon: "🌋",
+    description: "Molten lava and unstable ground. The heat is on!",
+    unlockRequirement: 10000,
+  },
+  9: {
+    id: 9,
+    name: "SPACE",
+    icon: "🚀",
+    description: "The final frontier. Zero gravity, infinite danger.",
+    unlockRequirement: 10000,
+  },
+};
+
+// World unlock threshold
+const WORLD_UNLOCK_SCORE = 10000;
+
+// Load world high scores from localStorage (tracks best score per world)
+function loadWorldHighScores() {
+  const saved = localStorage.getItem("motorcycleWorldHighScores");
+  return saved ? JSON.parse(saved) : { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 };
+}
+
+// Save world high scores to localStorage
+function saveWorldHighScores(scores) {
+  localStorage.setItem("motorcycleWorldHighScores", JSON.stringify(scores));
+}
+
+// Check if a world is unlocked
+function isWorldUnlocked(worldId) {
+  if (worldId === 1) return true; // World 1 is always unlocked
+  // World N is unlocked if world N-1 has a high score >= WORLD_UNLOCK_SCORE
+  const previousWorldScore = worldHighScores[worldId - 1] || 0;
+  return previousWorldScore >= WORLD_UNLOCK_SCORE;
+}
+
+// Get the highest unlocked world
+function getHighestUnlockedWorld() {
+  for (let i = 9; i >= 1; i--) {
+    if (isWorldUnlocked(i)) return i;
+  }
+  return 1;
+}
+
+// World state
+let worldHighScores = loadWorldHighScores();
+let selectedWorld = 1; // Currently selected world on the map
+let currentWorld = 1; // World being played
 
 // Game constants
 const TILE_HEIGHT = 50;
@@ -372,8 +483,8 @@ function saveTotalCoins(coins) {
 // Vehicle unlock prices
 const VEHICLE_PRICES = {
   motorcycle: 0, // Free by default
-  car: 50,
-  truck: 100,
+  car: 100,
+  truck: 200,
 };
 
 // Vehicle modifications configuration
@@ -405,21 +516,21 @@ const VEHICLE_MODS = {
     {
       id: "mod1",
       name: "Turbo Boost",
-      price: 10,
+      price: 20,
       description: "50% faster boost speed",
       effect: "boostSpeed25",
     },
     {
       id: "mod2",
       name: "Double Money",
-      price: 35,
+      price: 70,
       description: "Coins are worth 2x",
       effect: "coinValue2x",
     },
     {
       id: "mod3",
       name: "Score Master",
-      price: 50,
+      price: 100,
       description: "Score multiplier 1.5x",
       effect: "scoreMultiplier1_5x",
     },
@@ -665,6 +776,25 @@ debugResetAchievementsBtn.addEventListener("click", () => {
   });
   saveAchievements();
   showDebugStatus("✓ All achievements reset");
+});
+
+// Debug: Reset all world progress
+const debugResetWorldsBtn = document.getElementById("debugResetWorldsBtn");
+debugResetWorldsBtn.addEventListener("click", () => {
+  worldHighScores = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 };
+  saveWorldHighScores(worldHighScores);
+  selectedWorld = 1;
+  currentWorld = 1;
+  showDebugStatus("✓ All world progress reset");
+});
+
+// Debug: Unlock all worlds
+const debugUnlockAllWorldsBtn = document.getElementById("debugUnlockAllWorldsBtn");
+debugUnlockAllWorldsBtn.addEventListener("click", () => {
+  // Set all worlds to have 10000+ score to unlock them
+  worldHighScores = { 1: 10000, 2: 10000, 3: 10000, 4: 10000, 5: 10000, 6: 10000, 7: 10000, 8: 10000, 9: 10000 };
+  saveWorldHighScores(worldHighScores);
+  showDebugStatus("✓ All worlds unlocked");
 });
 
 // ==================== END DEBUG MODE FUNCTIONS ====================
@@ -1338,6 +1468,32 @@ function render() {
   ctx.font = "20px Arial";
   ctx.textAlign = "left";
   ctx.fillText(`High Score: ${game.highScore}`, 10, 25);
+
+  // Draw lane expansion warning at score 1800-2000 (before expansion at 2000)
+  if (game.score >= 1800 && game.score < LANE_EXPANSION_THRESHOLD && game.lanes === INITIAL_LANES) {
+    // Flashing effect
+    const flashRate = Math.floor(Date.now() / 300) % 2;
+    if (flashRate === 0) {
+      ctx.fillStyle = "#e74c3c"; // Red color matching game title
+      ctx.font = "bold 28px 'Courier New', monospace";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "top";
+
+      // Add text shadow for better visibility
+      ctx.shadowColor = "black";
+      ctx.shadowBlur = 4;
+      ctx.shadowOffsetX = 2;
+      ctx.shadowOffsetY = 2;
+
+      ctx.fillText("⚠️ LANE EXPANSION AHEAD ⚠️", canvas.width / 2, 50);
+
+      // Reset shadow
+      ctx.shadowColor = "transparent";
+      ctx.shadowBlur = 0;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 0;
+    }
+  }
 }
 
 function drawRoad() {
@@ -1593,6 +1749,12 @@ function gameOver() {
   finalScoreDisplay.textContent = game.score;
   gameOverScreen.classList.remove("hidden");
   bgMusic.pause();
+
+  // Update world high score if this score is better
+  if (game.score > (worldHighScores[currentWorld] || 0)) {
+    worldHighScores[currentWorld] = game.score;
+    saveWorldHighScores(worldHighScores);
+  }
 
   // Check achievements on game over
   checkGameOverAchievements();
@@ -2243,6 +2405,114 @@ backToMenuFromAchievements.addEventListener("click", () => {
 });
 
 // ==================== END ACHIEVEMENTS SCREEN ====================
+
+// ==================== WORLD MAP SCREEN ====================
+
+// Update world map UI to reflect unlock states
+function updateWorldMapUI() {
+  worldNodes.forEach((node) => {
+    const worldId = parseInt(node.dataset.world);
+    const unlocked = isWorldUnlocked(worldId);
+    const lockOverlay = node.querySelector(".world-lock-overlay");
+
+    if (unlocked) {
+      node.classList.remove("locked");
+      node.classList.add("unlocked");
+      if (lockOverlay) lockOverlay.style.display = "none";
+    } else {
+      node.classList.add("locked");
+      node.classList.remove("unlocked");
+      if (lockOverlay) lockOverlay.style.display = "flex";
+    }
+
+    // Update selected state
+    if (worldId === selectedWorld) {
+      node.classList.add("selected");
+    } else {
+      node.classList.remove("selected");
+    }
+  });
+
+  // Update info panel
+  const world = WORLDS[selectedWorld];
+  if (world) {
+    selectedWorldName.textContent = world.name;
+
+    // Show unlock requirement for locked worlds
+    if (!isWorldUnlocked(selectedWorld)) {
+      const prevWorldName = WORLDS[selectedWorld - 1]?.name || "previous world";
+      selectedWorldDescription.textContent = `🔒 LOCKED - Score ${WORLD_UNLOCK_SCORE.toLocaleString()} in ${prevWorldName} to unlock!`;
+      selectWorldBtn.disabled = true;
+      selectWorldBtn.textContent = "LOCKED";
+    } else {
+      selectedWorldDescription.textContent = world.description;
+      // Show high score for this world if it exists
+      const worldScore = worldHighScores[selectedWorld] || 0;
+      if (worldScore > 0) {
+        selectedWorldDescription.textContent += ` (Best: ${worldScore.toLocaleString()})`;
+      }
+      selectWorldBtn.disabled = false;
+      // Show "SELECTED" if this is the current world, otherwise "SELECT"
+      selectWorldBtn.textContent = (selectedWorld === currentWorld) ? "SELECTED" : "SELECT";
+    }
+  }
+}
+
+// Select a world on the map
+function selectWorld(worldId) {
+  selectedWorld = worldId;
+  updateWorldMapUI();
+}
+
+// Open world map screen
+function openWorldMap() {
+  menuScreen.classList.add("hidden");
+  worldMapScreen.classList.remove("hidden");
+  updateWorldMapUI();
+}
+
+// Close world map and return to menu
+function closeWorldMap() {
+  worldMapScreen.classList.add("hidden");
+  menuScreen.classList.remove("hidden");
+}
+
+// Set the selected world as the current world and return to menu
+function confirmWorldSelection() {
+  if (!isWorldUnlocked(selectedWorld)) return;
+
+  currentWorld = selectedWorld;
+  closeWorldMap();
+}
+
+// Setup world node click handlers
+worldNodes.forEach((node) => {
+  node.addEventListener("click", () => {
+    const worldId = parseInt(node.dataset.world);
+    selectWorld(worldId);
+  });
+});
+
+// Worlds button on menu
+worldsBtn.addEventListener("click", () => {
+  openWorldMap();
+});
+
+// Back to menu from world map
+backToMenuFromWorlds.addEventListener("click", () => {
+  if (!game.isMuted) {
+    pauseMenuSound.currentTime = 0;
+    pauseMenuSound.play().catch((e) => console.log("Pause menu sound error:", e));
+  }
+  closeWorldMap();
+});
+
+// Select world button
+selectWorldBtn.addEventListener("click", () => {
+  confirmWorldSelection();
+});
+
+// ==================== END WORLD MAP SCREEN ====================
 
 // Draw vehicle previews in menu
 function drawVehiclePreviews() {
