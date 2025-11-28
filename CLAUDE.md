@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a 2D vertical sidescroller motorcycle game (titled "ROAD RAGE") built with vanilla JavaScript and HTML5 Canvas. The game features dynamic difficulty scaling, powerups, audio, high score tracking, visual polish, a vehicle unlock system with 3 playable vehicles, and a comprehensive vehicle modification system with 9 unique mods that provide gameplay enhancements. The game runs entirely in the browser with no build process or dependencies.
+This is a 2D vertical sidescroller motorcycle game (titled "ROAD RAGE") built with vanilla JavaScript and HTML5 Canvas. The game features dynamic difficulty scaling, powerups, audio, high score tracking, visual polish, a **multi-world system** with 2 playable worlds (Highway and Desert), 6 unlockable vehicles (3 per world), and a comprehensive vehicle modification system with 18 unique mods (3 per vehicle) that provide gameplay enhancements. The game runs entirely in the browser with no build process or dependencies.
 
 ## Running the Game
 
@@ -97,7 +97,9 @@ Keyboard events (game.js:122-136):
 
 ### Audio System
 
-- **Background music**: `the-return-of-the-8-bit-era-301292.mp3` (loops, volume 50%)
+- **Background music**: World-specific music that changes per world
+  - Highway: `the-return-of-the-8-bit-era-301292.mp3`
+  - Desert: `desert-world-bg-music.mp3`
 - **Sound effects**:
   - Coin collection, explosions, hitmarkers, bubbles, pause menu
   - Milestone sounds at 1000, 2000, 3000 points
@@ -115,83 +117,153 @@ Keyboard events (game.js:122-136):
 
 - **Road**: Alternating tile colors (#2c3e50, #34495e) scroll smoothly
 - **Lane Dividers**: Yellow dashed lines that scroll
-- **Obstacles**: Red crates with dark red borders
+- **Obstacles**: World-themed obstacle styles
+  - Highway: Red crates with dark red borders
+  - Desert: Green cacti with arms and spines
+- **Background**: World-specific background images (`updateWorldBackground()`)
+  - Highway: `highway-bg.png`
+  - Desert: `desert-bg.png`
 - **Powerups**: Detailed rendering with transparency, borders, and shine effects
 - **Shield Effect**: Translucent blue bubble with shimmer around motorcycle
 - **Game Over Screen**: Animated GIF (cat-scream.gif) with dark overlay
 - **Banana Cheerer**: Fixed position GIF (banana-cheerer.gif) at bottom-left (style.css:30-41)
+- **Vehicle Animations**:
+  - Monster Truck: Animated exhaust flames shooting from side pipes
+  - Ornithopter: Animated wing flutter effect
+- **Particle Effects**: World-specific dust/sand trails behind vehicles
+  - Highway: Gray road dust particles
+  - Desert: Tan sand particles with sideways drift
+  - Particle intensity increases when boosting
 
-### Vehicle System (game.js:195-265)
+### World System (game.js:222-355)
 
-The game features 3 unlockable vehicles with unique characteristics:
+The game features a multi-world system with themed environments:
+
+#### World Definitions (`WORLDS` object)
+- **9 worlds defined** (2 playable, 7 coming soon)
+- Each world has: name, icon, description, unlock requirement, theme configuration, and vehicle list
+- **World unlock**: Score 10,000 in the previous world to unlock the next
+- **World themes** include: background image, music track, and obstacle style
+
+#### Playable Worlds
+
+1. **Highway** (World 1, unlocked by default)
+   - Classic road experience
+   - Background: `highway-bg.png`
+   - Music: `the-return-of-the-8-bit-era-301292.mp3`
+   - Obstacles: Red crates
+
+2. **Desert** (World 2, requires 10,000 score in Highway)
+   - Scorching sands theme (Dune-inspired)
+   - Background: `desert-bg.png`
+   - Music: `desert-world-bg-music.mp3`
+   - Obstacles: Green cacti
+
+#### World Functions
+- `isWorldUnlocked(worldId)`: Check if world is accessible
+- `getWorldKey(worldId)`: Convert ID to key (e.g., 1 -> "highway")
+- `getWorldVehicles(worldId)`: Get vehicles available in a world
+- `updateWorldBackground()`: Apply world's background image to page
+- `loadWorldMusic(worldId)`: Switch to world's music track
+
+### Vehicle System (game.js:537-850)
+
+The game features **6 unlockable vehicles** across 2 worlds, with world-specific vehicle definitions in `WORLD_VEHICLES`:
+
+#### Highway Vehicles
 
 1. **Motorcycle** (Free, default)
    - Balanced beginner-friendly vehicle
-   - 3 starting hearts
-   - No special characteristics
+   - Blue triangle with orange rider
 
-2. **Sports Car** (50 coins)
+2. **Sports Car** (150 coins)
    - Speed and risk-reward focused
-   - 3 starting hearts
-   - Access to boost speed and coin multiplier mods
+   - Red sleek body with spoiler
 
-3. **Monster Truck** (100 coins)
+3. **Monster Truck** (300 coins)
    - Maximum durability and survivability
-   - 3 starting hearts (5 with mod)
-   - Access to extra health and reinforced shield mods
+   - Orange/yellow with huge wheels
 
-**Vehicle Storage**: Unlocked vehicles persist in localStorage (`motorcycleUnlockedVehicles`)
-**Vehicle Selection**: Menu screen with canvas previews, lock overlays, and unlock/modify buttons
+#### Desert Vehicles (Dune-themed)
 
-### Modification System (game.js:195-355)
+1. **Jeep** (Free when Desert unlocked)
+   - Balanced desert exploration vehicle
+   - Tan/khaki with roll cage
 
-Each vehicle has 3 unique mods that enhance gameplay. All mods are **fully implemented** and affect gameplay.
+2. **Sandworm** (200 coins)
+   - Speed-focused desert creature
+   - Purple segmented body (Shai-Hulud inspired)
 
-#### Motorcycle Mods (Beginner-Friendly/Balanced)
+3. **Ornithopter** (400 coins)
+   - Maximum durability flying craft
+   - Dragonfly-wing aircraft design
 
-1. **Shield Start** (25 coins, `startWithShield`)
+**Vehicle Storage**: World-aware format in localStorage (`motorcycleUnlockedVehicles`)
+- Format: `{ highway: ["motorcycle", ...], desert: ["jeep", ...] }`
+- First vehicle of each world is free when that world is unlocked
+**Vehicle Selection**: Dynamic carousel that rebuilds when switching worlds (`buildVehicleCarousel()`)
+
+### Modification System (game.js:857-1030)
+
+Each vehicle has 3 unique mods that enhance gameplay. All **18 mods** are fully implemented and affect gameplay. Mods are defined per-world in `WORLD_VEHICLE_MODS`.
+
+#### Highway Mods
+
+**Motorcycle Mods (Beginner-Friendly/Balanced)**
+
+1. **Shield Start** (15 coins, `startWithShield`)
    - Start each life with an active shield
-   - Applied at game start/restart
 
-2. **Heart Boost** (40 coins, `heartSpawnBoost`)
+2. **Heart Boost** (30 coins, `heartSpawnBoost`)
    - Hearts spawn 50% more frequently
-   - Multiplies HEART_SPAWN_CHANCE by 1.5
 
 3. **Second Chance** (60 coins, `survivalChance20`)
    - 20% chance to survive any fatal hit
-   - Checks on fatal damage from obstacles or bombs
-   - Plays "Heroes Never Die" sound on survival
 
-#### Sports Car Mods (Speed/Risk-Reward)
+**Sports Car Mods (Speed/Risk-Reward)**
 
-1. **Turbo Boost** (30 coins, `boostSpeed25`)
+1. **Turbo Boost** (40 coins, `boostSpeed25`)
    - 50% faster boost speed
-   - Multiplies boost speed by 1.5 (normal boost is 2x, becomes 3x)
 
-2. **Double Money** (50 coins, `coinValue2x`)
+2. **Double Money** (75 coins, `coinValue2x`)
    - Coins are worth 2x value
-   - Each coin collected gives 2 coins instead of 1
 
-3. **Score Master** (75 coins, `scoreMultiplier1_5x`)
+3. **Score Master** (150 coins, `scoreMultiplier1_5x`)
    - Score multiplier 1.5x
-   - Each avoided obstacle gives 15 points instead of 10
 
-#### Monster Truck Mods (Tank/Durability)
+**Monster Truck Mods (Tank/Durability)**
 
-1. **Time Lord** (40 coins, `maxHealth5`)
+1. **Time Lord** (75 coins, `maxHealth5`)
    - Start with 5 hearts instead of 3
-   - +2 extra hearts at game start/restart
 
-2. **Reinforced Shield** (65 coins, `shieldDoubleHit`)
-   - Shields protect against 2 hits instead of 1
-   - Shield persists after first hit, breaks on second
+2. **Reinforced Shield** (150 coins, `shieldDoubleHit`)
+   - Shields protect against 2 hits
 
-3. **Tank Mode** (100 coins, `survivalChance35`)
+3. **Tank Mode** (300 coins, `survivalChance35`)
    - 35% chance to survive any fatal hit
-   - Checks on fatal damage from obstacles or bombs
-   - Plays "Heroes Never Die" sound on survival
 
-**Mod Storage**: Unlocked mods persist per-vehicle in localStorage (`motorcycleUnlockedMods`)
+#### Desert Mods (Dune-themed names, same effects)
+
+**Jeep Mods**
+
+1. **Desert Shield** (20 coins, `startWithShield`)
+2. **Oasis Finder** (35 coins, `heartSpawnBoost`)
+3. **Desert Survival** (55 coins, `survivalChance20`)
+
+**Sandworm Mods**
+
+1. **Spice Boost** (45 coins, `boostSpeed25`)
+2. **Spice Mining** (80 coins, `coinValue2x`)
+3. **Prescience** (160 coins, `scoreMultiplier1_5x`)
+
+**Ornithopter Mods**
+
+1. **Reinforced Hull** (80 coins, `maxHealth5`)
+2. **Shield Generator** (160 coins, `shieldDoubleHit`)
+3. **Suspensor Field** (320 coins, `survivalChance35`)
+
+**Mod Storage**: World-aware format in localStorage (`motorcycleUnlockedMods`)
+- Format: `{ highway: { motorcycle: [], car: [], truck: [] }, desert: { jeep: [], sandworm: [], ornithopter: [] } }`
 **Mod Logic**:
 - `hasModEffect(effectName)` checks if current vehicle has mod unlocked
 - `getModEffectValue(effectName, defaultValue)` returns multiplier values
@@ -199,21 +271,26 @@ Each vehicle has 3 unique mods that enhance gameplay. All mods are **fully imple
 
 ## File Structure
 
-- [index.html](index.html): HTML structure, menu screens, mod screen, canvas, UI elements, 18 audio elements
-- [game.js](game.js): All game logic (1084+ lines) - vehicle system, mod system, collision detection, rendering
-- [style.css](style.css): Styling for game container, menu screens, mod screen, UI, and overlays
+- [index.html](index.html): HTML structure, menu screens, world map, mod screen, canvas, UI elements, audio elements
+- [game.js](game.js): All game logic (3200+ lines) - world system, vehicle system, mod system, collision detection, rendering
+- [style.css](style.css): Styling for game container, menu screens, world map, mod screen, UI, and overlays
 - [CLAUDE.md](CLAUDE.md): This file - architecture documentation
 - [README_TODO.md](README_TODO.md): Development TODO list and feature ideas
 - [CONTRIBUTING.md](CONTRIBUTING.md): Git workflow and contribution guidelines
 - **scripts/** folder: Testing utilities
   - `give_coins.html`: Add coins for testing
   - `reset_coins.html`: Reset coins to 0
-  - `lock_vehicles.html`: Lock all vehicles and reset mods
+  - `lock_vehicles.html`: Lock all vehicles and reset mods (world-aware)
 - **Assets** (in media/ folder):
+  - **images/**: World background images
+    - `highway-bg.png`: Highway world background
+    - `desert-bg.png`: Desert world background
+  - **sounds/**: Audio files
+    - `the-return-of-the-8-bit-era-301292.mp3`: Highway background music
+    - `desert-world-bg-music.mp3`: Desert background music
+    - Sound effects for collisions, powerups, milestones, game over
   - `cat-scream.gif`: Game over screen animation
   - `banana-cheerer.gif`: Decorative cheering banana
-  - `the-return-of-the-8-bit-era-301292.mp3`: Background music
-  - Sound effects for collisions, powerups, milestones, game over
 
 ## Modifying Game Parameters
 
@@ -239,10 +316,12 @@ Each vehicle has 3 unique mods that enhance gameplay. All mods are **fully imple
 - Pure vanilla JavaScript - no frameworks, no dependencies
 - All state in single `game` object for easy debugging and potential serialization
 - Persistence via `localStorage` API:
-  - High scores (`motorcycleHighScore`)
+  - World high scores (`motorcycleWorldHighScores`) - per-world format: `{ "1": 5000, "2": 3000 }`
   - Total coins (`motorcycleTotalCoins`)
-  - Unlocked vehicles (`motorcycleUnlockedVehicles`)
-  - Unlocked mods per vehicle (`motorcycleUnlockedMods`)
+  - Unlocked vehicles (`motorcycleUnlockedVehicles`) - world-aware format
+  - Unlocked mods per vehicle (`motorcycleUnlockedMods`) - world-aware format
+  - Unlocked achievements (`motorcycleUnlockedAchievements`)
+- Automatic data migration: Old localStorage format migrates to world-aware format on load
 - 60 FPS target via `requestAnimationFrame()`
 - Mobile support: Limited (keyboard controls only, could add touch events)
 - Browser compatibility: Modern browsers only (ES6+ features used)
