@@ -2022,14 +2022,15 @@ function updateVehicleUI() {
       if (previewContainer) previewContainer.classList.add("locked");
       option.style.opacity = "0.6";
 
-      // Update unlock button disabled state based on coins
+      // Update unlock button price and disabled state based on coins
       const price = VEHICLE_PRICES[vehicleType];
       if (unlockBtn) {
-        if (totalCoins >= price) {
-          unlockBtn.disabled = false;
-        } else {
-          unlockBtn.disabled = true;
+        // Update the displayed price dynamically
+        const priceSpan = unlockBtn.querySelector(".unlock-price");
+        if (priceSpan) {
+          priceSpan.textContent = price;
         }
+        unlockBtn.disabled = totalCoins < price;
       }
     }
   });
