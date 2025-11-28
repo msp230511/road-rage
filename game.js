@@ -71,9 +71,11 @@ const worldMapScreen = document.getElementById("worldMapScreen");
 const worldsBtn = document.getElementById("worldsBtn");
 const backToMenuFromWorlds = document.getElementById("backToMenuFromWorlds");
 const selectedWorldName = document.getElementById("selectedWorldName");
-const selectedWorldDescription = document.getElementById("selectedWorldDescription");
+const selectedWorldDescription = document.getElementById(
+  "selectedWorldDescription"
+);
 const selectWorldBtn = document.getElementById("selectWorldBtn");
-const worldNodes = document.querySelectorAll(".world-node")
+const worldNodes = document.querySelectorAll(".world-node");
 
 // Banana roast elements
 const bananaSpeechBubble = document.getElementById("bananaSpeechBubble");
@@ -227,14 +229,16 @@ const WORLDS = {
     id: 1,
     name: "HIGHWAY",
     icon: "🛣️",
-    description: "The classic road experience. Dodge traffic and collect coins on the open highway.",
+    description:
+      "The classic road experience. Dodge traffic and collect coins on the open highway.",
     unlockRequirement: 0, // Always unlocked
   },
   2: {
     id: 2,
     name: "DESERT",
     icon: "🏜️",
-    description: "Scorching sands and mirages await. Watch out for tumbleweeds!",
+    description:
+      "Scorching sands and mirages await. Watch out for tumbleweeds!",
     unlockRequirement: 10000, // Need 10000 score in World 1
   },
   3: {
@@ -269,7 +273,8 @@ const WORLDS = {
     id: 7,
     name: "ARCTIC",
     icon: "❄️",
-    description: "Frozen tundra and icy roads. One wrong move and you'll slide.",
+    description:
+      "Frozen tundra and icy roads. One wrong move and you'll slide.",
     unlockRequirement: 10000,
   },
   8: {
@@ -294,7 +299,9 @@ const WORLD_UNLOCK_SCORE = 10000;
 // Load world high scores from localStorage (tracks best score per world)
 function loadWorldHighScores() {
   const saved = localStorage.getItem("motorcycleWorldHighScores");
-  return saved ? JSON.parse(saved) : { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 };
+  return saved
+    ? JSON.parse(saved)
+    : { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 };
 }
 
 // Save world high scores to localStorage
@@ -354,14 +361,18 @@ const DIFFICULTY_CONFIG = {
   5000: { speed: 18, spawnChance: 0.5 },
   5500: { speed: 18, spawnChance: 0.5 },
   6000: { speed: 18, spawnChance: 0.6 },
-  6500: { speed: 18, spawnChance: 0.6 },
-  7000: { speed: 18, spawnChance: 0.6 },
+  6500: { speed: 20, spawnChance: 0.6 },
+  7000: { speed: 20, spawnChance: 0.6 },
   7500: { speed: 20, spawnChance: 0.6 },
-  8000: { speed: 20, spawnChance: 0.6 },
-  8500: { speed: 20, spawnChance: 0.6 },
-  9000: { speed: 20, spawnChance: 0.6 },
-  9500: { speed: 20, spawnChance: 0.6 },
-  10000: { speed: 20, spawnChance: 0.7 }, // Beyond max difficulty
+  8000: { speed: 22, spawnChance: 0.6 },
+  8500: { speed: 22, spawnChance: 0.6 },
+  9000: { speed: 22, spawnChance: 0.6 },
+  9500: { speed: 22, spawnChance: 0.6 },
+  10000: { speed: 22, spawnChance: 0.7 }, // Beyond max difficulty
+  10500: { speed: 22, spawnChance: 0.7 },
+  11000: { speed: 22, spawnChance: 0.7 },
+  11500: { speed: 22, spawnChance: 0.7 },
+  12000: { speed: 22, spawnChance: 0.7 },
 };
 
 // Vehicle types with drawing functions
@@ -789,10 +800,22 @@ debugResetWorldsBtn.addEventListener("click", () => {
 });
 
 // Debug: Unlock all worlds
-const debugUnlockAllWorldsBtn = document.getElementById("debugUnlockAllWorldsBtn");
+const debugUnlockAllWorldsBtn = document.getElementById(
+  "debugUnlockAllWorldsBtn"
+);
 debugUnlockAllWorldsBtn.addEventListener("click", () => {
   // Set all worlds to have 10000+ score to unlock them
-  worldHighScores = { 1: 10000, 2: 10000, 3: 10000, 4: 10000, 5: 10000, 6: 10000, 7: 10000, 8: 10000, 9: 10000 };
+  worldHighScores = {
+    1: 10000,
+    2: 10000,
+    3: 10000,
+    4: 10000,
+    5: 10000,
+    6: 10000,
+    7: 10000,
+    8: 10000,
+    9: 10000,
+  };
   saveWorldHighScores(worldHighScores);
   showDebugStatus("✓ All worlds unlocked");
 });
@@ -1106,7 +1129,9 @@ function spawnBomb(deltaMultiplier = 1) {
 function spawnHeart(deltaMultiplier = 1) {
   // Apply heart spawn boost mod
   const heartSpawnChance =
-    HEART_SPAWN_CHANCE * getModEffectValue("heartSpawnBoost", 1) * deltaMultiplier;
+    HEART_SPAWN_CHANCE *
+    getModEffectValue("heartSpawnBoost", 1) *
+    deltaMultiplier;
 
   if (Math.random() < heartSpawnChance) {
     const lane = Math.floor(Math.random() * game.lanes);
@@ -1470,7 +1495,11 @@ function render() {
   ctx.fillText(`High Score: ${game.highScore}`, 10, 25);
 
   // Draw lane expansion warning at score 1800-2000 (before expansion at 2000)
-  if (game.score >= 1800 && game.score < LANE_EXPANSION_THRESHOLD && game.lanes === INITIAL_LANES) {
+  if (
+    game.score >= 1800 &&
+    game.score < LANE_EXPANSION_THRESHOLD &&
+    game.lanes === INITIAL_LANES
+  ) {
     // Flashing effect
     const flashRate = Math.floor(Date.now() / 300) % 2;
     if (flashRate === 0) {
@@ -2453,7 +2482,8 @@ function updateWorldMapUI() {
       }
       selectWorldBtn.disabled = false;
       // Show "SELECTED" if this is the current world, otherwise "SELECT"
-      selectWorldBtn.textContent = (selectedWorld === currentWorld) ? "SELECTED" : "SELECT";
+      selectWorldBtn.textContent =
+        selectedWorld === currentWorld ? "SELECTED" : "SELECT";
     }
   }
 }
@@ -2502,7 +2532,9 @@ worldsBtn.addEventListener("click", () => {
 backToMenuFromWorlds.addEventListener("click", () => {
   if (!game.isMuted) {
     pauseMenuSound.currentTime = 0;
-    pauseMenuSound.play().catch((e) => console.log("Pause menu sound error:", e));
+    pauseMenuSound
+      .play()
+      .catch((e) => console.log("Pause menu sound error:", e));
   }
   closeWorldMap();
 });
