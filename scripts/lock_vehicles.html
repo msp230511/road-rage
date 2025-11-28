@@ -6,19 +6,21 @@
   <body>
     <h1>Locking vehicles and resetting mods...</h1>
     <script>
-      // Lock all vehicles except motorcycle
+      // Lock all vehicles except motorcycle (using new world-keyed format)
       localStorage.setItem(
         "motorcycleUnlockedVehicles",
-        JSON.stringify(["motorcycle"])
+        JSON.stringify({
+          highway: ["motorcycle"],
+          desert: [],
+        })
       );
 
-      // Reset all vehicle mods to locked
+      // Reset all vehicle mods to locked (using new world-keyed format)
       localStorage.setItem(
         "motorcycleUnlockedMods",
         JSON.stringify({
-          motorcycle: [],
-          car: [],
-          truck: [],
+          highway: { motorcycle: [], car: [], truck: [] },
+          desert: { jeep: [], sandworm: [], ornithopter: [] },
         })
       );
 

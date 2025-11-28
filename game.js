@@ -49,7 +49,6 @@ const closeThingsToKnowBtn = document.getElementById("closeThingsToKnowBtn");
 // Achievements screen elements
 const achievementsBtn = document.getElementById("achievementsBtn");
 const achievementsScreen = document.getElementById("achievementsScreen");
-const achievementsCoinsDisplay = document.getElementById("achievementsCoins");
 const backToMenuFromAchievements = document.getElementById(
   "backToMenuFromAchievements"
 );
@@ -223,73 +222,136 @@ function unlockAchievement(achievementId) {
   showAchievementNotification(achievement);
 }
 
-// World definitions
+// World definitions with theming
 const WORLDS = {
   1: {
     id: 1,
     name: "HIGHWAY",
+    key: "highway",
     icon: "🛣️",
     description:
       "The classic road experience. Dodge traffic and collect coins on the open highway.",
     unlockRequirement: 0, // Always unlocked
+    theme: {
+      backgroundImage: "media/images/highway-bg.png",
+      music: "media/sounds/the-return-of-the-8-bit-era-301292.mp3",
+      obstacleStyle: "crate",
+    },
+    vehicles: ["motorcycle", "car", "truck"],
   },
   2: {
     id: 2,
     name: "DESERT",
+    key: "desert",
     icon: "🏜️",
     description:
-      "Scorching sands and mirages await. Watch out for tumbleweeds!",
+      "Scorching sands and mirages await. Watch out for cacti!",
     unlockRequirement: 10000, // Need 10000 score in World 1
+    theme: {
+      backgroundImage: "media/images/desert-bg.png",
+      music: "media/sounds/desert-world-bg-music.mp3",
+      obstacleStyle: "cactus",
+    },
+    vehicles: ["jeep", "sandworm", "ornithopter"],
   },
   3: {
     id: 3,
     name: "FOREST",
+    key: "forest",
     icon: "🌲",
     description: "Dense woods and winding paths. Nature can be unpredictable.",
     unlockRequirement: 10000,
+    theme: {
+      backgroundImage: null,
+      music: "media/sounds/the-return-of-the-8-bit-era-301292.mp3",
+      obstacleStyle: "crate",
+    },
+    vehicles: [],
   },
   4: {
     id: 4,
     name: "BEACH",
+    key: "beach",
     icon: "🌊",
     description: "Sandy shores and crashing waves. Don't get swept away!",
     unlockRequirement: 10000,
+    theme: {
+      backgroundImage: null,
+      music: "media/sounds/the-return-of-the-8-bit-era-301292.mp3",
+      obstacleStyle: "crate",
+    },
+    vehicles: [],
   },
   5: {
     id: 5,
     name: "MOUNTAIN",
+    key: "mountain",
     icon: "🏔️",
     description: "Treacherous peaks and thin air. Only the brave venture here.",
     unlockRequirement: 10000,
+    theme: {
+      backgroundImage: null,
+      music: "media/sounds/the-return-of-the-8-bit-era-301292.mp3",
+      obstacleStyle: "crate",
+    },
+    vehicles: [],
   },
   6: {
     id: 6,
     name: "CITY",
+    key: "city",
     icon: "🌃",
     description: "Urban jungle with heavy traffic. Rush hour never ends.",
     unlockRequirement: 10000,
+    theme: {
+      backgroundImage: null,
+      music: "media/sounds/the-return-of-the-8-bit-era-301292.mp3",
+      obstacleStyle: "crate",
+    },
+    vehicles: [],
   },
   7: {
     id: 7,
     name: "ARCTIC",
+    key: "arctic",
     icon: "❄️",
     description:
       "Frozen tundra and icy roads. One wrong move and you'll slide.",
     unlockRequirement: 10000,
+    theme: {
+      backgroundImage: null,
+      music: "media/sounds/the-return-of-the-8-bit-era-301292.mp3",
+      obstacleStyle: "crate",
+    },
+    vehicles: [],
   },
   8: {
     id: 8,
     name: "VOLCANO",
+    key: "volcano",
     icon: "🌋",
     description: "Molten lava and unstable ground. The heat is on!",
     unlockRequirement: 10000,
+    theme: {
+      backgroundImage: null,
+      music: "media/sounds/the-return-of-the-8-bit-era-301292.mp3",
+      obstacleStyle: "crate",
+    },
+    vehicles: [],
   },
   9: {
     id: 9,
     name: "SPACE",
+    key: "space",
     icon: "🚀",
     description: "The final frontier. Zero gravity, infinite danger.",
     unlockRequirement: 10000,
+    theme: {
+      backgroundImage: null,
+      music: "media/sounds/the-return-of-the-8-bit-era-301292.mp3",
+      obstacleStyle: "crate",
+    },
+    vehicles: [],
   },
 };
 
@@ -325,10 +387,110 @@ function getHighestUnlockedWorld() {
   return 1;
 }
 
+// Get world key from world ID (e.g., 1 -> "highway", 2 -> "desert")
+function getWorldKey(worldId) {
+  return WORLDS[worldId]?.key || "highway";
+}
+
+// Get world ID from world key (e.g., "highway" -> 1, "desert" -> 2)
+function getWorldIdFromKey(worldKey) {
+  for (const [id, world] of Object.entries(WORLDS)) {
+    if (world.key === worldKey) return parseInt(id);
+  }
+  return 1;
+}
+
+// Get vehicles available for a specific world
+function getWorldVehicles(worldId) {
+  const worldKey = getWorldKey(worldId);
+  return WORLD_VEHICLES[worldKey] || {};
+}
+
+// Get the first (default/free) vehicle for a world
+function getWorldDefaultVehicle(worldId) {
+  const world = WORLDS[worldId];
+  if (world && world.vehicles && world.vehicles.length > 0) {
+    return world.vehicles[0];
+  }
+  return "motorcycle";
+}
+
+// Check if a vehicle belongs to a specific world
+function isVehicleInWorld(vehicleId, worldId) {
+  const world = WORLDS[worldId];
+  return world && world.vehicles && world.vehicles.includes(vehicleId);
+}
+
+// Get the world that a vehicle belongs to
+function getVehicleWorld(vehicleId) {
+  for (const [id, world] of Object.entries(WORLDS)) {
+    if (world.vehicles && world.vehicles.includes(vehicleId)) {
+      return parseInt(id);
+    }
+  }
+  return 1; // Default to highway
+}
+
 // World state
 let worldHighScores = loadWorldHighScores();
 let selectedWorld = 1; // Currently selected world on the map
 let currentWorld = 1; // World being played
+
+// Background images cache for world theming
+const backgroundImages = {};
+
+// Preload background images for all worlds
+function preloadBackgroundImages() {
+  Object.values(WORLDS).forEach((world) => {
+    if (world.theme?.backgroundImage) {
+      const img = new Image();
+      img.src = world.theme.backgroundImage;
+      backgroundImages[world.id] = img;
+    }
+  });
+}
+
+// Call preload on script load
+preloadBackgroundImages();
+
+// Update website background based on current world
+function updateWorldBackground() {
+  const world = WORLDS[currentWorld];
+  const bgPath = world?.theme?.backgroundImage;
+
+  if (bgPath) {
+    document.body.style.backgroundImage = `url('${bgPath}')`;
+    document.body.style.backgroundSize = 'cover';
+    document.body.style.backgroundPosition = 'center';
+    document.body.style.backgroundRepeat = 'no-repeat';
+  } else {
+    // Fallback to default gradient
+    document.body.style.backgroundImage = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+  }
+}
+
+// Current music source tracking
+let currentMusicSource = null;
+
+// Switch music based on world
+function loadWorldMusic(worldId) {
+  const world = WORLDS[worldId];
+  const musicPath = world?.theme?.music || "media/sounds/the-return-of-the-8-bit-era-301292.mp3";
+
+  // Only switch if different
+  if (currentMusicSource !== musicPath) {
+    currentMusicSource = musicPath;
+
+    // Update audio source
+    const source = bgMusic.querySelector("source");
+    if (source) {
+      source.src = musicPath;
+    } else {
+      bgMusic.src = musicPath;
+    }
+    bgMusic.load(); // Reload with new source
+  }
+}
 
 // Game constants
 const TILE_HEIGHT = 50;
@@ -375,98 +537,314 @@ const DIFFICULTY_CONFIG = {
   12000: { speed: 22, spawnChance: 0.7 },
 };
 
-// Vehicle types with drawing functions
+// World-based vehicle definitions
+const WORLD_VEHICLES = {
+  highway: {
+    motorcycle: {
+      name: "MOTORCYCLE",
+      price: 0,
+      draw: function (context, x, y, scale = 1) {
+        // Motorcycle body
+        context.fillStyle = "#3498db";
+        context.beginPath();
+        context.moveTo(x, y - 20 * scale);
+        context.lineTo(x - 15 * scale, y + 15 * scale);
+        context.lineTo(x + 15 * scale, y + 15 * scale);
+        context.closePath();
+        context.fill();
+
+        // Wheels
+        context.fillStyle = "#2c3e50";
+        context.beginPath();
+        context.arc(x - 8 * scale, y + 12 * scale, 5 * scale, 0, Math.PI * 2);
+        context.arc(x + 8 * scale, y + 12 * scale, 5 * scale, 0, Math.PI * 2);
+        context.fill();
+
+        // Rider
+        context.fillStyle = "#e67e22";
+        context.beginPath();
+        context.arc(x, y - 5 * scale, 8 * scale, 0, Math.PI * 2);
+        context.fill();
+      },
+    },
+    car: {
+      name: "SPORTS CAR",
+      price: 150,
+      draw: function (context, x, y, scale = 1) {
+        // Car body (sleek sports car shape)
+        context.fillStyle = "#e74c3c";
+        context.fillRect(x - 18 * scale, y - 10 * scale, 36 * scale, 30 * scale);
+
+        // Car hood (front triangle)
+        context.fillStyle = "#c0392b";
+        context.beginPath();
+        context.moveTo(x, y - 20 * scale);
+        context.lineTo(x - 18 * scale, y - 10 * scale);
+        context.lineTo(x + 18 * scale, y - 10 * scale);
+        context.closePath();
+        context.fill();
+
+        // Windshield
+        context.fillStyle = "#3498db";
+        context.fillRect(x - 12 * scale, y - 5 * scale, 24 * scale, 12 * scale);
+
+        // Wheels
+        context.fillStyle = "#2c3e50";
+        context.fillRect(x - 20 * scale, y + 15 * scale, 8 * scale, 8 * scale);
+        context.fillRect(x + 12 * scale, y + 15 * scale, 8 * scale, 8 * scale);
+
+        // Spoiler
+        context.fillStyle = "#2c3e50";
+        context.fillRect(x - 15 * scale, y + 18 * scale, 30 * scale, 3 * scale);
+      },
+    },
+    truck: {
+      name: "MONSTER TRUCK",
+      price: 300,
+      draw: function (context, x, y, scale = 1) {
+        // Truck bed (back)
+        context.fillStyle = "#f39c12";
+        context.fillRect(x - 20 * scale, y + 5 * scale, 40 * scale, 15 * scale);
+
+        // Truck cab (front)
+        context.fillStyle = "#e67e22";
+        context.fillRect(x - 18 * scale, y - 15 * scale, 36 * scale, 20 * scale);
+
+        // Cab roof
+        context.fillStyle = "#d35400";
+        context.fillRect(x - 15 * scale, y - 20 * scale, 30 * scale, 5 * scale);
+
+        // Windshield
+        context.fillStyle = "#3498db";
+        context.fillRect(x - 12 * scale, y - 12 * scale, 24 * scale, 8 * scale);
+
+        // Monster truck wheels (huge)
+        context.fillStyle = "#2c3e50";
+        context.beginPath();
+        context.arc(x - 15 * scale, y + 20 * scale, 10 * scale, 0, Math.PI * 2);
+        context.arc(x + 15 * scale, y + 20 * scale, 10 * scale, 0, Math.PI * 2);
+        context.fill();
+
+        // Wheel rims
+        context.fillStyle = "#7f8c8d";
+        context.beginPath();
+        context.arc(x - 15 * scale, y + 20 * scale, 5 * scale, 0, Math.PI * 2);
+        context.arc(x + 15 * scale, y + 20 * scale, 5 * scale, 0, Math.PI * 2);
+        context.fill();
+      },
+    },
+  },
+  desert: {
+    jeep: {
+      name: "JEEP",
+      price: 0,
+      draw: function (context, x, y, scale = 1) {
+        // Body - tan/khaki color
+        context.fillStyle = "#C4A35A";
+        context.fillRect(x - 20 * scale, y - 10 * scale, 40 * scale, 25 * scale);
+
+        // Hood (front)
+        context.fillStyle = "#A68B4B";
+        context.beginPath();
+        context.moveTo(x - 18 * scale, y - 10 * scale);
+        context.lineTo(x, y - 18 * scale);
+        context.lineTo(x + 18 * scale, y - 10 * scale);
+        context.closePath();
+        context.fill();
+
+        // Windshield frame
+        context.fillStyle = "#2c3e50";
+        context.fillRect(x - 15 * scale, y - 8 * scale, 30 * scale, 3 * scale);
+
+        // Roll cage
+        context.strokeStyle = "#2c3e50";
+        context.lineWidth = 3 * scale;
+        context.beginPath();
+        context.moveTo(x - 15 * scale, y - 5 * scale);
+        context.lineTo(x - 15 * scale, y + 5 * scale);
+        context.moveTo(x + 15 * scale, y - 5 * scale);
+        context.lineTo(x + 15 * scale, y + 5 * scale);
+        context.stroke();
+
+        // Wheels - large off-road tires
+        context.fillStyle = "#2c3e50";
+        context.beginPath();
+        context.arc(x - 12 * scale, y + 18 * scale, 8 * scale, 0, Math.PI * 2);
+        context.arc(x + 12 * scale, y + 18 * scale, 8 * scale, 0, Math.PI * 2);
+        context.fill();
+
+        // Wheel hubs
+        context.fillStyle = "#7f8c8d";
+        context.beginPath();
+        context.arc(x - 12 * scale, y + 18 * scale, 3 * scale, 0, Math.PI * 2);
+        context.arc(x + 12 * scale, y + 18 * scale, 3 * scale, 0, Math.PI * 2);
+        context.fill();
+      },
+    },
+    sandworm: {
+      name: "SANDWORM",
+      price: 200,
+      draw: function (context, x, y, scale = 1) {
+        // Segmented body - orange/tan colors (Shai-Hulud inspired)
+        const segments = 5;
+        const segmentSize = 12 * scale;
+
+        for (let i = 0; i < segments; i++) {
+          const segY = y + (i - 2) * segmentSize * 0.8;
+          const segWidth = segmentSize * (1 - Math.abs(i - 2) * 0.15);
+
+          // Segment body
+          context.fillStyle = i % 2 === 0 ? "#D4A35A" : "#C49350";
+          context.beginPath();
+          context.ellipse(x, segY, segWidth, segmentSize * 0.6, 0, 0, Math.PI * 2);
+          context.fill();
+
+          // Segment ridge
+          context.strokeStyle = "#A67B3D";
+          context.lineWidth = 2 * scale;
+          context.beginPath();
+          context.ellipse(x, segY, segWidth * 0.8, segmentSize * 0.4, 0, 0, Math.PI * 2);
+          context.stroke();
+        }
+
+        // Head (front)
+        context.fillStyle = "#E8C078";
+        context.beginPath();
+        context.arc(x, y - segmentSize * 2.5, segmentSize * 0.8, 0, Math.PI * 2);
+        context.fill();
+
+        // Mouth opening (three-part like in Dune)
+        context.fillStyle = "#8B0000";
+        context.beginPath();
+        context.moveTo(x, y - segmentSize * 3);
+        context.lineTo(x - 8 * scale, y - segmentSize * 2);
+        context.lineTo(x + 8 * scale, y - segmentSize * 2);
+        context.closePath();
+        context.fill();
+
+        // Teeth/crystalline teeth
+        context.fillStyle = "#FFE4B5";
+        for (let i = -2; i <= 2; i++) {
+          context.beginPath();
+          context.moveTo(x + i * 3 * scale, y - segmentSize * 2.8);
+          context.lineTo(x + i * 3 * scale - 2 * scale, y - segmentSize * 2.2);
+          context.lineTo(x + i * 3 * scale + 2 * scale, y - segmentSize * 2.2);
+          context.closePath();
+          context.fill();
+        }
+      },
+    },
+    ornithopter: {
+      name: "ORNITHOPTER",
+      price: 400,
+      draw: function (context, x, y, scale = 1) {
+        // Wing flutter animation
+        const wingFlutter = Math.sin(Date.now() / 100) * 5 * scale;
+
+        // Wings - dragonfly style
+        context.fillStyle = "rgba(200, 200, 255, 0.6)";
+        context.strokeStyle = "#666";
+        context.lineWidth = 1 * scale;
+
+        // Left wings
+        context.beginPath();
+        context.moveTo(x - 5 * scale, y - 5 * scale);
+        context.quadraticCurveTo(
+          x - 30 * scale, y - 15 * scale + wingFlutter,
+          x - 35 * scale, y + wingFlutter
+        );
+        context.quadraticCurveTo(
+          x - 30 * scale, y + 5 * scale + wingFlutter,
+          x - 5 * scale, y
+        );
+        context.closePath();
+        context.fill();
+        context.stroke();
+
+        // Lower left wing
+        context.beginPath();
+        context.moveTo(x - 5 * scale, y + 5 * scale);
+        context.quadraticCurveTo(
+          x - 28 * scale, y + 10 * scale - wingFlutter,
+          x - 32 * scale, y + 5 * scale - wingFlutter
+        );
+        context.quadraticCurveTo(
+          x - 25 * scale, y + 15 * scale - wingFlutter,
+          x - 5 * scale, y + 8 * scale
+        );
+        context.closePath();
+        context.fill();
+        context.stroke();
+
+        // Right wings
+        context.beginPath();
+        context.moveTo(x + 5 * scale, y - 5 * scale);
+        context.quadraticCurveTo(
+          x + 30 * scale, y - 15 * scale + wingFlutter,
+          x + 35 * scale, y + wingFlutter
+        );
+        context.quadraticCurveTo(
+          x + 30 * scale, y + 5 * scale + wingFlutter,
+          x + 5 * scale, y
+        );
+        context.closePath();
+        context.fill();
+        context.stroke();
+
+        // Lower right wing
+        context.beginPath();
+        context.moveTo(x + 5 * scale, y + 5 * scale);
+        context.quadraticCurveTo(
+          x + 28 * scale, y + 10 * scale - wingFlutter,
+          x + 32 * scale, y + 5 * scale - wingFlutter
+        );
+        context.quadraticCurveTo(
+          x + 25 * scale, y + 15 * scale - wingFlutter,
+          x + 5 * scale, y + 8 * scale
+        );
+        context.closePath();
+        context.fill();
+        context.stroke();
+
+        // Fuselage - sleek aircraft body
+        context.fillStyle = "#4A4A4A";
+        context.beginPath();
+        context.ellipse(x, y, 8 * scale, 20 * scale, 0, 0, Math.PI * 2);
+        context.fill();
+
+        // Cockpit
+        context.fillStyle = "#3498db";
+        context.beginPath();
+        context.ellipse(x, y - 12 * scale, 6 * scale, 8 * scale, 0, 0, Math.PI * 2);
+        context.fill();
+
+        // Tail
+        context.fillStyle = "#4A4A4A";
+        context.beginPath();
+        context.moveTo(x - 4 * scale, y + 18 * scale);
+        context.lineTo(x, y + 28 * scale);
+        context.lineTo(x + 4 * scale, y + 18 * scale);
+        context.closePath();
+        context.fill();
+
+        // Engine glow
+        context.fillStyle = "#FF6600";
+        context.beginPath();
+        context.arc(x, y + 20 * scale, 3 * scale, 0, Math.PI * 2);
+        context.fill();
+      },
+    },
+  },
+};
+
+// Legacy VEHICLES object for backward compatibility - references WORLD_VEHICLES
 const VEHICLES = {
-  motorcycle: {
-    name: "MOTORCYCLE",
-    draw: function (context, x, y, scale = 1) {
-      // Motorcycle body
-      context.fillStyle = "#3498db";
-      context.beginPath();
-      context.moveTo(x, y - 20 * scale);
-      context.lineTo(x - 15 * scale, y + 15 * scale);
-      context.lineTo(x + 15 * scale, y + 15 * scale);
-      context.closePath();
-      context.fill();
-
-      // Wheels
-      context.fillStyle = "#2c3e50";
-      context.beginPath();
-      context.arc(x - 8 * scale, y + 12 * scale, 5 * scale, 0, Math.PI * 2);
-      context.arc(x + 8 * scale, y + 12 * scale, 5 * scale, 0, Math.PI * 2);
-      context.fill();
-
-      // Rider
-      context.fillStyle = "#e67e22";
-      context.beginPath();
-      context.arc(x, y - 5 * scale, 8 * scale, 0, Math.PI * 2);
-      context.fill();
-    },
-  },
-  car: {
-    name: "SPORTS CAR",
-    draw: function (context, x, y, scale = 1) {
-      // Car body (sleek sports car shape)
-      context.fillStyle = "#e74c3c";
-      context.fillRect(x - 18 * scale, y - 10 * scale, 36 * scale, 30 * scale);
-
-      // Car hood (front triangle)
-      context.fillStyle = "#c0392b";
-      context.beginPath();
-      context.moveTo(x, y - 20 * scale);
-      context.lineTo(x - 18 * scale, y - 10 * scale);
-      context.lineTo(x + 18 * scale, y - 10 * scale);
-      context.closePath();
-      context.fill();
-
-      // Windshield
-      context.fillStyle = "#3498db";
-      context.fillRect(x - 12 * scale, y - 5 * scale, 24 * scale, 12 * scale);
-
-      // Wheels
-      context.fillStyle = "#2c3e50";
-      context.fillRect(x - 20 * scale, y + 15 * scale, 8 * scale, 8 * scale);
-      context.fillRect(x + 12 * scale, y + 15 * scale, 8 * scale, 8 * scale);
-
-      // Spoiler
-      context.fillStyle = "#2c3e50";
-      context.fillRect(x - 15 * scale, y + 18 * scale, 30 * scale, 3 * scale);
-    },
-  },
-  truck: {
-    name: "MONSTER TRUCK",
-    draw: function (context, x, y, scale = 1) {
-      // Truck bed (back)
-      context.fillStyle = "#f39c12";
-      context.fillRect(x - 20 * scale, y + 5 * scale, 40 * scale, 15 * scale);
-
-      // Truck cab (front)
-      context.fillStyle = "#e67e22";
-      context.fillRect(x - 18 * scale, y - 15 * scale, 36 * scale, 20 * scale);
-
-      // Cab roof
-      context.fillStyle = "#d35400";
-      context.fillRect(x - 15 * scale, y - 20 * scale, 30 * scale, 5 * scale);
-
-      // Windshield
-      context.fillStyle = "#3498db";
-      context.fillRect(x - 12 * scale, y - 12 * scale, 24 * scale, 8 * scale);
-
-      // Monster truck wheels (huge)
-      context.fillStyle = "#2c3e50";
-      context.beginPath();
-      context.arc(x - 15 * scale, y + 20 * scale, 10 * scale, 0, Math.PI * 2);
-      context.arc(x + 15 * scale, y + 20 * scale, 10 * scale, 0, Math.PI * 2);
-      context.fill();
-
-      // Wheel rims
-      context.fillStyle = "#7f8c8d";
-      context.beginPath();
-      context.arc(x - 15 * scale, y + 20 * scale, 5 * scale, 0, Math.PI * 2);
-      context.arc(x + 15 * scale, y + 20 * scale, 5 * scale, 0, Math.PI * 2);
-      context.fill();
-    },
-  },
+  motorcycle: WORLD_VEHICLES.highway.motorcycle,
+  car: WORLD_VEHICLES.highway.car,
+  truck: WORLD_VEHICLES.highway.truck,
+  jeep: WORLD_VEHICLES.desert.jeep,
+  sandworm: WORLD_VEHICLES.desert.sandworm,
+  ornithopter: WORLD_VEHICLES.desert.ornithopter,
 };
 
 // Load high score from localStorage
@@ -491,90 +869,187 @@ function saveTotalCoins(coins) {
   localStorage.setItem("motorcycleTotalCoins", coins.toString());
 }
 
-// Vehicle unlock prices
-const VEHICLE_PRICES = {
-  motorcycle: 0, // Free by default
-  car: 150,
-  truck: 300,
+
+// World-based vehicle modifications configuration
+const WORLD_VEHICLE_MODS = {
+  highway: {
+    motorcycle: [
+      {
+        id: "mod1",
+        name: "Shield Start",
+        price: 15,
+        description: "Start each life with a shield",
+        effect: "startWithShield",
+      },
+      {
+        id: "mod2",
+        name: "Heart Boost",
+        price: 30,
+        description: "Hearts spawn 50% more often",
+        effect: "heartSpawnBoost",
+      },
+      {
+        id: "mod3",
+        name: "Second Chance",
+        price: 60,
+        description: "20% chance to survive fatal hit",
+        effect: "survivalChance20",
+      },
+    ],
+    car: [
+      {
+        id: "mod1",
+        name: "Turbo Boost",
+        price: 40,
+        description: "50% faster boost speed",
+        effect: "boostSpeed25",
+      },
+      {
+        id: "mod2",
+        name: "Double Money",
+        price: 75,
+        description: "Coins are worth 2x",
+        effect: "coinValue2x",
+      },
+      {
+        id: "mod3",
+        name: "Score Master",
+        price: 150,
+        description: "Score multiplier 1.5x",
+        effect: "scoreMultiplier1_5x",
+      },
+    ],
+    truck: [
+      {
+        id: "mod1",
+        name: "Time Lord",
+        price: 75,
+        description: "Start with 5 hearts instead of 3",
+        effect: "maxHealth5",
+      },
+      {
+        id: "mod2",
+        name: "Reinforced Shield",
+        price: 150,
+        description: "Shields protect against 2 hits",
+        effect: "shieldDoubleHit",
+      },
+      {
+        id: "mod3",
+        name: "Tank Mode",
+        price: 300,
+        description: "35% chance to survive fatal hit",
+        effect: "survivalChance35",
+      },
+    ],
+  },
+  desert: {
+    jeep: [
+      {
+        id: "mod1",
+        name: "Desert Shield",
+        price: 20,
+        description: "Start with a protective sandstorm barrier",
+        effect: "startWithShield",
+      },
+      {
+        id: "mod2",
+        name: "Oasis Finder",
+        price: 35,
+        description: "Hearts spawn 50% more often",
+        effect: "heartSpawnBoost",
+      },
+      {
+        id: "mod3",
+        name: "Desert Survival",
+        price: 55,
+        description: "20% chance to survive fatal hit",
+        effect: "survivalChance20",
+      },
+    ],
+    sandworm: [
+      {
+        id: "mod1",
+        name: "Spice Boost",
+        price: 45,
+        description: "50% faster boost speed",
+        effect: "boostSpeed25",
+      },
+      {
+        id: "mod2",
+        name: "Spice Mining",
+        price: 80,
+        description: "Coins are worth 2x",
+        effect: "coinValue2x",
+      },
+      {
+        id: "mod3",
+        name: "Prescience",
+        price: 160,
+        description: "Score multiplier 1.5x",
+        effect: "scoreMultiplier1_5x",
+      },
+    ],
+    ornithopter: [
+      {
+        id: "mod1",
+        name: "Reinforced Hull",
+        price: 80,
+        description: "Start with 5 hearts instead of 3",
+        effect: "maxHealth5",
+      },
+      {
+        id: "mod2",
+        name: "Shield Generator",
+        price: 160,
+        description: "Shields protect against 2 hits",
+        effect: "shieldDoubleHit",
+      },
+      {
+        id: "mod3",
+        name: "Suspensor Field",
+        price: 320,
+        description: "35% chance to survive fatal hit",
+        effect: "survivalChance35",
+      },
+    ],
+  },
 };
 
-// Vehicle modifications configuration
+// Legacy VEHICLE_MODS object for backward compatibility
 const VEHICLE_MODS = {
-  motorcycle: [
-    {
-      id: "mod1",
-      name: "Shield Start",
-      price: 15,
-      description: "Start each life with a shield",
-      effect: "startWithShield",
-    },
-    {
-      id: "mod2",
-      name: "Heart Boost",
-      price: 30,
-      description: "Hearts spawn 50% more often",
-      effect: "heartSpawnBoost",
-    },
-    {
-      id: "mod3",
-      name: "Second Chance",
-      price: 60,
-      description: "20% chance to survive fatal hit",
-      effect: "survivalChance20",
-    },
-  ],
-  car: [
-    {
-      id: "mod1",
-      name: "Turbo Boost",
-      price: 40,
-      description: "50% faster boost speed",
-      effect: "boostSpeed25",
-    },
-    {
-      id: "mod2",
-      name: "Double Money",
-      price: 75,
-      description: "Coins are worth 2x",
-      effect: "coinValue2x",
-    },
-    {
-      id: "mod3",
-      name: "Score Master",
-      price: 150,
-      description: "Score multiplier 1.5x",
-      effect: "scoreMultiplier1_5x",
-    },
-  ],
-  truck: [
-    {
-      id: "mod1",
-      name: "Time Lord",
-      price: 75,
-      description: "Start with 5 hearts instead of 3",
-      effect: "maxHealth5",
-    },
-    {
-      id: "mod2",
-      name: "Reinforced Shield",
-      price: 150,
-      description: "Shields protect against 2 hits",
-      effect: "shieldDoubleHit",
-    },
-    {
-      id: "mod3",
-      name: "Tank Mode",
-      price: 300,
-      description: "35% chance to survive fatal hit",
-      effect: "survivalChance35",
-    },
-  ],
+  motorcycle: WORLD_VEHICLE_MODS.highway.motorcycle,
+  car: WORLD_VEHICLE_MODS.highway.car,
+  truck: WORLD_VEHICLE_MODS.highway.truck,
+  jeep: WORLD_VEHICLE_MODS.desert.jeep,
+  sandworm: WORLD_VEHICLE_MODS.desert.sandworm,
+  ornithopter: WORLD_VEHICLE_MODS.desert.ornithopter,
 };
 
-// Load unlocked vehicles from localStorage
+// Load unlocked vehicles from localStorage (world-aware format)
 function loadUnlockedVehicles() {
   const saved = localStorage.getItem("motorcycleUnlockedVehicles");
-  return saved ? JSON.parse(saved) : ["motorcycle"]; // Motorcycle is unlocked by default
+  if (saved) {
+    const parsed = JSON.parse(saved);
+    // Check if old format (array) and migrate to new format
+    if (Array.isArray(parsed)) {
+      const newFormat = {
+        highway: parsed, // Old vehicles belong to highway
+        desert: [],
+      };
+      localStorage.setItem("motorcycleUnlockedVehicles", JSON.stringify(newFormat));
+      return newFormat;
+    }
+    // Ensure all world keys exist
+    if (!parsed.highway) parsed.highway = ["motorcycle"];
+    if (!parsed.desert) parsed.desert = [];
+    return parsed;
+  }
+  // Default for new players
+  return {
+    highway: ["motorcycle"],
+    desert: [],
+  };
 }
 
 // Save unlocked vehicles to localStorage
@@ -585,29 +1060,68 @@ function saveUnlockedVehicles(unlockedVehicles) {
   );
 }
 
-// Check if a vehicle is unlocked
-function isVehicleUnlocked(vehicleType) {
-  return unlockedVehicles.includes(vehicleType);
+// Check if a vehicle is unlocked (world-aware)
+function isVehicleUnlocked(vehicleType, worldKey = null) {
+  // If no worldKey provided, determine from vehicle type
+  if (!worldKey) {
+    const vehicleWorldId = getVehicleWorld(vehicleType);
+    worldKey = getWorldKey(vehicleWorldId);
+  }
+
+  // First vehicle of each world is free when world is unlocked
+  const worldId = getWorldIdFromKey(worldKey);
+  const defaultVehicle = getWorldDefaultVehicle(worldId);
+  if (vehicleType === defaultVehicle && isWorldUnlocked(worldId)) {
+    // Ensure it's added to unlocked list
+    if (!unlockedVehicles[worldKey]?.includes(vehicleType)) {
+      if (!unlockedVehicles[worldKey]) unlockedVehicles[worldKey] = [];
+      unlockedVehicles[worldKey].push(vehicleType);
+      saveUnlockedVehicles(unlockedVehicles);
+    }
+    return true;
+  }
+
+  return unlockedVehicles[worldKey]?.includes(vehicleType) || false;
 }
 
-// Unlock a vehicle
+// Unlock a vehicle (world-aware)
 function unlockVehicle(vehicleType) {
-  if (!isVehicleUnlocked(vehicleType)) {
-    unlockedVehicles.push(vehicleType);
+  const vehicleWorldId = getVehicleWorld(vehicleType);
+  const worldKey = getWorldKey(vehicleWorldId);
+
+  if (!isVehicleUnlocked(vehicleType, worldKey)) {
+    if (!unlockedVehicles[worldKey]) {
+      unlockedVehicles[worldKey] = [];
+    }
+    unlockedVehicles[worldKey].push(vehicleType);
     saveUnlockedVehicles(unlockedVehicles);
   }
 }
 
-// Load unlocked mods for all vehicles from localStorage
+// Load unlocked mods for all vehicles from localStorage (world-aware format)
 function loadUnlockedMods() {
   const saved = localStorage.getItem("motorcycleUnlockedMods");
-  return saved
-    ? JSON.parse(saved)
-    : {
-        motorcycle: [],
-        car: [],
-        truck: [],
+  if (saved) {
+    const parsed = JSON.parse(saved);
+    // Check if old format (no world keys) and migrate
+    if (parsed.motorcycle !== undefined && !parsed.highway) {
+      const newFormat = {
+        highway: parsed, // Old mods belong to highway vehicles
+        desert: { jeep: [], sandworm: [], ornithopter: [] },
       };
+      localStorage.setItem("motorcycleUnlockedMods", JSON.stringify(newFormat));
+      return newFormat;
+    }
+    // Ensure all world keys exist
+    if (!parsed.highway) parsed.highway = { motorcycle: [], car: [], truck: [] };
+    if (!parsed.desert) parsed.desert = { jeep: [], sandworm: [], ornithopter: [] };
+    return parsed;
+  }
+  // Default for new players
+  return {
+    highway: { motorcycle: [], car: [], truck: [] },
+    desert: { jeep: [], sandworm: [], ornithopter: [] },
+  };
 }
 
 // Save unlocked mods to localStorage
@@ -615,25 +1129,35 @@ function saveUnlockedMods(unlockedMods) {
   localStorage.setItem("motorcycleUnlockedMods", JSON.stringify(unlockedMods));
 }
 
-// Check if a specific mod is unlocked for a vehicle
+// Check if a specific mod is unlocked for a vehicle (world-aware)
 function isModUnlocked(vehicleType, modId) {
-  return unlockedMods[vehicleType]?.includes(modId) || false;
+  const vehicleWorldId = getVehicleWorld(vehicleType);
+  const worldKey = getWorldKey(vehicleWorldId);
+  return unlockedMods[worldKey]?.[vehicleType]?.includes(modId) || false;
 }
 
-// Unlock a mod for a vehicle
+// Unlock a mod for a vehicle (world-aware)
 function unlockMod(vehicleType, modId) {
+  const vehicleWorldId = getVehicleWorld(vehicleType);
+  const worldKey = getWorldKey(vehicleWorldId);
+
   if (!isModUnlocked(vehicleType, modId)) {
-    if (!unlockedMods[vehicleType]) {
-      unlockedMods[vehicleType] = [];
+    if (!unlockedMods[worldKey]) {
+      unlockedMods[worldKey] = {};
     }
-    unlockedMods[vehicleType].push(modId);
+    if (!unlockedMods[worldKey][vehicleType]) {
+      unlockedMods[worldKey][vehicleType] = [];
+    }
+    unlockedMods[worldKey][vehicleType].push(modId);
     saveUnlockedMods(unlockedMods);
   }
 }
 
-// Get all unlocked mods for a vehicle
+// Get all unlocked mods for a vehicle (world-aware)
 function getVehicleMods(vehicleType) {
-  return unlockedMods[vehicleType] || [];
+  const vehicleWorldId = getVehicleWorld(vehicleType);
+  const worldKey = getWorldKey(vehicleWorldId);
+  return unlockedMods[worldKey]?.[vehicleType] || [];
 }
 
 // Check if current vehicle has a specific mod effect
@@ -755,19 +1279,21 @@ debugResetCoinsBtn.addEventListener("click", () => {
 
 // Debug: Lock all vehicles and reset mods
 debugResetVehiclesBtn.addEventListener("click", () => {
-  // Lock all vehicles except motorcycle
+  // Lock all vehicles except first vehicle of each world (world-aware format)
   localStorage.setItem(
     "motorcycleUnlockedVehicles",
-    JSON.stringify(["motorcycle"])
+    JSON.stringify({
+      highway: ["motorcycle"],
+      desert: [],
+    })
   );
 
-  // Reset all vehicle mods to locked
+  // Reset all vehicle mods to locked (world-aware format)
   localStorage.setItem(
     "motorcycleUnlockedMods",
     JSON.stringify({
-      motorcycle: [],
-      car: [],
-      truck: [],
+      highway: { motorcycle: [], car: [], truck: [] },
+      desert: { jeep: [], sandworm: [], ornithopter: [] },
     })
   );
 
@@ -1526,7 +2052,7 @@ function render() {
 }
 
 function drawRoad() {
-  // Draw alternating road tiles
+  // Draw alternating road tiles (consistent across all worlds)
   const offset = game.scrollOffset % TILE_HEIGHT;
 
   for (let row = 0; row <= TOTAL_TILES; row++) {
@@ -1561,28 +2087,130 @@ function drawLaneDividers() {
   ctx.setLineDash([]);
 }
 
+// Obstacle style drawing functions
+const OBSTACLE_STYLES = {
+  crate: function (ctx, x, y, laneWidth) {
+    // Draw obstacle as a crate/barrel
+    ctx.fillStyle = "#e74c3c";
+    ctx.fillRect(
+      x - laneWidth * 0.3,
+      y - TILE_HEIGHT * 0.3,
+      laneWidth * 0.6,
+      TILE_HEIGHT * 0.6
+    );
+
+    // Add border
+    ctx.strokeStyle = "#c0392b";
+    ctx.lineWidth = 3;
+    ctx.strokeRect(
+      x - laneWidth * 0.3,
+      y - TILE_HEIGHT * 0.3,
+      laneWidth * 0.6,
+      TILE_HEIGHT * 0.6
+    );
+  },
+
+  cactus: function (ctx, x, y, laneWidth) {
+    // Green cactus with arms
+    const cactusWidth = laneWidth * 0.12;
+    const cactusHeight = TILE_HEIGHT * 0.7;
+
+    // Main body
+    ctx.fillStyle = "#228B22"; // Forest green
+    ctx.beginPath();
+    ctx.roundRect(
+      x - cactusWidth / 2,
+      y - cactusHeight / 2,
+      cactusWidth,
+      cactusHeight,
+      5
+    );
+    ctx.fill();
+
+    // Left arm (upper)
+    ctx.beginPath();
+    ctx.roundRect(
+      x - cactusWidth * 2,
+      y - cactusHeight * 0.2,
+      cactusWidth,
+      cactusHeight * 0.35,
+      3
+    );
+    ctx.fill();
+    // Left arm connector
+    ctx.fillRect(
+      x - cactusWidth * 1.5,
+      y - cactusHeight * 0.1,
+      cactusWidth,
+      cactusWidth * 0.8
+    );
+
+    // Right arm (lower)
+    ctx.beginPath();
+    ctx.roundRect(
+      x + cactusWidth * 1,
+      y,
+      cactusWidth,
+      cactusHeight * 0.3,
+      3
+    );
+    ctx.fill();
+    // Right arm connector
+    ctx.fillRect(
+      x + cactusWidth * 0.5,
+      y + cactusHeight * 0.05,
+      cactusWidth,
+      cactusWidth * 0.8
+    );
+
+    // Darker outline/details
+    ctx.strokeStyle = "#006400";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.roundRect(
+      x - cactusWidth / 2,
+      y - cactusHeight / 2,
+      cactusWidth,
+      cactusHeight,
+      5
+    );
+    ctx.stroke();
+
+    // Add some spines (small dots)
+    ctx.fillStyle = "#90EE90";
+    for (let i = 0; i < 5; i++) {
+      ctx.beginPath();
+      ctx.arc(
+        x - cactusWidth * 0.15,
+        y - cactusHeight * 0.3 + i * (cactusHeight * 0.15),
+        1.5,
+        0,
+        Math.PI * 2
+      );
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(
+        x + cactusWidth * 0.15,
+        y - cactusHeight * 0.25 + i * (cactusHeight * 0.15),
+        1.5,
+        0,
+        Math.PI * 2
+      );
+      ctx.fill();
+    }
+  },
+};
+
 function drawObstacle(obstacle) {
   const x = obstacle.lane * game.laneWidth + game.laneWidth / 2;
   const y = obstacle.y + TILE_HEIGHT / 2;
 
-  // Draw obstacle as a crate/barrel
-  ctx.fillStyle = "#e74c3c";
-  ctx.fillRect(
-    x - game.laneWidth * 0.3,
-    y - TILE_HEIGHT * 0.3,
-    game.laneWidth * 0.6,
-    TILE_HEIGHT * 0.6
-  );
+  // Get obstacle style from current world theme
+  const world = WORLDS[currentWorld];
+  const obstacleStyle = world?.theme?.obstacleStyle || "crate";
+  const drawFunction = OBSTACLE_STYLES[obstacleStyle] || OBSTACLE_STYLES.crate;
 
-  // Add border
-  ctx.strokeStyle = "#c0392b";
-  ctx.lineWidth = 3;
-  ctx.strokeRect(
-    x - game.laneWidth * 0.3,
-    y - TILE_HEIGHT * 0.3,
-    game.laneWidth * 0.6,
-    TILE_HEIGHT * 0.6
-  );
+  drawFunction(ctx, x, y, game.laneWidth);
 }
 
 function drawMotorcycle() {
@@ -1972,70 +2600,24 @@ function startGame() {
     laneWidth: canvas.width / INITIAL_LANES,
     vehicleType: selectedVehicle,
     milestonesReached: {},
+    // Achievement tracking
+    damageTaken: false,
+    coinsThisGame: 0,
+    consecutiveBombDeaths: 0,
+    lastDeathWasBomb: false,
   };
 
   healthDisplay.textContent = game.health;
   scoreDisplay.textContent = game.score;
+
+  // Load world-appropriate music
+  loadWorldMusic(currentWorld);
 
   // Start music if not muted
   if (!game.isMuted) {
     bgMusic.currentTime = 0;
     bgMusic.play();
   }
-}
-
-// Update vehicle UI based on unlock state
-function updateVehicleUI() {
-  vehicleOptions.forEach((option) => {
-    const vehicleType = option.dataset.vehicle;
-    const unlocked = isVehicleUnlocked(vehicleType);
-    const lockOverlay = option.querySelector(".lock-overlay");
-    const unlockBtn = option.querySelector(".vehicle-unlock-btn");
-    const modifyBtn = option.querySelector(".vehicle-modify-btn");
-    const previewContainer = option.querySelector(".vehicle-preview-container");
-
-    if (unlocked) {
-      // Vehicle is unlocked
-      if (lockOverlay) {
-        lockOverlay.style.display = "none";
-      }
-      if (unlockBtn) {
-        unlockBtn.style.display = "none";
-      }
-      if (modifyBtn) {
-        modifyBtn.style.display = "flex";
-      }
-      if (previewContainer) previewContainer.classList.remove("locked");
-      option.style.pointerEvents = "auto";
-      option.style.opacity = "1";
-    } else {
-      // Vehicle is locked
-      if (lockOverlay) {
-        lockOverlay.style.display = "flex";
-      }
-      if (unlockBtn) {
-        unlockBtn.style.display = "flex";
-      }
-      if (modifyBtn) {
-        modifyBtn.style.display = "none";
-      }
-      if (previewContainer) previewContainer.classList.add("locked");
-      option.style.opacity = "0.6";
-
-      // Update unlock button disabled state based on coins
-      const price = VEHICLE_PRICES[vehicleType];
-      if (unlockBtn) {
-        if (totalCoins >= price) {
-          unlockBtn.disabled = false;
-        } else {
-          unlockBtn.disabled = true;
-        }
-      }
-    }
-  });
-
-  // Update coin display on menu
-  updateCoinsDisplay();
 }
 
 // Update mod UI based on unlock state
@@ -2170,55 +2752,6 @@ function setupModUnlockButtons() {
   });
 }
 
-// Handle unlock button clicks
-function setupUnlockButtons() {
-  const unlockButtons = document.querySelectorAll(".vehicle-unlock-btn");
-  unlockButtons.forEach((btn) => {
-    btn.addEventListener("click", (e) => {
-      e.stopPropagation(); // Prevent vehicle selection
-      const option = btn.closest(".vehicle-option");
-      const vehicleType = option.dataset.vehicle;
-      const price = VEHICLE_PRICES[vehicleType];
-
-      // Check if player has enough coins
-      if (totalCoins >= price) {
-        // Deduct coins
-        totalCoins -= price;
-        saveTotalCoins(totalCoins);
-
-        // Unlock vehicle
-        unlockVehicle(vehicleType);
-
-        // Update UI
-        updateVehicleUI();
-
-        // Play coin sound (but reverse it or use a different sound for purchase)
-        if (!game.isMuted) {
-          coinSound.currentTime = 0;
-          coinSound
-            .play()
-            .catch((e) => console.log("Purchase sound error:", e));
-        }
-      }
-    });
-  });
-}
-
-// Handle modify button clicks
-function setupModifyButtons() {
-  const modifyButtons = document.querySelectorAll(".vehicle-modify-btn");
-  modifyButtons.forEach((btn) => {
-    btn.addEventListener("click", (e) => {
-      e.stopPropagation(); // Prevent vehicle selection
-      const option = btn.closest(".vehicle-option");
-      const vehicleType = option.dataset.vehicle;
-
-      // Open modification screen for this vehicle
-      openModScreen(vehicleType);
-    });
-  });
-}
-
 // Open modification screen for a vehicle
 function openModScreen(vehicleType) {
   currentModVehicle = vehicleType;
@@ -2266,29 +2799,154 @@ function drawModVehiclePreview(vehicleType) {
   vehicle.draw(ctx, centerX, centerY, 2);
 }
 
-// Vehicle selection
-const vehicleOptions = document.querySelectorAll(".vehicle-option");
-vehicleOptions.forEach((option) => {
-  option.addEventListener("click", () => {
-    const vehicleType = option.dataset.vehicle;
+// Vehicle carousel reference
+const vehicleCarousel = document.getElementById("vehicleCarousel");
+const currentWorldIndicator = document.getElementById("currentWorldIndicator");
 
-    // Only allow selection if vehicle is unlocked
-    if (isVehicleUnlocked(vehicleType)) {
-      vehicleOptions.forEach((opt) => opt.classList.remove("selected"));
-      option.classList.add("selected");
-      selectedVehicle = vehicleType;
+// Build vehicle carousel for current world
+function buildVehicleCarousel() {
+  if (!vehicleCarousel) return;
+
+  vehicleCarousel.innerHTML = "";
+
+  const world = WORLDS[currentWorld];
+  const worldKey = world.key;
+  const worldVehicles = WORLD_VEHICLES[worldKey] || {};
+  const vehicleIds = world.vehicles || [];
+
+  // Update world indicator
+  if (currentWorldIndicator) {
+    const iconSpan = currentWorldIndicator.querySelector(".world-indicator-icon");
+    const nameSpan = currentWorldIndicator.querySelector(".world-indicator-name");
+    if (iconSpan) iconSpan.textContent = world.icon;
+    if (nameSpan) nameSpan.textContent = world.name;
+  }
+
+  // Create vehicle cards
+  vehicleIds.forEach((vehicleId) => {
+    const vehicle = worldVehicles[vehicleId];
+    if (!vehicle) return;
+
+    const unlocked = isVehicleUnlocked(vehicleId, worldKey);
+    const price = vehicle.price || 0;
+
+    const card = document.createElement("div");
+    card.className = `vehicle-option ${selectedVehicle === vehicleId ? "selected" : ""}`;
+    card.dataset.vehicle = vehicleId;
+    card.dataset.world = worldKey;
+
+    card.innerHTML = `
+      <div class="vehicle-preview-container ${unlocked ? "" : "locked"}">
+        <canvas class="vehicle-preview" width="150" height="150"></canvas>
+        ${!unlocked ? `
+          <div class="lock-overlay">
+            <svg class="lock-icon" viewBox="0 0 24 24" fill="white">
+              <path d="M12 2C9.243 2 7 4.243 7 7v3H6c-1.103 0-2 .897-2 2v8c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2v-8c0-1.103-.897-2-2-2h-1V7c0-2.757-2.243-5-5-5zm6 10 .002 8H6v-8h12zm-9-2V7c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9z"/>
+            </svg>
+          </div>
+        ` : ""}
+      </div>
+      <p>${vehicle.name}</p>
+      ${!unlocked && price > 0 ? `
+        <button class="vehicle-unlock-btn" ${totalCoins >= price ? "" : "disabled"}>
+          <span class="coin-icon">💰</span>
+          <span class="unlock-price">${price}</span>
+        </button>
+      ` : ""}
+      ${unlocked ? `<button class="vehicle-modify-btn">MODIFY</button>` : ""}
+    `;
+
+    vehicleCarousel.appendChild(card);
+
+    // Draw vehicle preview
+    const canvas = card.querySelector(".vehicle-preview");
+    if (canvas && vehicle.draw) {
+      const ctx = canvas.getContext("2d");
+      ctx.clearRect(0, 0, 150, 150);
+      vehicle.draw(ctx, 75, 75, 2);
     }
   });
-});
 
-// Select first unlocked vehicle by default
-const firstUnlocked = Array.from(vehicleOptions).find((option) =>
-  isVehicleUnlocked(option.dataset.vehicle)
-);
-if (firstUnlocked) {
-  firstUnlocked.classList.add("selected");
-  selectedVehicle = firstUnlocked.dataset.vehicle;
+  // Setup event listeners for the new cards
+  setupVehicleCarouselEvents();
+
+  // Auto-select first unlocked vehicle if current selection is invalid
+  const currentWorldVehicles = world.vehicles || [];
+  if (!currentWorldVehicles.includes(selectedVehicle) || !isVehicleUnlocked(selectedVehicle)) {
+    const firstUnlocked = currentWorldVehicles.find((v) => isVehicleUnlocked(v, worldKey));
+    if (firstUnlocked) {
+      selectedVehicle = firstUnlocked;
+      const selectedCard = vehicleCarousel.querySelector(`[data-vehicle="${firstUnlocked}"]`);
+      if (selectedCard) selectedCard.classList.add("selected");
+    }
+  }
 }
+
+// Setup event listeners for vehicle carousel
+function setupVehicleCarouselEvents() {
+  const vehicleOptions = vehicleCarousel.querySelectorAll(".vehicle-option");
+
+  vehicleOptions.forEach((option) => {
+    // Click to select vehicle
+    option.addEventListener("click", (e) => {
+      // Don't select if clicking on buttons
+      if (e.target.closest(".vehicle-unlock-btn") || e.target.closest(".vehicle-modify-btn")) {
+        return;
+      }
+
+      const vehicleType = option.dataset.vehicle;
+
+      // Only allow selection if vehicle is unlocked
+      if (isVehicleUnlocked(vehicleType)) {
+        vehicleOptions.forEach((opt) => opt.classList.remove("selected"));
+        option.classList.add("selected");
+        selectedVehicle = vehicleType;
+      }
+    });
+
+    // Unlock button click
+    const unlockBtn = option.querySelector(".vehicle-unlock-btn");
+    if (unlockBtn) {
+      unlockBtn.addEventListener("click", () => {
+        const vehicleType = option.dataset.vehicle;
+        const worldVehicles = getWorldVehicles(currentWorld);
+        const vehicle = worldVehicles[vehicleType];
+        const price = vehicle?.price || 0;
+
+        if (totalCoins >= price && !isVehicleUnlocked(vehicleType)) {
+          totalCoins -= price;
+          saveTotalCoins(totalCoins);
+          unlockVehicle(vehicleType);
+          updateCoinsDisplay();
+          buildVehicleCarousel(); // Rebuild to show updated state
+
+          // Auto-select the newly unlocked vehicle
+          selectedVehicle = vehicleType;
+          const selectedCard = vehicleCarousel.querySelector(`[data-vehicle="${vehicleType}"]`);
+          if (selectedCard) {
+            vehicleCarousel.querySelectorAll(".vehicle-option").forEach((opt) => opt.classList.remove("selected"));
+            selectedCard.classList.add("selected");
+          }
+        }
+      });
+    }
+
+    // Modify button click
+    const modifyBtn = option.querySelector(".vehicle-modify-btn");
+    if (modifyBtn) {
+      modifyBtn.addEventListener("click", () => {
+        const vehicleType = option.dataset.vehicle;
+        openModScreen(vehicleType);
+      });
+    }
+  });
+}
+
+// Initial build of vehicle carousel
+buildVehicleCarousel();
+
+// Set initial website background based on current world
+updateWorldBackground();
 
 // Start game button
 startGameBtn.addEventListener("click", startGame);
@@ -2395,9 +3053,6 @@ function populateAchievementsScreen() {
     lockedAchievementsList.innerHTML =
       '<div class="achievements-empty">All achievements unlocked! 🎉</div>';
   }
-
-  // Update coins display
-  achievementsCoinsDisplay.textContent = totalCoins;
 }
 
 // Things To Know overlay
@@ -2405,7 +3060,7 @@ thingsToKnowBtn.addEventListener("click", () => {
   thingsToKnowOverlay.classList.remove("hidden");
 });
 
-closeThingsToKnowBtn.addEventListener("click", (e) => {
+closeThingsToKnowBtn.addEventListener("click", () => {
   thingsToKnowOverlay.classList.add("hidden");
 });
 
@@ -2419,7 +3074,7 @@ thingsToKnowOverlay.addEventListener("click", (e) => {
 // Open achievements screen
 achievementsBtn.addEventListener("click", () => {
   menuScreen.classList.add("hidden");
-  menuCoinDisplay.style.display = "none";
+  menuCoinsDisplay.style.display = "none";
   achievementsBtn.style.display = "none";
   achievementsScreen.classList.remove("hidden");
   populateAchievementsScreen();
@@ -2429,7 +3084,7 @@ achievementsBtn.addEventListener("click", () => {
 backToMenuFromAchievements.addEventListener("click", () => {
   achievementsScreen.classList.add("hidden");
   menuScreen.classList.remove("hidden");
-  menuCoinDisplay.style.display = "flex";
+  menuCoinsDisplay.style.display = "flex";
   achievementsBtn.style.display = "flex";
 });
 
@@ -2467,12 +3122,20 @@ function updateWorldMapUI() {
   if (world) {
     selectedWorldName.textContent = world.name;
 
+    // Check if world has vehicles implemented
+    const hasVehicles = world.vehicles && world.vehicles.length > 0;
+
     // Show unlock requirement for locked worlds
     if (!isWorldUnlocked(selectedWorld)) {
       const prevWorldName = WORLDS[selectedWorld - 1]?.name || "previous world";
       selectedWorldDescription.textContent = `🔒 LOCKED - Score ${WORLD_UNLOCK_SCORE.toLocaleString()} in ${prevWorldName} to unlock!`;
       selectWorldBtn.disabled = true;
       selectWorldBtn.textContent = "LOCKED";
+    } else if (!hasVehicles) {
+      // World is unlocked but not yet implemented
+      selectedWorldDescription.textContent = `🚧 COMING SOON - This world is not yet available!`;
+      selectWorldBtn.disabled = true;
+      selectWorldBtn.textContent = "COMING SOON";
     } else {
       selectedWorldDescription.textContent = world.description;
       // Show high score for this world if it exists
@@ -2511,7 +3174,26 @@ function closeWorldMap() {
 function confirmWorldSelection() {
   if (!isWorldUnlocked(selectedWorld)) return;
 
+  // Check if world has vehicles implemented
+  const world = WORLDS[selectedWorld];
+  if (!world.vehicles || world.vehicles.length === 0) return;
+
   currentWorld = selectedWorld;
+
+  // Auto-select first unlocked vehicle of this world
+  const worldKey = world.key;
+  const worldVehicles = world.vehicles || [];
+  const firstUnlocked = worldVehicles.find((v) => isVehicleUnlocked(v, worldKey));
+  if (firstUnlocked) {
+    selectedVehicle = firstUnlocked;
+  }
+
+  // Rebuild carousel with new world's vehicles
+  buildVehicleCarousel();
+
+  // Update website background for the new world
+  updateWorldBackground();
+
   closeWorldMap();
 }
 
@@ -2546,33 +3228,8 @@ selectWorldBtn.addEventListener("click", () => {
 
 // ==================== END WORLD MAP SCREEN ====================
 
-// Draw vehicle previews in menu
-function drawVehiclePreviews() {
-  vehicleOptions.forEach((option) => {
-    const previewCanvas = option.querySelector(".vehicle-preview");
-    const previewCtx = previewCanvas.getContext("2d");
-    const vehicleType = option.dataset.vehicle;
-    const vehicle = VEHICLES[vehicleType];
-
-    // Clear canvas
-    previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
-
-    // Draw vehicle in center
-    vehicle.draw(
-      previewCtx,
-      previewCanvas.width / 2,
-      previewCanvas.height / 2,
-      1.5
-    );
-  });
-}
-
 // Initialize menu
-drawVehiclePreviews();
-setupUnlockButtons();
-setupModifyButtons();
 setupModUnlockButtons();
-updateVehicleUI();
 
 // Initialize coins display
 updateCoinsDisplay();
