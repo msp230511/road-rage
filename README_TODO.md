@@ -123,26 +123,26 @@ The game is in a fully playable state with all core mechanics, powerups, difficu
 
 #### Vehicle-Specific Mod Themes
 
-**Motorcycle (Beginner-Friendly/Balanced)**
+**Motorcycle (Beginner-Friendly/Balanced)** ✅
 
 - Theme: Defense and survival for learning the game
-- Mod 1 (25 coins): Start with shield
-- Mod 2 (40 coins): Hearts spawn 25% more frequently
-- Mod 3 (60 coins): 20% chance to survive critical hit
+- Mod 1 (25 coins): **Shield Start** - Start each life with a shield ✅
+- Mod 2 (40 coins): **Heart Boost** - Hearts spawn 50% more frequently ✅
+- Mod 3 (60 coins): **Second Chance** - 20% chance to survive fatal hit ✅
 
-**Sports Car (Speed/Risk-Reward)**
+**Sports Car (Speed/Risk-Reward)** ✅
 
 - Theme: Speed and earning potential
-- Mod 1 (30 coins): 25% faster boost speed
-- Mod 2 (50 coins): Coins worth 2x (high risk → high reward)
-- Mod 3 (75 coins): Score multiplier 1.5x
+- Mod 1 (30 coins): **Turbo Boost** - 50% faster boost speed ✅
+- Mod 2 (50 coins): **Double Money** - Coins worth 2x ✅
+- Mod 3 (75 coins): **Score Master** - Score multiplier 1.5x ✅
 
-**Monster Truck (Tank/Durability)**
+**Monster Truck (Tank/Durability)** ✅
 
 - Theme: Maximum survivability and durability
-- Mod 1 (40 coins): +1 max health (start with 4 hearts)
-- Mod 2 (65 coins): Shields protect against 2 hits
-- Mod 3 (100 coins): 35% chance to survive any fatal hit
+- Mod 1 (40 coins): **Time Lord** - Start with 5 hearts instead of 3 ✅
+- Mod 2 (65 coins): **Reinforced Shield** - Shields protect against 2 hits ✅
+- Mod 3 (100 coins): **Tank Mode** - 35% chance to survive fatal hit ✅
 
 #### Additional Mod Ideas (Future)
 
