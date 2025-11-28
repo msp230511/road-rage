@@ -225,6 +225,70 @@
           </button>
         </div>
       </div>
+      <!-- Game Elements Legend -->
+      <div class="game-legend">
+        <div class="legend-header">
+          <h3 class="legend-title">GAME ELEMENTS</h3>
+          <button class="legend-toggle" id="legendToggle">
+            <span class="chevron">▼</span>
+          </button>
+        </div>
+        <div class="legend-content" id="legendContent">
+          <div class="legend-item">
+            <canvas class="legend-canvas" width="40" height="40" id="legendObstacle"></canvas>
+            <div class="legend-text">
+              <span class="legend-name">OBSTACLE</span>
+              <span class="legend-effect">-1 Health</span>
+            </div>
+          </div>
+          <div class="legend-item">
+            <canvas class="legend-canvas" width="40" height="40" id="legendHeart"></canvas>
+            <div class="legend-text">
+              <span class="legend-name">HEART</span>
+              <span class="legend-effect">+1 Health</span>
+            </div>
+          </div>
+          <div class="legend-item">
+            <canvas class="legend-canvas" width="40" height="40" id="legendCoin"></canvas>
+            <div class="legend-text">
+              <span class="legend-name">COIN</span>
+              <span class="legend-effect">+1 Coin</span>
+            </div>
+          </div>
+          <div class="legend-item">
+            <canvas class="legend-canvas" width="40" height="40" id="legendShield"></canvas>
+            <div class="legend-text">
+              <span class="legend-name">SHIELD</span>
+              <span class="legend-effect">Protects Once</span>
+            </div>
+          </div>
+          <div class="legend-item">
+            <canvas class="legend-canvas" width="40" height="40" id="legendBomb"></canvas>
+            <div class="legend-text">
+              <span class="legend-name">BOMB</span>
+              <span class="legend-effect">Instant Death</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Controls Guide -->
+      <div class="controls-guide">
+        <h3 class="controls-title">CONTROLS</h3>
+        <div class="controls-grid">
+          <div class="control-item">
+            <div class="control-key">←</div>
+            <div class="control-label">Move Left</div>
+          </div>
+          <div class="control-item">
+            <div class="control-boost-label">BOOST</div>
+            <div class="control-key">↑</div>
+          </div>
+          <div class="control-item">
+            <div class="control-key">→</div>
+            <div class="control-label">Move Right</div>
+          </div>
+        </div>
+      </div>
       <div class="banana-cheerer">
         <img src="media/images/banana-cheerer.gif" alt="Cheering Banana" />
       </div>
@@ -439,7 +503,7 @@
     </audio>
     <audio id="heartPickupSound">
       <source
-        src="media/sounds/sound-effects/base-effects/heart-pickup.mp3"
+        src="media/sounds/sound-effects/base-effects/mgs-health.mp3"
         type="audio/mpeg"
       />
     </audio>
