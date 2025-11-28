@@ -541,7 +541,7 @@ const VEHICLE_MODS = {
     {
       id: "mod3",
       name: "Score Master",
-      price: 100,
+      price: 150,
       description: "Score multiplier 1.5x",
       effect: "scoreMultiplier1_5x",
     },
@@ -550,21 +550,21 @@ const VEHICLE_MODS = {
     {
       id: "mod1",
       name: "Time Lord",
-      price: 50,
+      price: 75,
       description: "Start with 5 hearts instead of 3",
       effect: "maxHealth5",
     },
     {
       id: "mod2",
       name: "Reinforced Shield",
-      price: 95,
+      price: 150,
       description: "Shields protect against 2 hits",
       effect: "shieldDoubleHit",
     },
     {
       id: "mod3",
       name: "Tank Mode",
-      price: 150,
+      price: 300,
       description: "35% chance to survive fatal hit",
       effect: "survivalChance35",
     },
